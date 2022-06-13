@@ -1,0 +1,91 @@
+import 'package:flutter/material.dart';
+import 'package:masoukharid/Classes/Text&TextStyle/bottom_sheet_labeltext.dart';
+import 'package:masoukharid/Classes/statistics_bsh_content_widget.dart';
+import 'package:masoukharid/Methods/bottom_sheet_boxdecoration.dart';
+import 'package:masoukharid/Screens/Employees/employe_list.dart';
+import 'package:masoukharid/Constants/colors.dart';
+
+class EmployeesSettingsBSH extends StatelessWidget {
+  const EmployeesSettingsBSH({Key? key}) : super(key: key);
+
+  final String employeeImageAsset = 'images/Icons/EmployeesIcon.png';
+  final String historyIconImageAsset = 'images/SettingsIcons/history.png';
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: kBottomSheetBackgroundColor,
+      child: Container(
+        height: 270.0,
+        decoration: bottomSheetBoxDecoration(),
+        child: Container(
+          margin: const EdgeInsets.symmetric(
+            horizontal: 15.0,
+            vertical: 15.0,
+          ),
+          child: Center(
+            child: Column(
+              children: [
+                //Title
+                SizedBox(
+                  height: 60,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      BottomSheetLabelText(
+                        text: 'تنظیمات کارمندان',
+                        fontSize: 22,
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close_rounded),
+                        iconSize: 35,
+                        color: kBottomSheetTextColor,
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Center(
+                  child: SizedBox(
+                    height: 170,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 30),
+                      child: Center(
+                        child: Column(
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.pushNamed(context, EmployeeList.id);
+                              },
+                              child: StatisticsBSHContent(
+                                image: employeeImageAsset,
+                                text: 'لیست کارمندان',
+                                onTap: () {
+                                  Navigator.pushNamed(context, EmployeeList.id);
+                                },
+                              ),
+                            ),
+                            const Divider(thickness: 1),
+                            StatisticsBSHContent(
+                              image: historyIconImageAsset,
+                              text: 'تاریخچه',
+                              onTap: () {},
+                            ),
+                            const Divider(thickness: 1),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

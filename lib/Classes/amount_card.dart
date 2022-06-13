@@ -1,0 +1,88 @@
+import 'package:flutter/material.dart';
+import 'package:masoukharid/Constants/colors.dart';
+import 'package:masoukharid/Constants/constants.dart';
+
+class AmountWidget extends StatelessWidget {
+  AmountWidget({
+    Key? key,
+    required this.mainText,
+    required this.secondaryText,
+    required this.onChanged,
+    this.controller,
+    this.suffixIcon,
+    this.enabled,
+  }) : super(key: key);
+
+  final String mainText;
+  final String secondaryText;
+  final Widget? suffixIcon;
+  final TextEditingController? controller;
+  final void Function(String)? onChanged;
+  bool? enabled = true;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Row(
+          children: [
+            Text(
+              mainText,
+              style: const TextStyle(
+                fontFamily: 'Dana',
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF4B4B4B),
+              ),
+            ),
+            Text(
+              secondaryText,
+              style: const TextStyle(
+                fontFamily: 'Dana',
+                fontSize: 10,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFFE4E4E4),
+              ),
+            ),
+          ],
+        ),
+        SizedBox(
+          height: 45,
+          width: 100,
+          child: TextField(
+            onChanged: onChanged,
+            enabled: enabled,
+            controller: controller,
+            keyboardType: TextInputType.number,
+            textAlignVertical: TextAlignVertical.center,
+            textAlign: TextAlign.center,
+            decoration: InputDecoration(
+              contentPadding: kTextFieldPadding,
+              filled: true,
+              fillColor: Colors.white,
+              border: const OutlineInputBorder(
+                borderSide: BorderSide(width: 5.0),
+                borderRadius: BorderRadius.all(
+                  Radius.circular(10.0),
+                ),
+              ),
+              enabledBorder: const OutlineInputBorder(
+                borderSide: BorderSide(color: Color(0xFF707070), width: 1.5),
+                borderRadius: BorderRadius.all(Radius.circular(10.0)),
+              ),
+              focusedBorder: const OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: kButtonOrangeColor,
+                  width: 2.0,
+                ),
+                borderRadius: BorderRadius.all(Radius.circular(10.0)),
+              ),
+              suffixIcon: suffixIcon,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}

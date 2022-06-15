@@ -1,10 +1,10 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:masoukharid/Classes/Cards/turnover_card.dart';
 import 'package:masoukharid/Constants/colors.dart';
-import 'package:masoukharid/Services/storage_class.dart';
 
 class TurnOverScreen extends StatefulWidget {
   const TurnOverScreen({Key? key}) : super(key: key);
@@ -22,9 +22,11 @@ class _TurnOverScreenState extends State<TurnOverScreen> {
   int totalPendingWithdrawalsAmount = 0;
   String? companyName;
   String? imagePath;
+  final storage = const FlutterSecureStorage();
 
   Future getMarketInfo() async {
-    Map<String, String> headers = {'token': Storage.token};
+    String? value = await storage.read(key: "token");
+    Map<String, String> headers = {'token': value!};
     try {
       var response = await http.get(
         Uri.parse('https://testapi.carbon-family.com/api/market/profile'),
@@ -49,8 +51,9 @@ class _TurnOverScreenState extends State<TurnOverScreen> {
   }
 
   Future getTurnOver() async {
+    String? value = await storage.read(key: "token");
     Map<String, String> headers = {
-      'token': Storage.token,
+      'token': value!,
       "Accept": "application/json",
       "Content-Type": "application/json"
     };

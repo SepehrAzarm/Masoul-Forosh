@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+const kProfileCompanyNameTextColor = Color(0xFF1C2532);
 const kBottomSheetBackgroundColor = Color(0xFF757575);
 const kNewsCardContentTextColor = Color(0xFF888484);
 const kNewsCardHeaderTextColor = Color(0xFF1C2532);

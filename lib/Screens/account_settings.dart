@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
@@ -10,7 +11,6 @@ import 'package:masoukharid/Classes/Text&TextStyle/textfield_label_text_style.da
 import 'package:masoukharid/Classes/orange_button.dart';
 import 'package:masoukharid/Constants/colors.dart';
 import 'package:masoukharid/Screens/profile_screen.dart';
-import 'package:masoukharid/Services/storage_class.dart';
 
 class AccountSettings extends StatefulWidget {
   const AccountSettings({Key? key}) : super(key: key);
@@ -22,6 +22,7 @@ class AccountSettings extends StatefulWidget {
 class _AccountSettingsState extends State<AccountSettings> {
   final TextEditingController _address = TextEditingController();
   final String helpImageAsset = 'images/Icons/HelpIcon.png';
+  final storage = const FlutterSecureStorage();
   final ImagePicker _picker = ImagePicker();
   String? address;
   String? province;
@@ -33,7 +34,8 @@ class _AccountSettingsState extends State<AccountSettings> {
   String? imagePath;
   var newImage;
   Future getMarketInfo() async {
-    Map<String, String> headers = {'token': Storage.token};
+    String? value = await storage.read(key: "token");
+    Map<String, String> headers = {'token': value!};
     try {
       var response = await http.get(
         Uri.parse('https://testapi.carbon-family.com/api/market/profile'),
@@ -70,13 +72,14 @@ class _AccountSettingsState extends State<AccountSettings> {
   }
 
   Future postImage() async {
+    String? value = await storage.read(key: "token");
     String fileName = newImage.path.split('/').last;
     try {
       var dioRequest = Dio();
       dioRequest.options.baseUrl =
           'https://testapi.carbon-family.com/api/market/profile/uploadImage';
       dioRequest.options.headers = {
-        'token': Storage.token,
+        'token': value!,
         "Content-Type": "multipart/from-data",
         'accept': "application/json"
       };
@@ -113,8 +116,9 @@ class _AccountSettingsState extends State<AccountSettings> {
   }
 
   Future putUpdateMarketProfile() async {
+    String? value = await storage.read(key: "token");
     Map<String, String> headers = {
-      'token': Storage.token,
+      'token': value!,
       "Accept": "application/json",
       "Content-Type": "application/json"
     };

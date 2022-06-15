@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
@@ -27,6 +28,7 @@ class _ProductEditState extends State<ProductEdit> {
   final TextEditingController _availableController = TextEditingController();
   final TextEditingController _limitController = TextEditingController();
   final TextEditingController _orderBoundary = TextEditingController();
+  final storage = const FlutterSecureStorage();
   final ImagePicker _picker = ImagePicker();
   bool? isChecked = false;
   bool visible = false;
@@ -71,8 +73,8 @@ class _ProductEditState extends State<ProductEdit> {
   }
 
   Future getProductInfo() async {
-    Map<String, String> headers = {'token': Storage.token};
-
+    String? value = await storage.read(key: "token");
+    Map<String, String> headers = {'token': value!};
     try {
       var response = await http.get(
         Uri.parse(
@@ -99,8 +101,9 @@ class _ProductEditState extends State<ProductEdit> {
   }
 
   Future putEditProductInfo() async {
+    String? value = await storage.read(key: "token");
     Map<String, String> headers = {
-      'token': Storage.token,
+      'token': value!,
       "Accept": "application/json",
       "Content-Type": "application/json"
     };
@@ -153,13 +156,14 @@ class _ProductEditState extends State<ProductEdit> {
   }
 
   Future postImage() async {
+    String? value = await storage.read(key: "token");
     String fileName = newImage.path.split('/').last;
     try {
       var dioRequest = Dio();
       dioRequest.options.baseUrl =
           'https://testapi.carbon-family.com/api/market/products/uploadImage';
       dioRequest.options.headers = {
-        'token': Storage.token,
+        'token': value!,
         "Content-Type": "multipart/from-data",
         'accept': "application/json"
       };
@@ -248,6 +252,7 @@ class _ProductEditState extends State<ProductEdit> {
                               height: 250,
                               child: Image(
                                 image: NetworkImage(imagePath == null
+                                    // ignore: prefer_interpolation_to_compose_strings
                                     ? 'https://testapi.carbon-family.com/' +
                                         availableImage[0]
                                     : 'https://testapi.carbon-family.com/${imagePath!}'),
@@ -487,64 +492,6 @@ class _ProductEditState extends State<ProductEdit> {
                           ],
                         ),
                         const SizedBox(height: 20),
-                        //Slider
-                        // SizedBox(
-                        //   height: 130,
-                        //   child: Column(
-                        //     crossAxisAlignment: CrossAxisAlignment.start,
-                        //     children: [
-                        //       const Padding(
-                        //         padding: EdgeInsets.only(right: 20.0),
-                        //         child: Text(
-                        //           'مقدار تخفیف',
-                        //           style: TextStyle(
-                        //             fontWeight: FontWeight.bold,
-                        //             color: kTextFieldLabelTextColor,
-                        //             fontSize: 20.0,
-                        //             fontFamily: kTextFontsFamily,
-                        //           ),
-                        //         ),
-                        //       ),
-                        //       Slider(
-                        //         min: 0,
-                        //         max: 100,
-                        //         activeColor: kButtonOrangeColor,
-                        //         inactiveColor: kSliderInActiveColor,
-                        //         value: _sliderValue,
-                        //         onChanged: (double value) {
-                        //           setState(() {
-                        //             _sliderValue = value;
-                        //           });
-                        //         },
-                        //       ),
-                        //       Padding(
-                        //         padding: const EdgeInsets.only(right: 20.0),
-                        //         child: Row(
-                        //           children: [
-                        //             Text(
-                        //               _sliderValue.toStringAsFixed(0),
-                        //               style: const TextStyle(
-                        //                 fontWeight: FontWeight.bold,
-                        //                 color: kTextFieldLabelTextColor,
-                        //                 fontSize: 20.0,
-                        //                 fontFamily: kTextFontsFamily,
-                        //               ),
-                        //             ),
-                        //             const Text(
-                        //               '%',
-                        //               style: TextStyle(
-                        //                 fontWeight: FontWeight.bold,
-                        //                 color: kTextFieldLabelTextColor,
-                        //                 fontSize: 20.0,
-                        //                 fontFamily: kTextFontsFamily,
-                        //               ),
-                        //             ),
-                        //           ],
-                        //         ),
-                        //       )
-                        //     ],
-                        //   ),
-                        // ),
                         const SizedBox(height: 60),
                         Center(
                           child: Visibility(

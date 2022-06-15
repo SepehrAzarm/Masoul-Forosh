@@ -1,15 +1,16 @@
-import 'package:flutter/material.dart';
-import 'dart:io';
-import 'package:http/http.dart' as http;
-import 'package:dio/dio.dart';
 import 'dart:convert';
+import 'dart:io';
+
+import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:masoukharid/Classes/Text&TextStyle/textfield_label_text_style.dart';
 import 'package:masoukharid/Classes/orange_button.dart';
 import 'package:masoukharid/Constants/colors.dart';
 import 'package:masoukharid/Screens/Employees/employe_list.dart';
-import 'package:masoukharid/Services/storage_class.dart';
 
 class AddNewEmployee extends StatefulWidget {
   const AddNewEmployee({Key? key}) : super(key: key);
@@ -26,6 +27,7 @@ class _AddNewEmployeeState extends State<AddNewEmployee> {
   final TextEditingController _password = TextEditingController();
   final TextEditingController _passwordConfirmation = TextEditingController();
   final TextEditingController _email = TextEditingController();
+  final storage = const FlutterSecureStorage();
   final ImagePicker _picker = ImagePicker();
   late File imageFile;
   var newImage;
@@ -41,8 +43,9 @@ class _AddNewEmployeeState extends State<AddNewEmployee> {
   String? errorText;
 
   Future postAddNewEmployee() async {
+    String? value = await storage.read(key: "token");
     Map<String, String> headers = {
-      'token': Storage.token,
+      'token': value!,
       "Accept": "application/json",
       "Content-Type": "application/json"
     };
@@ -92,13 +95,14 @@ class _AddNewEmployeeState extends State<AddNewEmployee> {
   }
 
   Future postImage() async {
+    String? value = await storage.read(key: "token");
     String fileName = newImage.path.split('/').last;
     try {
       var dioRequest = Dio();
       dioRequest.options.baseUrl =
           'https://testapi.carbon-family.com/api/market/users/uploadImage';
       dioRequest.options.headers = {
-        'token': Storage.token,
+        'token': value!,
         "Content-Type": "multipart/from-data",
         'accept': "application/json"
       };

@@ -1,11 +1,13 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:masoukharid/Constants/colors.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:http/http.dart' as http;
 import 'package:masoukharid/Classes/Cards/employee_list_card.dart';
+import 'package:masoukharid/Constants/colors.dart';
 import 'package:masoukharid/Screens/Employees/employee_profile.dart';
 import 'package:masoukharid/Screens/profile_screen.dart';
 import 'package:masoukharid/Services/storage_class.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 class EmployeeList extends StatefulWidget {
   const EmployeeList({Key? key}) : super(key: key);
@@ -22,11 +24,14 @@ class _EmployeeListState extends State<EmployeeList> {
   List employeeStatus = [];
   List employeeIdList = [];
 
+  final storage = const FlutterSecureStorage();
+
   Future getEmployeeList() async {
     var queryParameters = {
       'role': 'owner',
     };
-    Map<String, String> headers = {'token': Storage.token};
+    String? value = await storage.read(key: "token");
+    Map<String, String> headers = {'token': value!};
     try {
       var response = await http.get(
           Uri.parse(

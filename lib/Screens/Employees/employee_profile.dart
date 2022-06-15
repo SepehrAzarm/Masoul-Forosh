@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:masoukharid/Classes/orange_button.dart';
 import 'package:masoukharid/Constants/colors.dart';
 import 'dart:convert';
@@ -15,6 +16,7 @@ class EmployeeProfile extends StatefulWidget {
 
 class _EmployeeProfileState extends State<EmployeeProfile> {
   List<dynamic> marketAdminUserAccess = [];
+  final storage = const FlutterSecureStorage();
   bool visible = false;
   bool history = false;
   bool marketProfile = false;
@@ -27,6 +29,7 @@ class _EmployeeProfileState extends State<EmployeeProfile> {
   String? role;
   String? errorText;
   bool? status;
+
 
   getAccessInfo() async {
     await getEmployeeInfo();
@@ -43,8 +46,9 @@ class _EmployeeProfileState extends State<EmployeeProfile> {
   }
 
   Future getEmployeeInfo() async {
+    String? value = await storage.read(key: "token");
     Map<String, String> headers = {
-      'token': Storage.token,
+      'token': value!,
       "Accept": "application/json",
       "Content-Type": "application/json"
     };
@@ -77,8 +81,9 @@ class _EmployeeProfileState extends State<EmployeeProfile> {
   }
 
   Future putEditEmployeeAccess() async {
+    String? value = await storage.read(key: "token");
     Map<String, String> headers = {
-      'token': Storage.token,
+      'token': value!,
       "Accept": "application/json",
       "Content-Type": "application/json"
     };
@@ -109,8 +114,9 @@ class _EmployeeProfileState extends State<EmployeeProfile> {
   }
 
   Future putEditEmployeeStatus() async {
+    String? value = await storage.read(key: "token");
     Map<String, String> headers = {
-      'token': Storage.token,
+      'token': value!,
       "Accept": "application/json",
       "Content-Type": "application/json"
     };

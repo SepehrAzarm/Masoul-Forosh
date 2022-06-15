@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:masoukharid/Screens/Statistics/factor_screen.dart';
 import 'package:masoukharid/Services/storage_class.dart';
@@ -19,10 +20,12 @@ class _FactorListScreenState extends State<FactorListScreen> {
   List invoiceNumber = [];
   List invoiceId = [];
   List storeName = [];
+  final storage = const FlutterSecureStorage();
 
   Future getFactorsList() async {
+    String? value = await storage.read(key: "token");
     Map<String, String> headers = {
-      'token': Storage.token,
+      'token': value!,
       "Accept": "application/json",
       "Content-Type": "application/json"
     };

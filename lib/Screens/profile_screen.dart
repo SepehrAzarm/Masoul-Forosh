@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
@@ -42,9 +43,11 @@ class _ProfileScreenState extends State<ProfileScreen>
   String? from;
   String? to;
   int? fee;
+  final storage = const FlutterSecureStorage();
 
   Future getProductList() async {
-    Map<String, String> headers = {'token': Storage.token};
+    String? value = await storage.read(key: "token");
+    Map<String, String> headers = {'token': value!};
     try {
       var response = await http.get(
           Uri.parse("https://testapi.carbon-family.com/api/market/products"),
@@ -73,7 +76,8 @@ class _ProfileScreenState extends State<ProfileScreen>
   }
 
   Future getMarketInfo() async {
-    Map<String, String> headers = {'token': Storage.token};
+    String? value = await storage.read(key: "token");
+    Map<String, String> headers = {'token': value!};
     try {
       var response = await http.get(
         Uri.parse('https://testapi.carbon-family.com/api/market/profile'),
@@ -123,7 +127,7 @@ class _ProfileScreenState extends State<ProfileScreen>
 
   @override
   Widget build(BuildContext context) {
-    final List<Widget> _pages = <Widget>[
+    final List<Widget> pages = <Widget>[
       //Profile
       RefreshIndicator(
         color: kOrangeColor,
@@ -179,14 +183,14 @@ class _ProfileScreenState extends State<ProfileScreen>
                                                 top: 8.0,
                                               ),
                                               child: SizedBox(
-                                                width: 320,
                                                 height: 50,
                                                 child: Text(
                                                   'فروشگاه $companyName ',
                                                   style: const TextStyle(
                                                     fontFamily: 'Dana',
                                                     fontSize: 22,
-                                                    color: Color(0xFF1C2532),
+                                                    color:
+                                                        kProfileCompanyNameTextColor,
                                                     fontWeight: FontWeight.bold,
                                                   ),
                                                 ),
@@ -367,8 +371,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                             radius: 57,
                             backgroundImage: NetworkImage(
                               imagePath != null
-                                  ? 'https://testapi.carbon-family.com/' +
-                                      imagePath!
+                                  ? 'https://testapi.carbon-family.com/${imagePath!}'
                                   : 'https://testapi.carbon-family.com/uploads/markets/marketImages/7185b4aa4494c37820e2d4abfefc6166_6246f113965272bf7ca06282_1648818031253.jpg',
                             ),
                           ),
@@ -394,7 +397,6 @@ class _ProfileScreenState extends State<ProfileScreen>
                                   onTap: () async {
                                     Storage.productId =
                                         await productIdList[index];
-
                                     Navigator.pushNamed(
                                         context, ProductsMainPage.id);
                                   },
@@ -451,8 +453,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                             radius: 57,
                             backgroundImage: NetworkImage(
                               imagePath != null
-                                  ? 'https://testapi.carbon-family.com/' +
-                                      imagePath!
+                                  ? 'https://testapi.carbon-family.com/${imagePath!}'
                                   : 'https://testapi.carbon-family.com/uploads/markets/marketImages/d798a55449bc9df4d13d7c46045150c7_62370134273683037652865c.jpg',
                             ),
                           ),
@@ -578,8 +579,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                                 width: 140,
                                 child: TextButton(
                                   onPressed: () {
-                                    Storage.resetToken();
-                                    print(Storage.token);
+                                    storage.delete(key: "token");
                                     Navigator.pushAndRemoveUntil(
                                       context,
                                       MaterialPageRoute(
@@ -669,7 +669,7 @@ class _ProfileScreenState extends State<ProfileScreen>
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      body: Center(child: _pages.elementAt(_selectedIndex)),
+      body: Center(child: pages.elementAt(_selectedIndex)),
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
           color: Colors.white,

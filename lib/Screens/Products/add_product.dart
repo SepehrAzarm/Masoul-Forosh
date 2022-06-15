@@ -1,18 +1,19 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:masoukharid/Classes/Text&TextStyle/orange_header_text.dart';
 import 'package:masoukharid/Classes/amount_card.dart';
 import 'package:masoukharid/Classes/orange_button.dart';
 import 'package:masoukharid/Constants/borders_decorations.dart';
 import 'package:masoukharid/Constants/colors.dart';
 import 'package:masoukharid/Constants/constants.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'dart:io';
-import 'package:http_parser/http_parser.dart';
-import 'package:dio/dio.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:masoukharid/Screens/profile_screen.dart';
-import 'package:masoukharid/Services/storage_class.dart';
 
 class AddProductPage extends StatefulWidget {
   const AddProductPage({Key? key}) : super(key: key);
@@ -26,6 +27,7 @@ class _AddProductPageState extends State<AddProductPage> {
   final TextEditingController _availableController = TextEditingController();
   final TextEditingController _orderBoundary = TextEditingController();
   final TextEditingController _limitController = TextEditingController();
+  final storage = const FlutterSecureStorage();
   final ImagePicker _picker = ImagePicker();
   late File imageFile;
   // ignore: prefer_typing_uninitialized_variables
@@ -68,8 +70,9 @@ class _AddProductPageState extends State<AddProductPage> {
   }
 
   Future postCreateNewProduct() async {
+    String? value = await storage.read(key: "token");
     Map<String, String> headers = {
-      'token': Storage.token,
+      'token': value!,
       "Accept": "application/json",
       "Content-Type": "application/json"
     };
@@ -130,13 +133,14 @@ class _AddProductPageState extends State<AddProductPage> {
   }
 
   Future postImage() async {
+    String? value = await storage.read(key: "token");
     String fileName = newImage.path.split('/').last;
     try {
       var dioRequest = Dio();
       dioRequest.options.baseUrl =
           'https://testapi.carbon-family.com/api/market/products/uploadImage';
       dioRequest.options.headers = {
-        'token': Storage.token,
+        'token': value!,
         "Content-Type": "multipart/from-data",
         'accept': "application/json"
       };

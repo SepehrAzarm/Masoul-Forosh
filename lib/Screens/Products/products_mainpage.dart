@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:masoukharid/Classes/orange_button.dart';
 import 'package:masoukharid/Constants/colors.dart';
@@ -21,6 +22,7 @@ class ProductsMainPage extends StatefulWidget {
 class _ProductsMainPageState extends State<ProductsMainPage> {
   final String headerImageAsset = 'images/ProductPic.png';
   final String contentText = kDefaultText;
+  final storage = const FlutterSecureStorage();
 
   String? title;
   String? description;
@@ -28,7 +30,8 @@ class _ProductsMainPageState extends State<ProductsMainPage> {
   List image = [];
 
   Future getProductInfo() async {
-    Map<String, String> headers = {'token': Storage.token};
+    String? value = await storage.read(key: "token");
+    Map<String, String> headers = {'token': value!};
     try {
       var response = await http.get(
         Uri.parse(

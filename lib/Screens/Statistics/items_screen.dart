@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:masoukharid/Classes/Cards/statistic_card.dart';
 import 'package:masoukharid/Constants/colors.dart';
@@ -20,10 +21,12 @@ class _SellingItemsScreenState extends State<SellingItemsScreen> {
   List itemsListTitle = [];
   List itemsTotalPrice = [];
   List itemsPercentage = [];
+  final storage = const FlutterSecureStorage();
 
   Future getSellItemsList() async {
+    String? value = await storage.read(key: "token");
     Map<String, String> headers = {
-      'token': Storage.token,
+      'token': value!,
       "Accept": "application/json",
       "Content-Type": "application/json"
     };

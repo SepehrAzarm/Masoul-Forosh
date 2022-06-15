@@ -1,17 +1,19 @@
 import 'dart:convert';
-import 'package:flutter/material.dart';
-import 'package:masoukharid/Screens/Password_Recovery/input_page.dart';
-import 'package:masoukharid/Constants/constants.dart';
-import 'package:masoukharid/Classes/Text&TextStyle/textfield_label_text_style.dart';
-import 'package:masoukharid/Methods/text_field_input_decorations.dart';
-import 'package:masoukharid/Classes/orange_button.dart';
-import 'package:masoukharid/Classes/Text&TextStyle/orange_header_text.dart';
-import 'package:masoukharid/Constants/colors.dart';
-import 'package:masoukharid/Screens/profile_screen.dart';
-import 'package:http/http.dart' as http;
-import 'package:masoukharid/Services/storage_class.dart';
-import 'package:internet_connection_checker/internet_connection_checker.dart';
+
 import 'package:check_vpn_connection/check_vpn_connection.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:http/http.dart' as http;
+import 'package:internet_connection_checker/internet_connection_checker.dart';
+import 'package:masoukharid/Classes/Text&TextStyle/orange_header_text.dart';
+import 'package:masoukharid/Classes/Text&TextStyle/textfield_label_text_style.dart';
+import 'package:masoukharid/Classes/orange_button.dart';
+import 'package:masoukharid/Constants/colors.dart';
+import 'package:masoukharid/Constants/constants.dart';
+import 'package:masoukharid/Methods/text_field_input_decorations.dart';
+import 'package:masoukharid/Screens/Password_Recovery/input_page.dart';
+import 'package:masoukharid/Screens/profile_screen.dart';
+import 'package:masoukharid/Services/storage_class.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -24,6 +26,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController _controllerPhoneNumber = TextEditingController();
   final TextEditingController _controllerPassword = TextEditingController();
+  final storage = const FlutterSecureStorage();
   Color phoneColor = kTextFieldBorderColor;
   Color keyColor = kTextFieldBorderColor;
   String? phoneNumber;
@@ -44,6 +47,7 @@ class _LoginPageState extends State<LoginPage> {
       if (response.statusCode == 200) {
         var data = await jsonDecode(response.body.toString());
         Storage.token = await data['token'];
+        await storage.write(key: "token", value: data['token']);
         print(Storage.token);
         print(response.statusCode);
       } else {
@@ -207,6 +211,9 @@ class _LoginPageState extends State<LoginPage> {
                                         : phoneColor = kTextFieldBorderColor;
                                   });
                                 },
+                                style: const TextStyle(
+                                  fontFamily: 'IranYekan',
+                                ),
                                 decoration: textFieldDecorations(
                                   suffixIcon: Container(
                                     margin: const EdgeInsets.all(10.0),

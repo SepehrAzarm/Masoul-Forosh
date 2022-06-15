@@ -35,12 +35,12 @@ class _NewsListState extends State<NewsList> {
   Widget build(BuildContext context) {
     return ListView.builder(
       physics: const NeverScrollableScrollPhysics(),
+      itemCount: newsList.length,
       itemBuilder: (context, index) {
         return NewsCardProfile(
             title: newsList[index].title,
             contentText: newsList[index].contentText);
       },
-      itemCount: newsList.length,
     );
   }
 }

@@ -32,8 +32,12 @@ class _AddProductPageState extends State<AddProductPage> {
   late File imageFile;
   // ignore: prefer_typing_uninitialized_variables
   var newImage;
+  List<String> categoryList = [];
+  List<String> secList = [];
+  String? categoryId;
   String? imagePath;
   bool? isChecked = false;
+  bool secCatVisible = false;
   bool visible = false;
   bool _enabled = true;
   String? title;
@@ -42,8 +46,103 @@ class _AddProductPageState extends State<AddProductPage> {
   String? errorMassage;
   String? orderBoundary;
   String dropDownValue = 'تعداد';
+  String categoryDropDownValue = 'کیک و دسر';
+  String secCategoryDropDownValue = '';
   String amountMainText = '';
   String amountSecText = '';
+
+  void categoryFunction() {
+    if (categoryDropDownValue == 'کیک و دسر') {
+      setState(() {
+        secCatVisible = false;
+      });
+      categoryId = "62a8493175134f227cd91633";
+    } else if (categoryDropDownValue == "لبنیات") {
+      setState(() {
+        secCatVisible = false;
+      });
+      categoryId = "62a8497510eaebfad97aa980";
+    } else if (categoryDropDownValue == "سوپرمارکتی") {
+      setState(() {
+        secCatVisible = true;
+        secList = ["مصرفی", "خوراکی"];
+        secCategoryDropDownValue = "خوراکی";
+      });
+    } else if (categoryDropDownValue == "نان و غلات") {
+      setState(() {
+        secCatVisible = true;
+        secList = ["نان", "برنج و حبوبات", "متفرقه"];
+        secCategoryDropDownValue = "نان";
+      });
+    } else if (categoryDropDownValue == "پروتئین") {
+      setState(() {
+        secCatVisible = true;
+        secList = ["گوشت", "مرغ و طیور", "دریایی", "فرآورده های پروتئینی"];
+        secCategoryDropDownValue = "گوشت";
+      });
+    } else if (categoryDropDownValue == "میوه و تره بار") {
+      setState(() {
+        secCatVisible = true;
+        secList = ["سبزی", "میوه", "صیفی جات"];
+        secCategoryDropDownValue = "سبزی";
+      });
+    } else if (categoryDropDownValue == "عطاری") {
+      setState(() {
+        secCatVisible = true;
+        secList = ["ادویه جات", "گیاهان خشک", "عرقیجات", "دمی جات"];
+        secCategoryDropDownValue = "ادویه جات";
+      });
+    } else if (categoryDropDownValue == "تجهیزات") {
+      setState(() {
+        secCatVisible = true;
+        secList = ["آشپزخانه", "بار", "طراحی و سالن"];
+        secCategoryDropDownValue = "آشپزخانه";
+      });
+    }
+  }
+
+  void secondCategory() {
+    if (secCategoryDropDownValue == "مصرفی") {
+      categoryId = "62aa14d1a168adf6ba98ed35";
+    } else if (secCategoryDropDownValue == "خوراکی") {
+      categoryId = "62aa14deb2dc415f6df6b0ec";
+    } else if (secCategoryDropDownValue == "نان") {
+      categoryId = "62a849e675134f227cd9163d";
+    } else if (secCategoryDropDownValue == "برنج و حبوبات") {
+      categoryId = "62a84a0210eaebfad97aa98a";
+    } else if (secCategoryDropDownValue == "متفرقه") {
+      categoryId = "62a84a1775134f227cd91642";
+    } else if (secCategoryDropDownValue == "گوشت") {
+      categoryId = "62a84b1810eaebfad97aa98f";
+    } else if (secCategoryDropDownValue == "مرغ و طیور") {
+      categoryId = "62a84b4475134f227cd9164c";
+    } else if (secCategoryDropDownValue == "دریایی") {
+      categoryId = "62a84b6810eaebfad97aa994";
+    } else if (secCategoryDropDownValue == "فرآورده های پروتئینی") {
+      categoryId = "62a84b9d75134f227cd91651";
+    } else if (secCategoryDropDownValue == "سبزی") {
+      categoryId = "62a84c2d75134f227cd91656";
+    } else if (secCategoryDropDownValue == "میوه") {
+      categoryId = "62a84c4110eaebfad97aa99e";
+    } else if (secCategoryDropDownValue == "صیفی جات") {
+      categoryId = "62a84c6d75134f227cd9165b";
+    } else if (secCategoryDropDownValue == "ادویه جات") {
+      categoryId = "62a84ce575134f227cd91660";
+    } else if (secCategoryDropDownValue == "گیاهان خشک") {
+      categoryId = "62a84d1110eaebfad97aa9a8";
+    } else if (secCategoryDropDownValue == "عرقیجات") {
+      categoryId = "62a84d3975134f227cd91665";
+    } else if (secCategoryDropDownValue == "دمی جات") {
+      categoryId = "62a84d5b10eaebfad97aa9ad";
+    } else if (secCategoryDropDownValue == "آشپزخانه") {
+      categoryId = "62a84dbe10eaebfad97aa9b2";
+    } else if (secCategoryDropDownValue == "بار") {
+      categoryId = "62a84df475134f227cd9166f";
+    } else if (secCategoryDropDownValue == "طراحی و سالن") {
+      categoryId = "62a84e1110eaebfad97aa9b7";
+    }
+  }
+
   String mainText() {
     if (dropDownValue == 'تعداد' ||
         dropDownValue == 'بسته' ||
@@ -69,6 +168,38 @@ class _AddProductPageState extends State<AddProductPage> {
     return amountSecText;
   }
 
+  Future getCategories() async {
+    Map<String, String> headers = {
+      "Accept": "application/json",
+      "Content-Type": "application/json"
+    };
+    try {
+      var response = await http.get(
+        Uri.parse(
+            "https://testapi.carbon-family.com/api/public/global/productsCategories"),
+        headers: headers,
+      );
+      if (response.statusCode == 200) {
+        var data = response.body;
+        var categories =
+            jsonDecode(data)['productsCategoriesTree']['categories']['childs'];
+        setState(() {
+          for (var i = 0; i < categories.length; i++) {
+            categoryList.add(categories[i]["title"]);
+          }
+        });
+        print(categoryList);
+        print(response.statusCode);
+        print(response.body);
+      } else {
+        print(response.statusCode);
+        print(response.body);
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
   Future postCreateNewProduct() async {
     String? value = await storage.read(key: "token");
     Map<String, String> headers = {
@@ -82,7 +213,7 @@ class _AddProductPageState extends State<AddProductPage> {
       "media": [
         imagePath,
       ],
-      "categoryId": "6246f05faca10face61bdf57",
+      "categoryId": categoryId,
       "isAvailableEnough": false,
       "availableAmount": availableAmount,
       "priceBeforeDiscount": 0,
@@ -110,7 +241,9 @@ class _AddProductPageState extends State<AddProductPage> {
         print(response.body);
       } else {
         var errorData = await jsonDecode(response.body.toString());
-        errorMassage = await errorData['message'];
+        setState(() {
+          errorMassage = errorData['message'];
+        });
         print(response.statusCode);
         print(response.body);
       }
@@ -171,463 +304,527 @@ class _AddProductPageState extends State<AddProductPage> {
   }
 
   @override
+  void initState() {
+    getCategories();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.white,
-        leading: const BackButton(
-          color: Colors.black,
-        ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 25),
-        child: SizedBox(
-          height: MediaQuery.of(context).size.height,
-          width: MediaQuery.of(context).size.width,
-          child: ListView(
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 20),
-                  OrangeHeaderText(
-                    text: 'افزودن محصول',
-                    fontSize: 35,
-                  ),
-                  const SizedBox(height: 20),
-                  const Text(
-                    'ویرایش عکس',
-                    style: TextStyle(
-                      fontFamily: 'Dana',
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: kNewsCardHeaderTextColor,
-                    ),
-                  ),
-                  const SizedBox(height: 15),
-                  Center(
-                    child: ClipRRect(
-                      borderRadius: const BorderRadius.all(
-                        Radius.circular(20),
-                      ),
-                      child: Container(
-                        color: Colors.amber,
-                        width: 250,
-                        height: 250,
-                        child: Image(
-                          image: NetworkImage(imagePath == null
-                              ? 'https://testapi.carbon-family.com/uploads/products/productsImages/635dc499204c404d99b3c3484b7c96fd_6246f113965272bf7ca06282_1648817959178.jpg'
-                              : 'https://testapi.carbon-family.com/' +
-                                  imagePath!),
-                          fit: BoxFit.cover,
+    return categoryList.isEmpty
+        ? const Center(
+            child: CircularProgressIndicator(
+            color: kOrangeColor,
+          ))
+        : Scaffold(
+            backgroundColor: Colors.white,
+            appBar: AppBar(
+              elevation: 0,
+              backgroundColor: Colors.white,
+              leading: const BackButton(
+                color: Colors.black,
+              ),
+            ),
+            body: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 25),
+              child: SizedBox(
+                height: MediaQuery.of(context).size.height,
+                width: MediaQuery.of(context).size.width,
+                child: ListView(
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 20),
+                        OrangeHeaderText(
+                          text: 'افزودن محصول',
+                          fontSize: 35,
                         ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 15),
-                  TextButton(
-                    onPressed: () async {
-                      await chooseImage();
-                      await postImage();
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: kOrangeColor,
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      width: 370.0,
-                      height: 57.0,
-                      child: const Center(
-                        child: Text(
-                          'افزودن عکس محصول',
+                        const SizedBox(height: 20),
+                        const Text(
+                          'افزودن عکس',
                           style: TextStyle(
-                            color: Colors.white,
                             fontFamily: 'Dana',
+                            fontSize: 20,
                             fontWeight: FontWeight.bold,
+                            color: kNewsCardHeaderTextColor,
                           ),
                         ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  const SizedBox(
-                    width: 350,
-                    height: 40,
-                    child: Text(
-                      'عکس پروفایل باید با فرمت jpg باشد و ابعاد 1x1 باشد و حجم آن کمتر از 15 مگابایت باشد',
-                      style: TextStyle(
-                        fontFamily: 'IranYekan',
-                        fontSize: 10,
-                        color: Colors.red,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  const Text(
-                    'ویرایش متن',
-                    style: TextStyle(
-                      fontFamily: 'Dana',
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: kNewsCardHeaderTextColor,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  TextField(
-                    onChanged: (value) {
-                      setState(() {
-                        title = value;
-                      });
-                    },
-                    cursorColor: kButtonOrangeColor,
-                    decoration: const InputDecoration(
-                      focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(
-                          color: kOrangeColor,
-                          width: 2.0,
+                        const SizedBox(height: 15),
+                        Center(
+                          child: ClipRRect(
+                            borderRadius: const BorderRadius.all(
+                              Radius.circular(20),
+                            ),
+                            child: Container(
+                              color: Colors.amber,
+                              width: 250,
+                              height: 250,
+                              child: Image(
+                                image: NetworkImage(imagePath == null
+                                    ? 'https://testapi.carbon-family.com/uploads/products/productsImages/635dc499204c404d99b3c3484b7c96fd_6246f113965272bf7ca06282_1648817959178.jpg'
+                                    : 'https://testapi.carbon-family.com/' +
+                                        imagePath!),
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
-                      hintText: 'عنوان محصول',
-                      hintStyle: TextStyle(
-                        fontFamily: 'Dana',
-                        fontSize: 13,
-                        color: Color(0xFFE5E5E5),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 30),
-                  SizedBox(
-                    height: 220,
-                    width: MediaQuery.of(context).size.width,
-                    child: TextField(
-                      onChanged: (value) {
-                        setState(() {
-                          description = value;
-                        });
-                      },
-                      textAlign: TextAlign.start,
-                      maxLines: null,
-                      minLines: null,
-                      expands: true,
-                      cursorColor: kButtonOrangeColor,
-                      decoration: const InputDecoration(
-                        hintText: '  توضیحات محصول را وارد کنید',
-                        hintStyle: TextStyle(
-                          fontFamily: 'Dana',
-                          fontSize: 13,
-                          color: Color(0xFFE5E5E5),
+                        const SizedBox(height: 15),
+                        TextButton(
+                          onPressed: () async {
+                            await chooseImage();
+                            await postImage();
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: kOrangeColor,
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                            width: 370.0,
+                            height: 57.0,
+                            child: const Center(
+                              child: Text(
+                                'افزودن عکس محصول',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontFamily: 'Dana',
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
                         ),
-                        contentPadding: kTextFieldPadding,
-                        filled: true,
-                        fillColor: Colors.white,
-                        border: kTextFieldBorder,
-                        enabledBorder: kTextFieldEnabled,
-                        focusedBorder: kTextFieldFocused,
-                      ),
-                    ),
-                  ),
-                  const Padding(
-                    padding: EdgeInsets.only(top: 5),
-                    child: Text(
-                      'تعداد کاراکتر: 300',
-                      style: TextStyle(
-                        fontFamily: 'IranYekan',
-                        fontSize: 10,
-                        color: kTextFieldHintTextColor,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 60),
-                  const Text(
-                    'ویرایش مقدار',
-                    style: TextStyle(
-                      fontFamily: 'Dana',
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: kNewsCardHeaderTextColor,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  DropdownButton(
-                    value: dropDownValue,
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        dropDownValue = newValue!;
-                      });
-                    },
-                    items: <String>[
-                      'تعداد',
-                      'جین',
-                      'وزن',
-                      'بسته',
-                      'لیتر',
-                      'پالت'
-                    ].map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                  ),
-                  const SizedBox(height: 20),
-                  AmountWidget(
-                    onChanged: (value) {
-                      setState(() {
-                        availableAmount = int.parse(value);
-                      });
-                    },
-                    controller: _availableController,
-                    mainText: mainText(),
-                    secondaryText: secondaryText(),
-                    suffixIcon: IconButton(
-                      iconSize: 20,
-                      color: const Color(0xFF4B4B4B),
-                      onPressed: () {
-                        setState(() {
-                          _availableController.clear();
-                        });
-                      },
-                      icon: const Icon(Icons.clear),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  AmountWidget(
-                    onChanged: (value) {
-                      setState(() {
-                        orderBoundary = value;
-                      });
-                    },
-                    controller: _orderBoundary,
-                    mainText: 'کف فروش',
-                    secondaryText: '',
-                    suffixIcon: IconButton(
-                      iconSize: 20,
-                      color: const Color(0xFF4B4B4B),
-                      onPressed: () {
-                        setState(() {
-                          _orderBoundary.clear();
-                        });
-                      },
-                      icon: const Icon(Icons.clear),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  AmountWidget(
-                    onChanged: (value) {},
-                    enabled: _enabled,
-                    controller: _limitController,
-                    mainText: 'محدودیت فروش',
-                    secondaryText: '',
-                    suffixIcon: IconButton(
-                      iconSize: 20,
-                      color: const Color(0xFF4B4B4B),
-                      onPressed: () {
-                        setState(() {
-                          _limitController.clear();
-                        });
-                      },
-                      icon: const Icon(Icons.clear),
-                    ),
-                  ),
-                  //Check Box
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Checkbox(
-                        activeColor: kButtonOrangeColor,
-                        value: isChecked,
-                        onChanged: (bool? value) {
-                          setState(() {
-                            isChecked = value!;
-                            _enabled = !value;
-                          });
-                        },
-                      ),
-                      const Text(
-                        'نامحدود',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF4B4B4B),
-                          fontSize: 12.0,
-                          fontFamily: 'Dana',
+                        const SizedBox(height: 20),
+                        const SizedBox(
+                          width: 350,
+                          height: 40,
+                          child: Text(
+                            'عکس پروفایل باید با فرمت jpg باشد و ابعاد 1x1 باشد و حجم آن کمتر از 15 مگابایت باشد',
+                            style: TextStyle(
+                              fontFamily: 'IranYekan',
+                              fontSize: 10,
+                              color: Colors.red,
+                            ),
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  //Slider
-                  // SizedBox(
-                  //   height: 130,
-                  //   child: Column(
-                  //     crossAxisAlignment: CrossAxisAlignment.start,
-                  //     children: [
-                  //       const Padding(
-                  //         padding: EdgeInsets.only(right: 20.0),
-                  //         child: Text(
-                  //           'مقدار تخفیف',
-                  //           style: TextStyle(
-                  //             fontWeight: FontWeight.bold,
-                  //             color: kTextFieldLabelTextColor,
-                  //             fontSize: 20.0,
-                  //             fontFamily: kTextFontsFamily,
-                  //           ),
-                  //         ),
-                  //       ),
-                  //       Slider(
-                  //         min: 0,
-                  //         max: 100,
-                  //         activeColor: kButtonOrangeColor,
-                  //         inactiveColor: kSliderInActiveColor,
-                  //         value: _sliderValue,
-                  //         onChanged: (double value) {
-                  //           setState(() {
-                  //             _sliderValue = value;
-                  //           });
-                  //         },
-                  //       ),
-                  //       Padding(
-                  //         padding: const EdgeInsets.only(right: 20.0),
-                  //         child: Row(
-                  //           children: [
-                  //             Text(
-                  //               _sliderValue.toStringAsFixed(0),
-                  //               style: const TextStyle(
-                  //                 fontWeight: FontWeight.bold,
-                  //                 color: kTextFieldLabelTextColor,
-                  //                 fontSize: 20.0,
-                  //                 fontFamily: kTextFontsFamily,
-                  //               ),
-                  //             ),
-                  //             const Text(
-                  //               '%',
-                  //               style: TextStyle(
-                  //                 fontWeight: FontWeight.bold,
-                  //                 color: kTextFieldLabelTextColor,
-                  //                 fontSize: 20.0,
-                  //                 fontFamily: kTextFontsFamily,
-                  //               ),
-                  //             ),
-                  //           ],
-                  //         ),
-                  //       )
-                  //     ],
-                  //   ),
-                  // ),
-                  Center(
-                    child: Visibility(
-                      maintainSize: true,
-                      maintainAnimation: true,
-                      maintainState: true,
-                      visible: visible,
-                      child: const SizedBox(
-                        height: 40,
-                        width: 40,
-                        child: CircularProgressIndicator(
-                          color: kOrangeColor,
+                        const SizedBox(height: 20),
+                        const Text(
+                          'افزودن متن',
+                          style: TextStyle(
+                            fontFamily: 'Dana',
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: kNewsCardHeaderTextColor,
+                          ),
                         ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 60),
-                  OrangeButton(
-                      text: 'تایید',
-                      onPressed: () async {
-                        setState(() {
-                          visible = true;
-                        });
-                        if (title != null && description != null) {
-                          await postCreateNewProduct();
-                          // ignore: unnecessary_null_comparison
-                          errorMassage == null
-                              ? Navigator.pushNamed(context, ProfileScreen.id)
-                              : showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return AlertDialog(
-                                      title: const Center(
-                                        child: SizedBox(
-                                          width: 80,
-                                          height: 80,
-                                          child: Image(
-                                            image: AssetImage(
-                                                'images/ErroIcon.png'),
-                                          ),
-                                        ),
-                                      ),
-                                      content: Text(
-                                        '$errorMassage',
-                                        textAlign: TextAlign.center,
-                                        style: const TextStyle(
-                                          fontFamily: 'IranYekan',
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      actions: [
-                                        OrangeButton(
-                                            text: 'بستن',
-                                            onPressed: () {
-                                              setState(() {
-                                                visible = false;
-                                                errorMassage = null;
-                                              });
-                                              Navigator.pop(context);
-                                            })
-                                      ],
-                                    );
-                                  });
-                        } else {
-                          setState(() {
-                            visible = false;
-                          });
-                          if (title == null &&
-                              description == null &&
-                              // ignore: unnecessary_null_comparison
-                              availableAmount == null) {
-                            showDialog(
-                                context: context,
-                                builder: (context) {
-                                  return AlertDialog(
-                                    title: const Center(
-                                      child: SizedBox(
-                                        width: 80,
-                                        height: 80,
-                                        child: Image(
-                                          image:
-                                              AssetImage('images/ErroIcon.png'),
-                                        ),
-                                      ),
-                                    ),
-                                    content: const Text(
-                                      'اطلاعات وارد شده صحیح نمی باشند',
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        fontFamily: 'IranYekan',
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    actions: [
-                                      OrangeButton(
-                                          text: 'بستن',
-                                          onPressed: () {
-                                            Navigator.pop(context);
-                                          })
-                                    ],
-                                  );
+                        const SizedBox(height: 10),
+                        TextField(
+                          onChanged: (value) {
+                            setState(() {
+                              title = value;
+                            });
+                          },
+                          cursorColor: kButtonOrangeColor,
+                          decoration: const InputDecoration(
+                            focusedBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(
+                                color: kOrangeColor,
+                                width: 2.0,
+                              ),
+                            ),
+                            hintText: 'عنوان محصول',
+                            hintStyle: TextStyle(
+                              fontFamily: 'Dana',
+                              fontSize: 13,
+                              color: Color(0xFFE5E5E5),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 30),
+                        SizedBox(
+                          height: 220,
+                          width: MediaQuery.of(context).size.width,
+                          child: TextField(
+                            onChanged: (value) {
+                              setState(() {
+                                description = value;
+                              });
+                            },
+                            textAlign: TextAlign.start,
+                            maxLines: null,
+                            minLines: null,
+                            expands: true,
+                            cursorColor: kButtonOrangeColor,
+                            decoration: const InputDecoration(
+                              hintText: '  توضیحات محصول را وارد کنید',
+                              hintStyle: TextStyle(
+                                fontFamily: 'Dana',
+                                fontSize: 13,
+                                color: Color(0xFFE5E5E5),
+                              ),
+                              contentPadding: kTextFieldPadding,
+                              filled: true,
+                              fillColor: Colors.white,
+                              border: kTextFieldBorder,
+                              enabledBorder: kTextFieldEnabled,
+                              focusedBorder: kTextFieldFocused,
+                            ),
+                          ),
+                        ),
+                        const Padding(
+                          padding: EdgeInsets.only(top: 5),
+                          child: Text(
+                            'تعداد کاراکتر: 300',
+                            style: TextStyle(
+                              fontFamily: 'IranYekan',
+                              fontSize: 10,
+                              color: kTextFieldHintTextColor,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 60),
+                        //Category
+                        const Text(
+                          'دسته بندی',
+                          style: TextStyle(
+                            fontFamily: 'Dana',
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: kNewsCardHeaderTextColor,
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            DropdownButton(
+                              value: categoryDropDownValue,
+                              onChanged: (String? newValue) {
+                                setState(() {
+                                  categoryDropDownValue = newValue!;
+                                  categoryFunction();
                                 });
-                          }
-                        }
-                      }),
-                  const SizedBox(height: 20),
-                ],
+                              },
+                              items: categoryList.map<DropdownMenuItem<String>>(
+                                  (String value) {
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Text(value),
+                                );
+                              }).toList(),
+                            ),
+                            Visibility(
+                              visible: secCatVisible,
+                              child: DropdownButton(
+                                value: secCategoryDropDownValue,
+                                onChanged: (String? newValue) {
+                                  setState(() {
+                                    secCategoryDropDownValue = newValue!;
+                                  });
+                                  secondCategory();
+                                },
+                                items: secList.map<DropdownMenuItem<String>>(
+                                    (String value) {
+                                  return DropdownMenuItem<String>(
+                                    value: value,
+                                    child: Text(value),
+                                  );
+                                }).toList(),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 30),
+                        const Text(
+                          'مقدار',
+                          style: TextStyle(
+                            fontFamily: 'Dana',
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: kNewsCardHeaderTextColor,
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        DropdownButton(
+                          value: dropDownValue,
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              dropDownValue = newValue!;
+                            });
+                          },
+                          items: <String>[
+                            'تعداد',
+                            'جین',
+                            'وزن',
+                            'بسته',
+                            'لیتر',
+                            'پالت'
+                          ].map<DropdownMenuItem<String>>((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value),
+                            );
+                          }).toList(),
+                        ),
+                        const SizedBox(height: 20),
+                        AmountWidget(
+                          onChanged: (value) {
+                            setState(() {
+                              availableAmount = int.parse(value);
+                            });
+                          },
+                          controller: _availableController,
+                          mainText: mainText(),
+                          secondaryText: secondaryText(),
+                          suffixIcon: IconButton(
+                            iconSize: 20,
+                            color: const Color(0xFF4B4B4B),
+                            onPressed: () {
+                              setState(() {
+                                _availableController.clear();
+                              });
+                            },
+                            icon: const Icon(Icons.clear),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        AmountWidget(
+                          onChanged: (value) {
+                            setState(() {
+                              orderBoundary = value;
+                            });
+                          },
+                          controller: _orderBoundary,
+                          mainText: 'کف فروش',
+                          secondaryText: '',
+                          suffixIcon: IconButton(
+                            iconSize: 20,
+                            color: const Color(0xFF4B4B4B),
+                            onPressed: () {
+                              setState(() {
+                                _orderBoundary.clear();
+                              });
+                            },
+                            icon: const Icon(Icons.clear),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        AmountWidget(
+                          onChanged: (value) {},
+                          enabled: _enabled,
+                          controller: _limitController,
+                          mainText: 'محدودیت فروش',
+                          secondaryText: '',
+                          suffixIcon: IconButton(
+                            iconSize: 20,
+                            color: const Color(0xFF4B4B4B),
+                            onPressed: () {
+                              setState(() {
+                                _limitController.clear();
+                              });
+                            },
+                            icon: const Icon(Icons.clear),
+                          ),
+                        ),
+                        //Check Box
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Checkbox(
+                              activeColor: kButtonOrangeColor,
+                              value: isChecked,
+                              onChanged: (bool? value) {
+                                setState(() {
+                                  isChecked = value!;
+                                  _enabled = !value;
+                                });
+                              },
+                            ),
+                            const Text(
+                              'نامحدود',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF4B4B4B),
+                                fontSize: 12.0,
+                                fontFamily: 'Dana',
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        //Slider
+                        // SizedBox(
+                        //   height: 130,
+                        //   child: Column(
+                        //     crossAxisAlignment: CrossAxisAlignment.start,
+                        //     children: [
+                        //       const Padding(
+                        //         padding: EdgeInsets.only(right: 20.0),
+                        //         child: Text(
+                        //           'مقدار تخفیف',
+                        //           style: TextStyle(
+                        //             fontWeight: FontWeight.bold,
+                        //             color: kTextFieldLabelTextColor,
+                        //             fontSize: 20.0,
+                        //             fontFamily: kTextFontsFamily,
+                        //           ),
+                        //         ),
+                        //       ),
+                        //       Slider(
+                        //         min: 0,
+                        //         max: 100,
+                        //         activeColor: kButtonOrangeColor,
+                        //         inactiveColor: kSliderInActiveColor,
+                        //         value: _sliderValue,
+                        //         onChanged: (double value) {
+                        //           setState(() {
+                        //             _sliderValue = value;
+                        //           });
+                        //         },
+                        //       ),
+                        //       Padding(
+                        //         padding: const EdgeInsets.only(right: 20.0),
+                        //         child: Row(
+                        //           children: [
+                        //             Text(
+                        //               _sliderValue.toStringAsFixed(0),
+                        //               style: const TextStyle(
+                        //                 fontWeight: FontWeight.bold,
+                        //                 color: kTextFieldLabelTextColor,
+                        //                 fontSize: 20.0,
+                        //                 fontFamily: kTextFontsFamily,
+                        //               ),
+                        //             ),
+                        //             const Text(
+                        //               '%',
+                        //               style: TextStyle(
+                        //                 fontWeight: FontWeight.bold,
+                        //                 color: kTextFieldLabelTextColor,
+                        //                 fontSize: 20.0,
+                        //                 fontFamily: kTextFontsFamily,
+                        //               ),
+                        //             ),
+                        //           ],
+                        //         ),
+                        //       )
+                        //     ],
+                        //   ),
+                        // ),
+                        Center(
+                          child: Visibility(
+                            maintainSize: true,
+                            maintainAnimation: true,
+                            maintainState: true,
+                            visible: visible,
+                            child: const SizedBox(
+                              height: 40,
+                              width: 40,
+                              child: CircularProgressIndicator(
+                                color: kOrangeColor,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 60),
+                        OrangeButton(
+                            text: 'تایید',
+                            onPressed: () async {
+                              setState(() {
+                                visible = true;
+                              });
+                              if (title != null && description != null) {
+                                await postCreateNewProduct();
+                                // ignore: unnecessary_null_comparison
+                                errorMassage == null
+                                    ? Navigator.pushNamed(
+                                        context, ProfileScreen.id)
+                                    : showDialog(
+                                        context: context,
+                                        builder: (context) {
+                                          return AlertDialog(
+                                            title: const Center(
+                                              child: SizedBox(
+                                                width: 80,
+                                                height: 80,
+                                                child: Image(
+                                                  image: AssetImage(
+                                                      'images/ErroIcon.png'),
+                                                ),
+                                              ),
+                                            ),
+                                            content: Text(
+                                              '$errorMassage',
+                                              textAlign: TextAlign.center,
+                                              style: const TextStyle(
+                                                fontFamily: 'IranYekan',
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            actions: [
+                                              OrangeButton(
+                                                  text: 'بستن',
+                                                  onPressed: () {
+                                                    setState(() {
+                                                      visible = false;
+                                                      errorMassage = null;
+                                                    });
+                                                    Navigator.pop(context);
+                                                  })
+                                            ],
+                                          );
+                                        });
+                              } else {
+                                setState(() {
+                                  visible = false;
+                                });
+                                if (title == null &&
+                                    description == null &&
+                                    // ignore: unnecessary_null_comparison
+                                    availableAmount == null) {
+                                  showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return AlertDialog(
+                                          title: const Center(
+                                            child: SizedBox(
+                                              width: 80,
+                                              height: 80,
+                                              child: Image(
+                                                image: AssetImage(
+                                                    'images/ErroIcon.png'),
+                                              ),
+                                            ),
+                                          ),
+                                          content: const Text(
+                                            'اطلاعات وارد شده صحیح نمی باشند',
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              fontFamily: 'IranYekan',
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          actions: [
+                                            OrangeButton(
+                                                text: 'بستن',
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                })
+                                          ],
+                                        );
+                                      });
+                                }
+                              }
+                            }),
+                        const SizedBox(height: 20),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ],
-          ),
-        ),
-      ),
-    );
+            ),
+          );
   }
 }

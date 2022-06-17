@@ -1,5 +1,4 @@
 class Storage {
-  static late String token;
   static late String marketId;
   static late String productId;
   static late String employeeId;
@@ -11,13 +10,5 @@ class Storage {
 
   static void resetProductId() {
     productId = '';
-  }
-
-  static void resetToken() {
-    token = '';
-  }
-
-  String useToken() {
-    return token;
   }
 }

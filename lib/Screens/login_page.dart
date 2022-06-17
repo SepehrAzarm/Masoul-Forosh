@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:internet_connection_checker/internet_connection_checker.dart';
+import 'package:jwt_decode/jwt_decode.dart';
 import 'package:masoukharid/Classes/Text&TextStyle/orange_header_text.dart';
 import 'package:masoukharid/Classes/Text&TextStyle/textfield_label_text_style.dart';
 import 'package:masoukharid/Classes/orange_button.dart';
@@ -12,8 +13,8 @@ import 'package:masoukharid/Constants/colors.dart';
 import 'package:masoukharid/Constants/constants.dart';
 import 'package:masoukharid/Methods/text_field_input_decorations.dart';
 import 'package:masoukharid/Screens/Password_Recovery/input_page.dart';
+import 'package:masoukharid/Screens/otp_verify_screen.dart';
 import 'package:masoukharid/Screens/profile_screen.dart';
-import 'package:masoukharid/Services/storage_class.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -31,9 +32,34 @@ class _LoginPageState extends State<LoginPage> {
   Color keyColor = kTextFieldBorderColor;
   String? phoneNumber;
   String? password;
+  bool? isVerified;
   bool obsText = true;
   bool visible = false;
   String? errorText;
+
+  Future getOtp() async {
+    String? value = await storage.read(key: "token");
+    Map<String, String> headers = {'token': value!};
+    try {
+      var response = await http.get(
+        Uri.parse(
+            'https://testapi.carbon-family.com/api/market/authentication/verify'),
+        headers: headers,
+      );
+      if (response.statusCode == 200) {
+        print(response.statusCode);
+        print(response.body);
+      } else {
+        var data = await jsonDecode(response.body.toString());
+        errorText = await data['message'];
+        print(response.statusCode);
+        print(response.body);
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
   Future authenticateUser() async {
     try {
       var response = await http.post(
@@ -46,9 +72,12 @@ class _LoginPageState extends State<LoginPage> {
       );
       if (response.statusCode == 200) {
         var data = await jsonDecode(response.body.toString());
-        Storage.token = await data['token'];
         await storage.write(key: "token", value: data['token']);
-        print(Storage.token);
+        String? value = await storage.read(key: "token");
+        Map<String, dynamic> payload = Jwt.parseJwt(value!);
+        isVerified = payload["user"]["isVerified"];
+        print(isVerified);
+        print(payload);
         print(response.statusCode);
       } else {
         var data = await jsonDecode(response.body.toString());
@@ -322,50 +351,59 @@ class _LoginPageState extends State<LoginPage> {
                                       });
                                       await authenticateUser();
                                       // ignore: unnecessary_null_comparison
-                                      errorText != null
-                                          ? showDialog(
-                                              context: context,
-                                              builder: (context) {
-                                                return AlertDialog(
-                                                  title: const Center(
-                                                    child: SizedBox(
-                                                      width: 80,
-                                                      height: 80,
-                                                      child: Image(
-                                                        image: AssetImage(
-                                                            'images/ErroIcon.png'),
+                                      if (isVerified == true) {
+                                        errorText != null
+                                            ? showDialog(
+                                                context: context,
+                                                builder: (context) {
+                                                  return AlertDialog(
+                                                    title: const Center(
+                                                      child: SizedBox(
+                                                        width: 80,
+                                                        height: 80,
+                                                        child: Image(
+                                                          image: AssetImage(
+                                                              'images/ErroIcon.png'),
+                                                        ),
                                                       ),
                                                     ),
-                                                  ),
-                                                  content: Text(
-                                                    '$errorText',
-                                                    textAlign: TextAlign.center,
-                                                    style: const TextStyle(
-                                                      fontFamily: 'IranYekan',
-                                                      fontSize: 15,
-                                                      fontWeight:
-                                                          FontWeight.bold,
+                                                    content: Text(
+                                                      '$errorText',
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      style: const TextStyle(
+                                                        fontFamily: 'IranYekan',
+                                                        fontSize: 15,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
                                                     ),
-                                                  ),
-                                                  actions: [
-                                                    OrangeButton(
-                                                        text: 'بستن',
-                                                        onPressed: () {
-                                                          setState(() {
-                                                            errorText = null;
-                                                            visible = false;
-                                                          });
-                                                          Navigator.pop(
-                                                              context);
-                                                        })
-                                                  ],
-                                                );
-                                              })
-                                          : Navigator.pushNamedAndRemoveUntil(
-                                              context,
-                                              ProfileScreen.id,
-                                              (Route<dynamic> route) => false,
-                                            );
+                                                    actions: [
+                                                      OrangeButton(
+                                                          text: 'بستن',
+                                                          onPressed: () {
+                                                            setState(() {
+                                                              errorText = null;
+                                                              visible = false;
+                                                            });
+                                                            Navigator.pop(
+                                                                context);
+                                                          })
+                                                    ],
+                                                  );
+                                                })
+                                            : Navigator.pushNamedAndRemoveUntil(
+                                                context,
+                                                ProfileScreen.id,
+                                                (Route<dynamic> route) => false,
+                                              );
+                                      } else {
+                                        getOtp();
+                                        Navigator.pushNamed(
+                                          context,
+                                          OTPVerifyScreen.id,
+                                        );
+                                      }
                                     } else {
                                       showDialog(
                                           context: context,

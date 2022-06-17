@@ -82,7 +82,6 @@ class _ProductEditState extends State<ProductEdit> {
         headers: headers,
       );
       if (response.statusCode == 200) {
-        print(response.statusCode);
         var data = response.body;
         setState(() {
           title = jsonDecode(data)["product"]["title"];
@@ -210,7 +209,7 @@ class _ProductEditState extends State<ProductEdit> {
           color: Colors.black,
         ),
       ),
-      body: availableImage.isEmpty
+      body: title == null
           ? const Center(
               child: CircularProgressIndicator(
               color: kOrangeColor,
@@ -251,11 +250,11 @@ class _ProductEditState extends State<ProductEdit> {
                               width: 250,
                               height: 250,
                               child: Image(
-                                image: NetworkImage(imagePath == null
-                                    // ignore: prefer_interpolation_to_compose_strings
+                                image: NetworkImage(availableImage.isEmpty
                                     ? 'https://testapi.carbon-family.com/' +
-                                        availableImage[0]
-                                    : 'https://testapi.carbon-family.com/${imagePath!}'),
+                                        imagePath!
+                                    : 'https://testapi.carbon-family.com/' +
+                                        availableImage[0]),
                                 fit: BoxFit.cover,
                               ),
                             ),

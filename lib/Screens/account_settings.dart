@@ -7,7 +7,6 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:masoukharid/Classes/Text&TextStyle/textfield_label_text_style.dart';
 import 'package:masoukharid/Classes/orange_button.dart';
 import 'package:masoukharid/Constants/colors.dart';
 import 'package:masoukharid/Screens/profile_screen.dart';
@@ -273,54 +272,54 @@ class _AccountSettingsState extends State<AccountSettings> {
                           ),
                         ),
                         const SizedBox(height: 30.0),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: const [
-                                SizedBox(
-                                  height: 30,
-                                  child: TextFieldLabel(text: 'آدرس'),
-                                ),
-                                SizedBox(
-                                  width: 3,
-                                ),
-                                Text(
-                                  '*',
-                                  style: TextStyle(
-                                    color: Colors.red,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(
-                              height: 28,
-                              child: TextField(
-                                controller: _address,
-                                onChanged: (String value) {
-                                  address = value;
-                                },
-                                cursorColor: kButtonOrangeColor,
-                                decoration: InputDecoration(
-                                  focusedBorder: const UnderlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: kButtonOrangeColor,
-                                      width: 2.0,
-                                    ),
-                                  ),
-                                  hintText: '$address',
-                                  hintStyle: const TextStyle(
-                                    fontSize: 11,
-                                    color: kTextFieldHintTextColor,
-                                    fontFamily: 'Dana',
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+                        // Column(
+                        //   mainAxisAlignment: MainAxisAlignment.center,
+                        //   crossAxisAlignment: CrossAxisAlignment.start,
+                        //   children: [
+                        //     Row(
+                        //       mainAxisAlignment: MainAxisAlignment.start,
+                        //       children: const [
+                        //         SizedBox(
+                        //           height: 30,
+                        //           child: TextFieldLabel(text: 'آدرس'),
+                        //         ),
+                        //         SizedBox(
+                        //           width: 3,
+                        //         ),
+                        //         Text(
+                        //           '*',
+                        //           style: TextStyle(
+                        //             color: Colors.red,
+                        //           ),
+                        //         ),
+                        //       ],
+                        //     ),
+                        //     SizedBox(
+                        //       height: 28,
+                        //       child: TextField(
+                        //         controller: _address,
+                        //         onChanged: (String value) {
+                        //           address = value;
+                        //         },
+                        //         cursorColor: kButtonOrangeColor,
+                        //         decoration: InputDecoration(
+                        //           focusedBorder: const UnderlineInputBorder(
+                        //             borderSide: BorderSide(
+                        //               color: kButtonOrangeColor,
+                        //               width: 2.0,
+                        //             ),
+                        //           ),
+                        //           hintText: '$address',
+                        //           hintStyle: const TextStyle(
+                        //             fontSize: 11,
+                        //             color: kTextFieldHintTextColor,
+                        //             fontFamily: 'Dana',
+                        //           ),
+                        //         ),
+                        //       ),
+                        //     ),
+                        //   ],
+                        // ),
                         const SizedBox(height: 130),
                         Center(
                           child: Visibility(

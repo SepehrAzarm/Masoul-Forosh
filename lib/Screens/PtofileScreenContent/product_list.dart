@@ -1,8 +1,9 @@
-import 'package:flutter/material.dart';
-import 'package:masoukharid/Classes/Cards/product_card.dart';
-import 'package:masoukharid/Services/storage_class.dart';
-import 'package:http/http.dart' as http;
 import 'dart:convert';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:http/http.dart' as http;
+import 'package:masoukharid/Classes/Cards/product_card.dart';
 
 class ProductList extends StatefulWidget {
   const ProductList({
@@ -18,8 +19,11 @@ class _ProductListState extends State<ProductList> {
   List productAvailableAmount = [];
   List productDescription = [];
 
+  final storage = const FlutterSecureStorage();
+
   Future getProductList() async {
-    Map<String, String> headers = {'token': Storage.token};
+    String? value = await storage.read(key: "token");
+    Map<String, String> headers = {'token': value!};
     try {
       var response = await http.get(
           Uri.parse(

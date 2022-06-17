@@ -1,8 +1,10 @@
 import 'dart:convert';
+
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
-import 'package:masoukharid/Services/storage_class.dart';
 
 class ApiManager {
+  final storage = const FlutterSecureStorage();
   Future<String> authenticateUser(String? phoneNumber, String? password) async {
     String token = '';
     try {
@@ -16,7 +18,7 @@ class ApiManager {
       if (response.statusCode == 200) {
         var data = await jsonDecode(response.body.toString());
         token = await data['token'];
-        print(Storage.token);
+        print("Hello World");
         print(response.statusCode);
       } else {
         print(response.statusCode);
@@ -28,7 +30,8 @@ class ApiManager {
   }
 
   void getOTPVerify() async {
-    Map<String, String> headers = {'token': Storage.token};
+    String? value = await storage.read(key: "token");
+    Map<String, String> headers = {'token': value!};
     try {
       var response = await http.get(
         Uri.parse(

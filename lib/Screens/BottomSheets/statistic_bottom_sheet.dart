@@ -7,7 +7,6 @@ import 'package:masoukharid/Screens/Statistics/items_screen.dart';
 import 'package:masoukharid/Screens/Statistics/turnover_screen.dart';
 
 import '../../Classes/statistics_bsh_content_widget.dart';
-import '../../Services/storage_class.dart';
 
 class StatisticsBSH extends StatefulWidget {
   const StatisticsBSH({Key? key}) : super(key: key);
@@ -74,7 +73,6 @@ class _StatisticsBSHState extends State<StatisticsBSH> {
                               onTap: () {
                                 Navigator.pushNamed(
                                     context, FactorListScreen.id);
-                                print(Storage.token);
                               },
                             ),
                             const Divider(thickness: 1),

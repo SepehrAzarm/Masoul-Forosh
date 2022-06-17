@@ -1,10 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:http/http.dart' as http;
 import 'package:masoukharid/Classes/Text&TextStyle/orange_header_text.dart';
 import 'package:masoukharid/Classes/orange_button.dart';
 import 'package:masoukharid/Constants/colors.dart';
-import 'package:masoukharid/Screens/Password_Recovery/enter_new_password.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'package:masoukharid/Screens/profile_screen.dart';
 
 class OTPVerifyScreen extends StatefulWidget {
   const OTPVerifyScreen({Key? key}) : super(key: key);
@@ -16,19 +18,30 @@ class OTPVerifyScreen extends StatefulWidget {
 
 class _OTPVerifyScreenState extends State<OTPVerifyScreen> {
   final TextEditingController _otpController = TextEditingController();
-  final TextEditingController _password = TextEditingController();
+  final storage = const FlutterSecureStorage();
   String? code;
-  String? password;
   bool obsText = true;
   String? errorText;
   bool visible = false;
   Future postOTPVerify() async {
+    String? value = await storage.read(key: "token");
+    Map<String, String> headers = {
+      'token': value!,
+      "Accept": "application/json",
+    };
     var response = await http.post(
         Uri.parse(
-            'https://testapi.carbon-family.com/api/market/authentication/forgetpassword'),
-        body: {'verificationCode': code, "newPassword": password});
-    if (response.statusCode == 200) {
-      print(response.statusCode);
+            'https://testapi.carbon-family.com/api/market/authentication/verify'),
+        headers: headers,
+        body: {'verificationCode': code});
+    if (response.statusCode == 201) {
+      var data = await jsonDecode(response.body.toString());
+      await storage.delete(key: "token");
+      await storage.write(key: "token", value: data["token"]);
+      String? value = await storage.read(key: "token");
+      print(value);
+      // print(response.body);
+      // print(response.statusCode);
     } else {
       print(response.statusCode);
       print(response.body);
@@ -85,6 +98,7 @@ class _OTPVerifyScreenState extends State<OTPVerifyScreen> {
                   ),
                 ),
                 const SizedBox(height: 50),
+                //Verify Code
                 SizedBox(
                   width: MediaQuery.of(context).size.width,
                   height: 60,
@@ -111,58 +125,7 @@ class _OTPVerifyScreenState extends State<OTPVerifyScreen> {
                   ),
                 ),
                 const SizedBox(height: 80.0),
-                SizedBox(
-                  height: 28,
-                  child: TextField(
-                    obscureText: obsText,
-                    controller: _password,
-                    onChanged: (String value) {
-                      setState(() {
-                        password = value;
-                      });
-                    },
-                    cursorColor: kButtonOrangeColor,
-                    decoration: InputDecoration(
-                      suffixIcon: IconButton(
-                        iconSize: 20.0,
-                        icon: Icon(obsText == true
-                            ? Icons.visibility
-                            : Icons.visibility_off),
-                        onPressed: () {
-                          setState(() {
-                            obsText == true ? obsText = false : obsText = true;
-                          });
-                        },
-                      ),
-                      focusedBorder: const UnderlineInputBorder(
-                        borderSide: BorderSide(
-                          color: kButtonOrangeColor,
-                          width: 2.0,
-                        ),
-                      ),
-                      hintText: 'رمز عبور جدید خود را وارد کنید',
-                      hintStyle: const TextStyle(
-                        fontSize: 11,
-                        color: kTextFieldHintTextColor,
-                        fontFamily: 'Dana',
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 30),
-                const SizedBox(
-                  width: 80,
-                  height: 20,
-                  child: Text(
-                    'رمز عبور باید شامل حروف بزرگ و کوچک انگلیسی و اعداد باشد',
-                    style: TextStyle(
-                      fontFamily: 'IranYekan',
-                      fontSize: 10,
-                      color: Colors.red,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 210),
+                const SizedBox(height: 280),
                 Center(
                   child: Visibility(
                     maintainSize: true,
@@ -190,7 +153,7 @@ class _OTPVerifyScreenState extends State<OTPVerifyScreen> {
                         errorText == null
                             ? Navigator.pushNamedAndRemoveUntil(
                                 context,
-                                EnterNewPass.id,
+                                ProfileScreen.id,
                                 (Route<dynamic> route) => false,
                               )
                             : showDialog(

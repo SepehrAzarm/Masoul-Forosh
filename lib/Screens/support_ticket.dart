@@ -1,12 +1,14 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:http/http.dart' as http;
 import 'package:masoukharid/Classes/orange_button.dart';
 import 'package:masoukharid/Screens/profile_screen.dart';
-import 'package:masoukharid/Services/storage_class.dart';
+
 import '../Constants/borders_decorations.dart';
 import '../Constants/colors.dart';
 import '../Constants/constants.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 class SupportTicketScreen extends StatefulWidget {
   const SupportTicketScreen({Key? key}) : super(key: key);
@@ -19,10 +21,12 @@ class _SupportTicketScreenState extends State<SupportTicketScreen> {
   String? title;
   String? text;
   String? errorMassage;
+  final storage = const FlutterSecureStorage();
 
   postTicket() async {
+    String? value = await storage.read(key: "token");
     Map<String, String> headers = {
-      'token': Storage.token,
+      'token': value!,
       "Accept": "application/json",
       "Content-Type": "application/json"
     };

@@ -48,6 +48,7 @@ class _ProfileScreenState extends State<ProfileScreen>
   Future getProductList() async {
     String? value = await storage.read(key: "token");
     Map<String, String> headers = {'token': value!};
+    print(value);
     try {
       var response = await http.get(
           Uri.parse("https://testapi.carbon-family.com/api/market/products"),
@@ -105,6 +106,11 @@ class _ProfileScreenState extends State<ProfileScreen>
   }
 
   Future<void> _refresh() async {
+    productTitles = [];
+    productAvailableAmount = [];
+    productDescription = [];
+    productIdList = [];
+    productImageList = [];
     getProductList();
     getMarketInfo();
   }
@@ -280,7 +286,6 @@ class _ProfileScreenState extends State<ProfileScreen>
                                                   width: 160,
                                                   child: TextButton(
                                                     onPressed: () {
-                                                      print(Storage.token);
                                                       Navigator.pushNamed(
                                                           context,
                                                           AccountSettings.id);

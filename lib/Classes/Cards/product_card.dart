@@ -14,7 +14,7 @@ class ProductCard extends StatelessWidget {
   final Function()? onTap;
   final String title;
   final String availableAmount;
-  final String image;
+  final Widget image;
 
   @override
   Widget build(BuildContext context) {
@@ -40,10 +40,7 @@ class ProductCard extends StatelessWidget {
                     borderRadius: const BorderRadius.all(
                       Radius.circular(14.0),
                     ),
-                    child: Image(
-                      fit: BoxFit.cover,
-                      image: NetworkImage(image),
-                    ),
+                    child: image,
                   ),
                 ),
                 //Content Text

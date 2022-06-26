@@ -40,8 +40,8 @@ class _OTPVerifyScreenState extends State<OTPVerifyScreen> {
       await storage.write(key: "token", value: data["token"]);
       String? value = await storage.read(key: "token");
       print(value);
-      // print(response.body);
-      // print(response.statusCode);
+      print(response.body);
+      print(response.statusCode);
     } else {
       print(response.statusCode);
       print(response.body);

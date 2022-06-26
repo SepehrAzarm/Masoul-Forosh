@@ -35,12 +35,6 @@ class _SplashScreenState extends State<SplashScreen> {
         (Route<dynamic> route) => false,
       );
     }
-
-    // Navigator.pushAndRemoveUntil(
-    //   context,
-    //   MaterialPageRoute(builder: (context) => const GetStartedPage()),
-    //   (Route<dynamic> route) => false,
-    // );
   }
 
   @override

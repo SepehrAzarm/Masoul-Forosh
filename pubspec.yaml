@@ -35,6 +35,8 @@ dependencies:
   check_vpn_connection: ^0.0.2
   flutter_secure_storage: ^5.0.2
   jwt_decode: ^0.3.1
+  cached_network_image: ^3.2.1
+  flutter_multi_formatter: ^2.5.7
 
 
 dev_dependencies:
@@ -52,9 +54,10 @@ flutter:
     - assets/lottieJSON/
     - images/
     - images/Icons/
+    - images/HeaderPics/
+    - images/staticImages/
     - images/SettingsIcons/
     - images/BottomNavigationBarIcons/
-    - images/HeaderPics/
 
   fonts:
     - family: Snaap

@@ -16,6 +16,8 @@ import 'package:masoukharid/Constants/constants.dart';
 import 'package:masoukharid/Screens/Products/products_mainpage.dart';
 import 'package:masoukharid/Services/storage_class.dart';
 
+import '../../Methods/text_field_input_decorations.dart';
+
 class ProductEdit extends StatefulWidget {
   const ProductEdit({Key? key}) : super(key: key);
   static const String id = 'ProductEdit';
@@ -25,35 +27,44 @@ class ProductEdit extends StatefulWidget {
 }
 
 class _ProductEditState extends State<ProductEdit> {
+  final TextEditingController _title = TextEditingController();
+  final TextEditingController _description = TextEditingController();
   final TextEditingController _availableController = TextEditingController();
   final TextEditingController _limitController = TextEditingController();
   final TextEditingController _orderBoundary = TextEditingController();
+  final TextEditingController _originalPrice = TextEditingController();
+  final TextEditingController _priceForMarket = TextEditingController();
   final storage = const FlutterSecureStorage();
   final ImagePicker _picker = ImagePicker();
-  bool? isChecked = false;
-  bool visible = false;
-  String? availableAmount;
-  String? orderBoundary;
-  int? newAvailableAmount;
-  late File imageFile;
-  bool enabled = true;
-  String? description;
-  String? imagePath;
-  String? title;
-  String? errorText;
   List availableImage = [];
   // ignore: prefer_typing_uninitialized_variables
   var newImage;
+  // ignore: prefer_typing_uninitialized_variables
+  var imageFile;
   String dropDownValue = 'تعداد';
   String amountMainText = '';
   String amountSecText = '';
+  String? orderBoundary;
+  String? description;
+  String? imagePath;
+  String? errorText;
+  String? title;
+  String? unit;
+  bool? isChecked = false;
+  bool visible = false;
+  bool enabled = true;
+  int? newAvailableAmount;
+  int? availableAmount;
+  int? priceForMarket;
+  int? originalPrice;
+
   String mainText() {
-    if (dropDownValue == 'تعداد' ||
-        dropDownValue == 'بسته' ||
-        dropDownValue == 'جین') {
-      amountMainText = 'مقدار موجود';
+    if (dropDownValue == 'تعداد ' ||
+        dropDownValue == 'بسته ' ||
+        dropDownValue == 'جین ') {
+      amountMainText = 'مقدار موجود ';
     } else {
-      amountMainText = 'میزان موجود';
+      amountMainText = 'میزان موجود ';
     }
     return amountMainText;
   }
@@ -85,10 +96,18 @@ class _ProductEditState extends State<ProductEdit> {
         var data = response.body;
         setState(() {
           title = jsonDecode(data)["product"]["title"];
+          unit = jsonDecode(data)["product"]["unit"];
+          originalPrice = jsonDecode(data)["product"]["originalPrice"];
+          priceForMarket = jsonDecode(data)["product"]["priceForMarket"];
           description = jsonDecode(data)["product"]["descriptions"];
-          availableAmount =
-              jsonDecode(data)["product"]["availableAmount"].toString();
+          availableAmount = jsonDecode(data)["product"]["availableAmount"];
           availableImage = jsonDecode(data)["product"]["media"];
+          dropDownValue = unit!;
+          _title.text = '$title ';
+          _description.text = '$description ';
+          _originalPrice.text = '$originalPrice ';
+          _priceForMarket.text = '$priceForMarket ';
+          _availableController.text = '$availableAmount ';
         });
       } else {
         print(response.body);
@@ -113,11 +132,14 @@ class _ProductEditState extends State<ProductEdit> {
       "media": [
         imagePath,
       ],
-      "availableAmount": newAvailableAmount,
+      "availableAmount": availableAmount,
+      "originalPrice": originalPrice,
+      "priceForMarket": priceForMarket,
       "categoryId": "6246f05faca10face61bdf57",
       "orderBoundery": {
         "minAmount": orderBoundary,
-      }
+      },
+      "unit": "تعداد"
     };
     var body = jsonEncode(data);
     try {
@@ -146,6 +168,8 @@ class _ProductEditState extends State<ProductEdit> {
     setState(() {
       var image = selectedImage;
       newImage = convertToFile(image);
+      imageFile = File(newImage.path);
+      print(newImage);
     });
   }
 
@@ -189,6 +213,29 @@ class _ProductEditState extends State<ProductEdit> {
       }
     } catch (e) {
       print(e);
+    }
+  }
+
+  Widget picFunc() {
+    if (newImage != null) {
+      return Image.file(
+        File(newImage.path),
+        fit: BoxFit.cover,
+      );
+    } else if (imagePath == null && availableImage.isEmpty) {
+      return const Image(
+        fit: BoxFit.cover,
+        image: AssetImage(
+          'images/staticImages/productStaticImage.jpg',
+        ),
+      );
+    } else {
+      return Image(
+        image: NetworkImage(availableImage.isEmpty
+            ? 'https://testapi.carbon-family.com/' + imagePath!
+            : 'https://testapi.carbon-family.com/' + availableImage[0]),
+        fit: BoxFit.cover,
+      );
     }
   }
 
@@ -246,25 +293,18 @@ class _ProductEditState extends State<ProductEdit> {
                               Radius.circular(20),
                             ),
                             child: Container(
-                              color: Colors.amber,
+                              color: kTextFieldHintTextColor,
                               width: 250,
                               height: 250,
-                              child: Image(
-                                image: NetworkImage(availableImage.isEmpty
-                                    ? 'https://testapi.carbon-family.com/' +
-                                        imagePath!
-                                    : 'https://testapi.carbon-family.com/' +
-                                        availableImage[0]),
-                                fit: BoxFit.cover,
-                              ),
+                              child: picFunc(),
                             ),
                           ),
                         ),
                         const SizedBox(height: 15),
+                        //Post Image Button and Function
                         TextButton(
                           onPressed: () async {
                             await chooseImage();
-                            await postImage();
                           },
                           child: Container(
                             decoration: BoxDecoration(
@@ -299,6 +339,7 @@ class _ProductEditState extends State<ProductEdit> {
                           ),
                         ),
                         const SizedBox(height: 20),
+                        // Title & description Edit
                         const Text(
                           'ویرایش متن',
                           style: TextStyle(
@@ -310,6 +351,7 @@ class _ProductEditState extends State<ProductEdit> {
                         ),
                         const SizedBox(height: 10),
                         TextField(
+                          controller: _title,
                           onChanged: (value) {
                             setState(() {
                               title = value;
@@ -336,6 +378,7 @@ class _ProductEditState extends State<ProductEdit> {
                           height: 220,
                           width: MediaQuery.of(context).size.width,
                           child: TextField(
+                            controller: _description,
                             onChanged: (value) {
                               setState(() {
                                 description = value;
@@ -373,7 +416,114 @@ class _ProductEditState extends State<ProductEdit> {
                             ),
                           ),
                         ),
-                        const SizedBox(height: 60),
+                        const SizedBox(height: 40),
+                        //Price
+                        const Text(
+                          'قیمت',
+                          style: TextStyle(
+                            fontFamily: 'Dana',
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: kNewsCardHeaderTextColor,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        SizedBox(
+                          height: 100,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text(
+                                    'قیمت در بازار(تومان)',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF4B4B4B),
+                                      fontFamily: 'Dana',
+                                      fontSize: 11,
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 10),
+                                    child: SizedBox(
+                                      width: 147,
+                                      height: 35,
+                                      child: TextField(
+                                          textInputAction: TextInputAction.next,
+                                          keyboardType: TextInputType.number,
+                                          controller: _originalPrice,
+                                          cursorColor: kButtonOrangeColor,
+                                          textAlignVertical:
+                                              TextAlignVertical.center,
+                                          textAlign: TextAlign.center,
+                                          onChanged: (String value) {
+                                            setState(() {
+                                              originalPrice = int.parse(value);
+                                            });
+                                          },
+                                          style: const TextStyle(
+                                            fontFamily: 'IranYekan',
+                                            fontSize: 13,
+                                          ),
+                                          decoration: textFieldDecorations()),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text(
+                                    'قیمت برای '
+                                    'مسئول فروش(تومان)',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF4B4B4B),
+                                      fontFamily: 'Dana',
+                                      fontSize: 11,
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 10),
+                                    child: SizedBox(
+                                      width: 147,
+                                      height: 35,
+                                      child: TextField(
+                                          textInputAction: TextInputAction.next,
+                                          keyboardType: TextInputType.number,
+                                          controller: _priceForMarket,
+                                          cursorColor: kButtonOrangeColor,
+                                          textAlignVertical:
+                                              TextAlignVertical.center,
+                                          textAlign: TextAlign.center,
+                                          onChanged: (String value) {
+                                            setState(() {
+                                              priceForMarket = int.parse(value);
+                                            });
+                                          },
+                                          // inputFormatters: [
+                                          //   MaskedInputFormatter(
+                                          //       "000,000,000,000,000,000,000"),
+                                          // ],
+                                          style: const TextStyle(
+                                            fontFamily: 'IranYekan',
+                                            fontSize: 13,
+                                          ),
+                                          decoration: textFieldDecorations()),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        //Amount
                         const Text(
                           'ویرایش مقدار',
                           style: TextStyle(
@@ -391,19 +541,74 @@ class _ProductEditState extends State<ProductEdit> {
                               dropDownValue = newValue!;
                             });
                           },
-                          items: <String>[
-                            'تعداد',
-                            'جین',
-                            'وزن',
-                            'بسته',
-                            'لیتر',
-                            'پالت'
-                          ].map<DropdownMenuItem<String>>((String value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Text(value),
-                            );
-                          }).toList(),
+                          items: const <DropdownMenuItem<String>>[
+                            DropdownMenuItem(
+                              value: 'تعداد',
+                              child: Text(
+                                'تعداد',
+                                style: TextStyle(
+                                  fontFamily: 'Dana',
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                            DropdownMenuItem(
+                              value: 'جین',
+                              child: Text(
+                                'جین',
+                                style: TextStyle(
+                                  fontFamily: 'Dana',
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                            DropdownMenuItem(
+                              value: 'وزن',
+                              child: Text(
+                                'وزن',
+                                style: TextStyle(
+                                  fontFamily: 'Dana',
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                            DropdownMenuItem(
+                              value: 'بسته',
+                              child: Text(
+                                'بسته',
+                                style: TextStyle(
+                                  fontFamily: 'Dana',
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                            DropdownMenuItem(
+                              value: 'لیتر',
+                              child: Text(
+                                'لیتر',
+                                style: TextStyle(
+                                  fontFamily: 'Dana',
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                            DropdownMenuItem(
+                              value: 'پالت',
+                              child: Text(
+                                'پالت',
+                                style: TextStyle(
+                                  fontFamily: 'Dana',
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                         const SizedBox(height: 20),
                         AmountWidget(
@@ -422,7 +627,7 @@ class _ProductEditState extends State<ProductEdit> {
                           ),
                           onChanged: (value) {
                             setState(() {
-                              newAvailableAmount = int.parse(value);
+                              availableAmount = int.parse(value);
                             });
                           },
                         ),
@@ -517,6 +722,7 @@ class _ProductEditState extends State<ProductEdit> {
                                 setState(() {
                                   visible = true;
                                 });
+                                await postImage();
                                 await putEditProductInfo();
                                 // ignore: unnecessary_null_comparison
                                 errorText != null
@@ -550,6 +756,7 @@ class _ProductEditState extends State<ProductEdit> {
                                                     setState(() {
                                                       errorText = null;
                                                       visible = false;
+                                                      imagePath = null;
                                                     });
                                                     Navigator.pop(context);
                                                   })
@@ -561,15 +768,13 @@ class _ProductEditState extends State<ProductEdit> {
                                         ProductsMainPage.id,
                                         (Route<dynamic> route) => false,
                                       );
-                                deactivate();
-                                print(errorText);
                               } else {
                                 // Navigator.pushNamedAndRemoveUntil(
                                 //   context,
                                 //   ProductsMainPage.id,
                                 //   (Route<dynamic> route) => false,
                                 // );
-                                print("Error");
+                                print("error");
                               }
                             }),
                         const SizedBox(height: 20),

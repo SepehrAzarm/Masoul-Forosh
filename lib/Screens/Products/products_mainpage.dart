@@ -58,6 +58,22 @@ class _ProductsMainPageState extends State<ProductsMainPage> {
     }
   }
 
+  Widget picFunc() {
+    if (image.isEmpty) {
+      return const Image(
+        fit: BoxFit.cover,
+        image: AssetImage(
+          'images/staticImages/productStaticImage.jpg',
+        ),
+      );
+    } else {
+      return Image(
+        image: NetworkImage('https://testapi.carbon-family.com/' + image[0]),
+        fit: BoxFit.cover,
+      );
+    }
+  }
+
   @override
   void initState() {
     getProductInfo();
@@ -88,15 +104,7 @@ class _ProductsMainPageState extends State<ProductsMainPage> {
                             borderRadius: const BorderRadius.only(
                                 bottomLeft: Radius.circular(18),
                                 bottomRight: Radius.circular(18)),
-                            child: Image(
-                              fit: BoxFit.cover,
-                              image: NetworkImage(
-                                image.isEmpty
-                                    ? 'https://testapi.carbon-family.com/uploads/products/productsImages/635dc499204c404d99b3c3484b7c96fd_6246f113965272bf7ca06282_1648817959178.jpg'
-                                    : 'https://testapi.carbon-family.com/' +
-                                        image[0],
-                              ),
-                            ),
+                            child: picFunc(),
                           ),
                         ),
                         Column(

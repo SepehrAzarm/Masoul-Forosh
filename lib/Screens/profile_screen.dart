@@ -115,6 +115,27 @@ class _ProfileScreenState extends State<ProfileScreen>
     getMarketInfo();
   }
 
+  profilePicFunc() {
+    if (imagePath == null) {
+      return const AssetImage(
+        'images/staticImages/productStaticImage.jpg',
+      );
+    } else {
+      return NetworkImage('https://testapi.carbon-family.com/${imagePath!}');
+    }
+  }
+
+  productDefaultPic(int index) {
+    if (productImageList.isEmpty) {
+      return const AssetImage(
+        'images/staticImages/productStaticImage.jpg',
+      );
+    } else {
+      return NetworkImage(
+          'https://testapi.carbon-family.com/${productImageList[index][0]}');
+    }
+  }
+
   @override
   void initState() {
     _tabController = TabController(length: 2, vsync: this);
@@ -374,11 +395,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                           radius: 60,
                           child: CircleAvatar(
                             radius: 57,
-                            backgroundImage: NetworkImage(
-                              imagePath != null
-                                  ? 'https://testapi.carbon-family.com/${imagePath!}'
-                                  : 'https://testapi.carbon-family.com/uploads/markets/marketImages/7185b4aa4494c37820e2d4abfefc6166_6246f113965272bf7ca06282_1648818031253.jpg',
-                            ),
+                            backgroundImage: profilePicFunc(),
                           ),
                         ),
                       ),
@@ -399,20 +416,27 @@ class _ProfileScreenState extends State<ProfileScreen>
                                   : 0,
                               itemBuilder: (BuildContext context, int index) {
                                 return ProductCard(
-                                  onTap: () async {
-                                    Storage.productId =
-                                        await productIdList[index];
-                                    Navigator.pushNamed(
-                                        context, ProductsMainPage.id);
-                                  },
-                                  title: productTitles[index],
-                                  availableAmount:
-                                      productAvailableAmount[index].toString(),
-                                  image: productImageList[index].isEmpty
-                                      ? 'https://testapi.carbon-family.com/uploads/products/productsImages/635dc499204c404d99b3c3484b7c96fd_6246f113965272bf7ca06282_1648817959178.jpg'
-                                      : 'https://testapi.carbon-family.com/' +
-                                          productImageList[index][0],
-                                );
+                                    onTap: () async {
+                                      Storage.productId =
+                                          await productIdList[index];
+                                      Navigator.pushNamed(
+                                          context, ProductsMainPage.id);
+                                    },
+                                    title: productTitles[index],
+                                    availableAmount:
+                                        productAvailableAmount[index]
+                                            .toString(),
+                                    image: productImageList[index].isEmpty
+                                        ? const Image(
+                                            fit: BoxFit.cover,
+                                            image: AssetImage(
+                                              'images/staticImages/productStaticImage.jpg',
+                                            ),
+                                          )
+                                        : Image(
+                                            image: productDefaultPic(index),
+                                            fit: BoxFit.cover,
+                                          ));
                               },
                             ),
                             const NewsList(),
@@ -456,11 +480,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                           radius: 60,
                           child: CircleAvatar(
                             radius: 57,
-                            backgroundImage: NetworkImage(
-                              imagePath != null
-                                  ? 'https://testapi.carbon-family.com/${imagePath!}'
-                                  : 'https://testapi.carbon-family.com/uploads/markets/marketImages/d798a55449bc9df4d13d7c46045150c7_62370134273683037652865c.jpg',
-                            ),
+                            backgroundImage: profilePicFunc(),
                           ),
                         ),
                         const SizedBox(height: 20),

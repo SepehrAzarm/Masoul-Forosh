@@ -154,6 +154,16 @@ class _AccountSettingsState extends State<AccountSettings> {
     }
   }
 
+  profilePicFunc() {
+    if (imagePath == null) {
+      return const AssetImage(
+        'images/staticImages/productStaticImage.jpg',
+      );
+    } else {
+      return NetworkImage('https://testapi.carbon-family.com/${imagePath!}');
+    }
+  }
+
   @override
   void initState() {
     getMarketInfo();
@@ -227,12 +237,7 @@ class _AccountSettingsState extends State<AccountSettings> {
                             radius: 60,
                             child: CircleAvatar(
                               radius: 57,
-                              backgroundImage: NetworkImage(
-                                imagePath != null
-                                    ? 'https://testapi.carbon-family.com/' +
-                                        imagePath!
-                                    : 'https://testapi.carbon-family.com/uploads/markets/marketImages/7185b4aa4494c37820e2d4abfefc6166_6246f113965272bf7ca06282_1648818031253.jpg',
-                              ),
+                              backgroundImage: profilePicFunc(),
                             ),
                           ),
                         ),

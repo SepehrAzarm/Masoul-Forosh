@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:masoukharid/Screens/CategoryScreen/category_first_page.dart';
+import 'package:masoukharid/Screens/CategoryScreen/category_second_page.dart';
 import 'package:masoukharid/Screens/Employees/add_employee.dart';
 import 'package:masoukharid/Screens/Employees/employe_list.dart';
 import 'package:masoukharid/Screens/Employees/employee_profile.dart';
@@ -18,7 +20,6 @@ import 'package:masoukharid/Screens/Statistics/items_screen.dart';
 import 'package:masoukharid/Screens/Statistics/turnover_screen.dart';
 import 'package:masoukharid/Screens/account_settings.dart';
 import 'package:masoukharid/Screens/get_started_page.dart';
-import 'package:masoukharid/Screens/loading_screen.dart';
 import 'package:masoukharid/Screens/login_page.dart';
 import 'package:masoukharid/Screens/otp_verify_screen.dart';
 import 'package:masoukharid/Screens/profile_screen.dart';
@@ -48,9 +49,10 @@ class MasoulForosh extends StatelessWidget {
       ],
       initialRoute: SplashScreen.id,
       routes: {
-        LoadingSplashScreen.id: (context) => const LoadingSplashScreen(),
         SupportTicketScreen.id: (context) => const SupportTicketScreen(),
         SellingItemsScreen.id: (context) => const SellingItemsScreen(),
+        CategorySecondList.id: (context) => const CategorySecondList(),
+        CategoryFirstPage.id: (context) => const CategoryFirstPage(),
         FactorListScreen.id: (context) => const FactorListScreen(),
         ProductsMainPage.id: (context) => const ProductsMainPage(),
         InputNumberPage.id: (context) => const InputNumberPage(),

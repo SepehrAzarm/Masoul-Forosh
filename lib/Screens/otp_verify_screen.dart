@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
+import 'package:masoukharid/Classes/Dialogs/error_dialog.dart';
 import 'package:masoukharid/Classes/Text&TextStyle/orange_header_text.dart';
 import 'package:masoukharid/Classes/orange_button.dart';
 import 'package:masoukharid/Constants/colors.dart';
@@ -151,6 +152,7 @@ class _OTPVerifyScreenState extends State<OTPVerifyScreen> {
                         await postOTPVerify();
                         // ignore: unnecessary_null_comparison
                         errorText == null
+                            // ignore: use_build_context_synchronously
                             ? Navigator.pushNamedAndRemoveUntil(
                                 context,
                                 ProfileScreen.id,
@@ -159,37 +161,15 @@ class _OTPVerifyScreenState extends State<OTPVerifyScreen> {
                             : showDialog(
                                 context: context,
                                 builder: (context) {
-                                  return AlertDialog(
-                                    title: const Center(
-                                      child: SizedBox(
-                                        width: 80,
-                                        height: 80,
-                                        child: Image(
-                                          image:
-                                              AssetImage('images/ErroIcon.png'),
-                                        ),
-                                      ),
-                                    ),
-                                    content: Text(
-                                      '$errorText',
-                                      textAlign: TextAlign.center,
-                                      style: const TextStyle(
-                                        fontFamily: 'IranYekan',
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    actions: [
-                                      OrangeButton(
-                                          text: 'بستن',
-                                          onPressed: () {
-                                            setState(() {
-                                              errorText = null;
-                                              visible = false;
-                                            });
-                                            Navigator.pop(context);
-                                          })
-                                    ],
+                                  return ErrorDialog(
+                                    errorText: '$errorText',
+                                    onPressed: () {
+                                      setState(() {
+                                        errorText = null;
+                                        visible = false;
+                                      });
+                                      Navigator.pop(context);
+                                    },
                                   );
                                 });
                         print(errorText);
@@ -197,27 +177,15 @@ class _OTPVerifyScreenState extends State<OTPVerifyScreen> {
                         showDialog(
                             context: context,
                             builder: (context) {
-                              return AlertDialog(
-                                title: const Text(
-                                  'لطفا کد تایید خود را وارد کنید',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontFamily: 'IranYekan',
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20,
-                                  ),
-                                ),
-                                actions: [
-                                  OrangeButton(
-                                      text: 'بستن',
-                                      onPressed: () {
-                                        setState(() {
-                                          errorText = null;
-                                          visible = false;
-                                        });
-                                        Navigator.pop(context);
-                                      })
-                                ],
+                              return ErrorDialog(
+                                errorText: 'لطفا کد تایید خود را وارد کنید',
+                                onPressed: () {
+                                  setState(() {
+                                    errorText = null;
+                                    visible = false;
+                                  });
+                                  Navigator.pop(context);
+                                },
                               );
                             });
                       }

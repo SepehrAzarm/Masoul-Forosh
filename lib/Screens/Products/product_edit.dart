@@ -7,12 +7,15 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:masoukharid/Classes/Dialogs/error_dialog.dart';
 import 'package:masoukharid/Classes/Text&TextStyle/orange_header_text.dart';
 import 'package:masoukharid/Classes/amount_card.dart';
 import 'package:masoukharid/Classes/orange_button.dart';
+import 'package:masoukharid/Classes/tax_widget.dart';
 import 'package:masoukharid/Constants/borders_decorations.dart';
 import 'package:masoukharid/Constants/colors.dart';
 import 'package:masoukharid/Constants/constants.dart';
+import 'package:masoukharid/Screens/CategoryScreen/category_first_page.dart';
 import 'package:masoukharid/Screens/Products/products_mainpage.dart';
 import 'package:masoukharid/Services/storage_class.dart';
 
@@ -27,13 +30,15 @@ class ProductEdit extends StatefulWidget {
 }
 
 class _ProductEditState extends State<ProductEdit> {
-  final TextEditingController _title = TextEditingController();
-  final TextEditingController _description = TextEditingController();
   final TextEditingController _availableController = TextEditingController();
   final TextEditingController _limitController = TextEditingController();
+  final TextEditingController _priceForMarket = TextEditingController();
   final TextEditingController _orderBoundary = TextEditingController();
   final TextEditingController _originalPrice = TextEditingController();
-  final TextEditingController _priceForMarket = TextEditingController();
+  final TextEditingController _taxPercentage = TextEditingController();
+  final TextEditingController _description = TextEditingController();
+  final TextEditingController _taxValue = TextEditingController();
+  final TextEditingController _title = TextEditingController();
   final storage = const FlutterSecureStorage();
   final ImagePicker _picker = ImagePicker();
   List availableImage = [];
@@ -44,19 +49,24 @@ class _ProductEditState extends State<ProductEdit> {
   String dropDownValue = 'تعداد';
   String amountMainText = '';
   String amountSecText = '';
+  String? availableCategory;
   String? orderBoundary;
   String? description;
   String? imagePath;
   String? errorText;
   String? title;
   String? unit;
+  bool taxIsChecked = true;
+  bool taxTypeValue = false;
+  bool taxTypePercent = false;
   bool? isChecked = false;
   bool visible = false;
   bool enabled = true;
-  int? newAvailableAmount;
   int? availableAmount;
   int? priceForMarket;
   int? originalPrice;
+  int taxPercentage = 0;
+  int taxValue = 0;
 
   String mainText() {
     if (dropDownValue == 'تعداد ' ||
@@ -102,12 +112,24 @@ class _ProductEditState extends State<ProductEdit> {
           description = jsonDecode(data)["product"]["descriptions"];
           availableAmount = jsonDecode(data)["product"]["availableAmount"];
           availableImage = jsonDecode(data)["product"]["media"];
+          taxIsChecked = jsonDecode(data)["product"]["tax"]["status"];
+          taxPercentage = jsonDecode(data)["product"]["tax"]["percentage"];
+          taxValue = jsonDecode(data)["product"]["tax"]["value"];
+          availableCategory =
+              jsonDecode(data)["product"]["categoryStringPath"];
           dropDownValue = unit!;
           _title.text = '$title ';
           _description.text = '$description ';
           _originalPrice.text = '$originalPrice ';
           _priceForMarket.text = '$priceForMarket ';
           _availableController.text = '$availableAmount ';
+          _taxPercentage.text = '$taxPercentage ';
+          _taxValue.text = '$taxValue ';
+          if (taxValue != 0) {
+            taxTypeValue = true;
+          } else if (taxPercentage != 0) {
+            taxTypePercent = true;
+          }
         });
       } else {
         print(response.body);
@@ -135,7 +157,12 @@ class _ProductEditState extends State<ProductEdit> {
       "availableAmount": availableAmount,
       "originalPrice": originalPrice,
       "priceForMarket": priceForMarket,
-      "categoryId": "6246f05faca10face61bdf57",
+      "categoryId": Storage.categoryId,
+      "tax": {
+        "status": taxIsChecked,
+        "value": taxValue,
+        "percentage": taxPercentage,
+      },
       "orderBoundery": {
         "minAmount": orderBoundary,
       },
@@ -232,8 +259,8 @@ class _ProductEditState extends State<ProductEdit> {
     } else {
       return Image(
         image: NetworkImage(availableImage.isEmpty
-            ? 'https://testapi.carbon-family.com/' + imagePath!
-            : 'https://testapi.carbon-family.com/' + availableImage[0]),
+            ? 'https://testapi.carbon-family.com/${imagePath!}'
+            : 'https://testapi.carbon-family.com/${availableImage[0]}'),
         fit: BoxFit.cover,
       );
     }
@@ -252,8 +279,15 @@ class _ProductEditState extends State<ProductEdit> {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.white,
-        leading: const BackButton(
+        leading: BackButton(
           color: Colors.black,
+          onPressed: () {
+            Navigator.pushNamedAndRemoveUntil(
+              context,
+              ProductsMainPage.id,
+              (Route<dynamic> route) => false,
+            );
+          },
         ),
       ),
       body: title == null
@@ -523,6 +557,174 @@ class _ProductEditState extends State<ProductEdit> {
                             ],
                           ),
                         ),
+                        //Tax
+                        const Text(
+                          'مالیات',
+                          style: TextStyle(
+                            fontFamily: 'Dana',
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: kNewsCardHeaderTextColor,
+                          ),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Checkbox(
+                              activeColor: kButtonOrangeColor,
+                              value: taxIsChecked,
+                              onChanged: (bool? value) {
+                                setState(() {
+                                  taxIsChecked = value!;
+                                  taxTypeValue = value;
+                                  if (taxIsChecked == false) {
+                                    taxTypeValue = false;
+                                    taxTypePercent = false;
+                                  }
+                                });
+                              },
+                            ),
+                            const Text(
+                              'مالیات بر ارزش افزوده',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF4B4B4B),
+                                fontSize: 12.0,
+                                fontFamily: 'Dana',
+                              ),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Checkbox(
+                                  activeColor: kButtonOrangeColor,
+                                  value: taxTypeValue,
+                                  onChanged: (bool? value) {
+                                    setState(() {
+                                      if (taxIsChecked == true) {
+                                        taxTypeValue = value!;
+                                        taxTypePercent = false;
+                                        _taxPercentage.clear();
+                                      }
+                                    });
+                                  },
+                                ),
+                                const Text(
+                                  'مالیات به صورت عددی',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF4B4B4B),
+                                    fontSize: 10,
+                                    fontFamily: 'Dana',
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Checkbox(
+                                  activeColor: kButtonOrangeColor,
+                                  value: taxTypePercent,
+                                  onChanged: (bool? value) {
+                                    setState(() {
+                                      if (taxIsChecked == true) {
+                                        taxTypePercent = value!;
+                                        taxTypeValue = false;
+                                        _taxValue.clear();
+                                      }
+                                    });
+                                  },
+                                ),
+                                const Text(
+                                  'مالیات به صورت درصدی',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF4B4B4B),
+                                    fontSize: 10,
+                                    fontFamily: 'Dana',
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        TaxWidget(
+                          mainText: 'مالیات',
+                          secondaryText: 'به عدد',
+                          onChanged: (value) {
+                            taxValue = int.parse(value);
+                          },
+                          enabled: taxTypeValue,
+                          controller: _taxValue,
+                          suffixIcon: IconButton(
+                            iconSize: 20,
+                            color: const Color(0xFF4B4B4B),
+                            onPressed: () {
+                              setState(() {
+                                _taxValue.clear();
+                              });
+                            },
+                            icon: const Icon(Icons.clear),
+                          ),
+                        ),
+                        TaxWidget(
+                          mainText: 'مالیات',
+                          secondaryText: 'درصد',
+                          onChanged: (value) {
+                            setState(() {
+                              if (int.parse(value) > 100) {
+                                _taxPercentage.text = " 100 ";
+                                taxPercentage = 100;
+                              }
+                              taxPercentage = int.parse(value);
+                            });
+                          },
+                          enabled: taxTypePercent,
+                          controller: _taxPercentage,
+                          suffixIcon: IconButton(
+                            iconSize: 20,
+                            color: const Color(0xFF4B4B4B),
+                            onPressed: () {
+                              setState(() {
+                                _taxPercentage.clear();
+                              });
+                            },
+                            icon: const Icon(Icons.clear),
+                          ),
+                        ),
+                        //Category
+                        const Text(
+                          'دسته بندی',
+                          style: TextStyle(
+                            fontFamily: 'Dana',
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: kNewsCardHeaderTextColor,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          'دسته بندی فعلی محصول: $availableCategory',
+                          style: const TextStyle(
+                            fontFamily: 'Dana',
+                            color: Color(0xFF4B4B4B),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        OrangeButton(
+                          text: 'انتخاب دسته بندی محصول',
+                          onPressed: () {
+                            Storage.isEditProduct = true;
+                            Navigator.pushNamed(context, CategoryFirstPage.id);
+                          },
+                        ),
+                        const SizedBox(height: 10),
                         //Amount
                         const Text(
                           'ویرایش مقدار',
@@ -533,7 +735,6 @@ class _ProductEditState extends State<ProductEdit> {
                             color: kNewsCardHeaderTextColor,
                           ),
                         ),
-                        const SizedBox(height: 20),
                         DropdownButton(
                           value: dropDownValue,
                           onChanged: (String? newValue) {
@@ -610,7 +811,7 @@ class _ProductEditState extends State<ProductEdit> {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 20),
+                        //Available Amount
                         AmountWidget(
                           controller: _availableController,
                           mainText: mainText(),
@@ -621,6 +822,7 @@ class _ProductEditState extends State<ProductEdit> {
                             onPressed: () {
                               setState(() {
                                 _availableController.clear();
+                                availableAmount = null;
                               });
                             },
                             icon: const Icon(Icons.clear),
@@ -631,7 +833,7 @@ class _ProductEditState extends State<ProductEdit> {
                             });
                           },
                         ),
-                        const SizedBox(height: 20),
+                        //orderBoundary
                         AmountWidget(
                           onChanged: (value) {
                             setState(() {
@@ -640,24 +842,25 @@ class _ProductEditState extends State<ProductEdit> {
                           },
                           controller: _orderBoundary,
                           mainText: 'کف فروش',
-                          secondaryText: '',
+                          secondaryText: ' در هر سفارش',
                           suffixIcon: IconButton(
                             iconSize: 20,
                             color: const Color(0xFF4B4B4B),
                             onPressed: () {
                               setState(() {
                                 _orderBoundary.clear();
+                                orderBoundary = null;
                               });
                             },
                             icon: const Icon(Icons.clear),
                           ),
                         ),
-                        const SizedBox(height: 20),
+                        //Order Limit
                         AmountWidget(
                           enabled: enabled,
                           controller: _limitController,
-                          mainText: 'محدودیت فروش',
-                          secondaryText: '',
+                          mainText: 'سقف فروش',
+                          secondaryText: ' در هر سفارش',
                           suffixIcon: IconButton(
                             iconSize: 20,
                             color: const Color(0xFF4B4B4B),
@@ -695,8 +898,7 @@ class _ProductEditState extends State<ProductEdit> {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 20),
-                        const SizedBox(height: 60),
+                        const SizedBox(height: 80),
                         Center(
                           child: Visibility(
                             maintainSize: true,
@@ -715,66 +917,123 @@ class _ProductEditState extends State<ProductEdit> {
                         OrangeButton(
                             text: 'تایید',
                             onPressed: () async {
-                              if (imagePath == null) {
+                              if (imagePath == null &&
+                                  availableAmount != null &&
+                                  priceForMarket != null &&
+                                  originalPrice != null &&
+                                  Storage.categoryId != null &&
+                                  originalPrice! >= priceForMarket!) {
                                 imagePath = availableImage[0];
-                                print(title);
-                                print(description);
                                 setState(() {
                                   visible = true;
                                 });
-                                await postImage();
+
+                                if (newImage != null) {
+                                  await postImage();
+                                }
                                 await putEditProductInfo();
                                 // ignore: unnecessary_null_comparison
                                 errorText != null
                                     ? showDialog(
                                         context: context,
                                         builder: (context) {
-                                          return AlertDialog(
-                                            title: const Center(
-                                              child: SizedBox(
-                                                width: 80,
-                                                height: 80,
-                                                child: Image(
-                                                  image: AssetImage(
-                                                      'images/ErroIcon.png'),
-                                                ),
-                                              ),
-                                            ),
-                                            content: Text(
-                                              '$errorText',
-                                              textAlign: TextAlign.center,
-                                              style: const TextStyle(
-                                                fontFamily: 'IranYekan',
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                            actions: [
-                                              OrangeButton(
-                                                  text: 'بستن',
-                                                  onPressed: () {
-                                                    setState(() {
-                                                      errorText = null;
-                                                      visible = false;
-                                                      imagePath = null;
-                                                    });
-                                                    Navigator.pop(context);
-                                                  })
-                                            ],
+                                          return ErrorDialog(
+                                            errorText: '$errorText',
+                                            onPressed: () {
+                                              setState(() {
+                                                errorText = null;
+                                                visible = false;
+                                                imagePath = null;
+                                              });
+                                              Navigator.pop(context);
+                                            },
                                           );
                                         })
+                                    // ignore: use_build_context_synchronously
                                     : Navigator.pushNamedAndRemoveUntil(
                                         context,
                                         ProductsMainPage.id,
                                         (Route<dynamic> route) => false,
                                       );
                               } else {
-                                // Navigator.pushNamedAndRemoveUntil(
-                                //   context,
-                                //   ProductsMainPage.id,
-                                //   (Route<dynamic> route) => false,
-                                // );
-                                print("error");
+                                if (originalPrice! < priceForMarket!) {
+                                  showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return ErrorDialog(
+                                          errorText:
+                                              'قیمت برای مسئول فروش باید کم تر از قیمت بازار باشد',
+                                          onPressed: () {
+                                            setState(() {
+                                              visible = false;
+                                            });
+                                            Navigator.pop(context);
+                                          },
+                                        );
+                                      });
+                                } else if (availableAmount == null) {
+                                  showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return ErrorDialog(
+                                          errorText:
+                                              'لطفا موجودی محصول را وارد نمائید',
+                                          onPressed: () {
+                                            setState(() {
+                                              visible = false;
+                                            });
+                                            Navigator.pop(context);
+                                          },
+                                        );
+                                      });
+                                } else if (priceForMarket == null) {
+                                  showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return ErrorDialog(
+                                          errorText:
+                                              'لطفا قیمت برای مسئول فروش را وارد نمائید',
+                                          onPressed: () {
+                                            setState(() {
+                                              visible = false;
+                                            });
+                                            Navigator.pop(context);
+                                          },
+                                        );
+                                      });
+                                } else if (originalPrice == null) {
+                                  showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return ErrorDialog(
+                                          errorText:
+                                              'لطفا قیمت در بازار را وارد نمائید',
+                                          onPressed: () {
+                                            setState(() {
+                                              visible = false;
+                                            });
+                                            Navigator.pop(context);
+                                          },
+                                        );
+                                      });
+                                } else if (Storage.categoryId == null) {
+                                  showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return ErrorDialog(
+                                          errorText:
+                                              'لطفا دسته بندی محصول را انتخاب نمائید',
+                                          onPressed: () {
+                                            setState(() {
+                                              visible = false;
+                                            });
+                                            Navigator.pop(context);
+                                          },
+                                        );
+                                      });
+                                } else {
+                                  print("error");
+                                }
                               }
                             }),
                         const SizedBox(height: 20),

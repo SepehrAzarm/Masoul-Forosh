@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:masoukharid/Constants/colors.dart';
 import 'package:masoukharid/Constants/constants.dart';
 
-class AmountWidget extends StatelessWidget {
-  AmountWidget({
+class TaxWidget extends StatelessWidget {
+  TaxWidget({
     Key? key,
     required this.mainText,
     required this.secondaryText,
     required this.onChanged,
+    this.enabled,
     this.controller,
     this.suffixIcon,
-    this.enabled,
   }) : super(key: key);
 
   final String mainText;
@@ -33,7 +33,7 @@ class AmountWidget extends StatelessWidget {
                 mainText,
                 style: const TextStyle(
                   fontFamily: 'Dana',
-                  fontSize: 15,
+                  fontSize: 16,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF4B4B4B),
                 ),

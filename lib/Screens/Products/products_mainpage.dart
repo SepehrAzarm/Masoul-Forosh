@@ -27,7 +27,25 @@ class _ProductsMainPageState extends State<ProductsMainPage> {
   String? title;
   String? description;
   String? availableAmount;
+  String? unit;
+  String? secUnit;
   List image = [];
+
+  void secondaryText() {
+    if (unit == 'تعداد' || unit == 'بسته' || unit == 'جین' || unit == 'پالت') {
+      setState(() {
+        secUnit = 'عدد ';
+      });
+    } else if (unit == 'وزن') {
+      setState(() {
+        secUnit = 'کیلوگرم ';
+      });
+    } else if (unit == 'لیتر') {
+      setState(() {
+        secUnit = 'لیتر ';
+      });
+    }
+  }
 
   Future getProductInfo() async {
     String? value = await storage.read(key: "token");
@@ -48,7 +66,9 @@ class _ProductsMainPageState extends State<ProductsMainPage> {
           availableAmount =
               jsonDecode(data)["product"]["availableAmount"].toString();
           image = jsonDecode(data)["product"]["media"];
+          unit = jsonDecode(data)["product"]["unit"];
         });
+        secondaryText();
       } else {
         print(response.body);
         print(response.statusCode);
@@ -68,7 +88,7 @@ class _ProductsMainPageState extends State<ProductsMainPage> {
       );
     } else {
       return Image(
-        image: NetworkImage('https://testapi.carbon-family.com/' + image[0]),
+        image: NetworkImage('https://testapi.carbon-family.com/${image[0]}'),
         fit: BoxFit.cover,
       );
     }
@@ -136,7 +156,7 @@ class _ProductsMainPageState extends State<ProductsMainPage> {
                                           padding:
                                               const EdgeInsets.only(right: 10),
                                           child: Text(
-                                            ' تعداد:$availableAmount',
+                                            '$unit: $availableAmount $secUnit',
                                             style: const TextStyle(
                                               fontFamily: 'IranYekanExtraBold',
                                               fontSize: 10,

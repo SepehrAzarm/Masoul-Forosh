@@ -15,6 +15,7 @@ import 'package:masoukharid/Methods/text_field_input_decorations.dart';
 import 'package:masoukharid/Screens/Password_Recovery/input_page.dart';
 import 'package:masoukharid/Screens/otp_verify_screen.dart';
 import 'package:masoukharid/Screens/profile_screen.dart';
+import 'package:masoukharid/Classes/Dialogs/error_dialog.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -356,42 +357,18 @@ class _LoginPageState extends State<LoginPage> {
                                             ? showDialog(
                                                 context: context,
                                                 builder: (context) {
-                                                  return AlertDialog(
-                                                    title: const Center(
-                                                      child: SizedBox(
-                                                        width: 80,
-                                                        height: 80,
-                                                        child: Image(
-                                                          image: AssetImage(
-                                                              'images/ErroIcon.png'),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    content: Text(
-                                                      '$errorText',
-                                                      textAlign:
-                                                          TextAlign.center,
-                                                      style: const TextStyle(
-                                                        fontFamily: 'IranYekan',
-                                                        fontSize: 15,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                    actions: [
-                                                      OrangeButton(
-                                                          text: 'بستن',
-                                                          onPressed: () {
-                                                            setState(() {
-                                                              errorText = null;
-                                                              visible = false;
-                                                            });
-                                                            Navigator.pop(
-                                                                context);
-                                                          })
-                                                    ],
+                                                  return ErrorDialog(
+                                                    errorText: '$errorText',
+                                                    onPressed: () {
+                                                      setState(() {
+                                                        errorText = null;
+                                                        visible = false;
+                                                      });
+                                                      Navigator.pop(context);
+                                                    },
                                                   );
                                                 })
+                                            // ignore: use_build_context_synchronously
                                             : Navigator.pushNamedAndRemoveUntil(
                                                 context,
                                                 ProfileScreen.id,
@@ -399,6 +376,7 @@ class _LoginPageState extends State<LoginPage> {
                                               );
                                       } else {
                                         getOtp();
+                                        // ignore: use_build_context_synchronously
                                         Navigator.pushNamed(
                                           context,
                                           OTPVerifyScreen.id,
@@ -408,37 +386,15 @@ class _LoginPageState extends State<LoginPage> {
                                       showDialog(
                                           context: context,
                                           builder: (context) {
-                                            return AlertDialog(
-                                              title: const Center(
-                                                child: SizedBox(
-                                                  width: 80,
-                                                  height: 80,
-                                                  child: Image(
-                                                    image: AssetImage(
-                                                        'images/ErroIcon.png'),
-                                                  ),
-                                                ),
-                                              ),
-                                              content: const Text(
-                                                'لطفا شماره موبایل و رمز عبور خود را وارد نمایید',
-                                                textAlign: TextAlign.center,
-                                                style: TextStyle(
-                                                  fontFamily: 'IranYekan',
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                              actions: [
-                                                OrangeButton(
-                                                    text: 'بستن',
-                                                    onPressed: () {
-                                                      setState(() {
-                                                        visible = false;
-                                                        errorText = null;
-                                                      });
-                                                      Navigator.pop(context);
-                                                    })
-                                              ],
+                                            return ErrorDialog(
+                                              errorText: 'لطفا شماره موبایل و رمز عبور خود را وارد نمایید',
+                                              onPressed: () {
+                                                setState(() {
+                                                  errorText = null;
+                                                  visible = false;
+                                                });
+                                                Navigator.pop(context);
+                                              },
                                             );
                                           });
                                     }

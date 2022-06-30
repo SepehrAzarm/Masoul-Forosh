@@ -8,13 +8,15 @@ class ProductCard extends StatelessWidget {
     required this.onTap,
     required this.title,
     required this.availableAmount,
+    required this.unit,
     required this.image,
   }) : super(key: key);
 
+  final String availableAmount;
   final Function()? onTap;
   final String title;
-  final String availableAmount;
   final Widget image;
+  final String unit;
 
   @override
   Widget build(BuildContext context) {
@@ -59,14 +61,14 @@ class ProductCard extends StatelessWidget {
                           style: kNewsCardHeaderTextStyle,
                         ),
                       ),
-                      //Content Text
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 6),
-                        child: Text(
-                          'تعداد موجود: $availableAmount عدد',
-                          style: kNewsCardContentTextStyle,
-                        ),
-                      ),
+                      // //Content Text
+                      // Padding(
+                      //   padding: const EdgeInsets.symmetric(horizontal: 6),
+                      //   child: Text(
+                      //     'مقدار موجود: $availableAmount  $unit',
+                      //     style: kNewsCardContentTextStyle,
+                      //   ),
+                      // ),
                     ],
                   ),
                 ),

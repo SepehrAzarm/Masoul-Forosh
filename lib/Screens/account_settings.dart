@@ -7,6 +7,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:masoukharid/Classes/Dialogs/error_dialog.dart';
 import 'package:masoukharid/Classes/orange_button.dart';
 import 'package:masoukharid/Constants/colors.dart';
 import 'package:masoukharid/Screens/profile_screen.dart';
@@ -276,56 +277,7 @@ class _AccountSettingsState extends State<AccountSettings> {
                             ),
                           ),
                         ),
-                        const SizedBox(height: 30.0),
-                        // Column(
-                        //   mainAxisAlignment: MainAxisAlignment.center,
-                        //   crossAxisAlignment: CrossAxisAlignment.start,
-                        //   children: [
-                        //     Row(
-                        //       mainAxisAlignment: MainAxisAlignment.start,
-                        //       children: const [
-                        //         SizedBox(
-                        //           height: 30,
-                        //           child: TextFieldLabel(text: 'آدرس'),
-                        //         ),
-                        //         SizedBox(
-                        //           width: 3,
-                        //         ),
-                        //         Text(
-                        //           '*',
-                        //           style: TextStyle(
-                        //             color: Colors.red,
-                        //           ),
-                        //         ),
-                        //       ],
-                        //     ),
-                        //     SizedBox(
-                        //       height: 28,
-                        //       child: TextField(
-                        //         controller: _address,
-                        //         onChanged: (String value) {
-                        //           address = value;
-                        //         },
-                        //         cursorColor: kButtonOrangeColor,
-                        //         decoration: InputDecoration(
-                        //           focusedBorder: const UnderlineInputBorder(
-                        //             borderSide: BorderSide(
-                        //               color: kButtonOrangeColor,
-                        //               width: 2.0,
-                        //             ),
-                        //           ),
-                        //           hintText: '$address',
-                        //           hintStyle: const TextStyle(
-                        //             fontSize: 11,
-                        //             color: kTextFieldHintTextColor,
-                        //             fontFamily: 'Dana',
-                        //           ),
-                        //         ),
-                        //       ),
-                        //     ),
-                        //   ],
-                        // ),
-                        const SizedBox(height: 130),
+                        const SizedBox(height: 160),
                         Center(
                           child: Visibility(
                             maintainSize: true,
@@ -350,6 +302,7 @@ class _AccountSettingsState extends State<AccountSettings> {
                             if (visible == true) {
                               await putUpdateMarketProfile();
                               errorText == null
+                                  // ignore: use_build_context_synchronously
                                   ? Navigator.pushNamedAndRemoveUntil(
                                       context,
                                       ProfileScreen.id,
@@ -358,37 +311,15 @@ class _AccountSettingsState extends State<AccountSettings> {
                                   : showDialog(
                                       context: context,
                                       builder: (context) {
-                                        return AlertDialog(
-                                          title: const Center(
-                                            child: SizedBox(
-                                              width: 80,
-                                              height: 80,
-                                              child: Image(
-                                                image: AssetImage(
-                                                    'images/ErroIcon.png'),
-                                              ),
-                                            ),
-                                          ),
-                                          content: Text(
-                                            '$errorText',
-                                            textAlign: TextAlign.center,
-                                            style: const TextStyle(
-                                              fontFamily: 'IranYekan',
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          actions: [
-                                            OrangeButton(
-                                                text: 'بستن',
-                                                onPressed: () {
-                                                  setState(() {
-                                                    visible = false;
-                                                    errorText = null;
-                                                  });
-                                                  Navigator.pop(context);
-                                                })
-                                          ],
+                                        return ErrorDialog(
+                                          errorText: '$errorText',
+                                          onPressed: () {
+                                            setState(() {
+                                              errorText = null;
+                                              visible = false;
+                                            });
+                                            Navigator.pop(context);
+                                          },
                                         );
                                       });
                             }

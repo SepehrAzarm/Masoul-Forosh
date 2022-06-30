@@ -31,11 +31,13 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen>
     with SingleTickerProviderStateMixin {
+  final storage = const FlutterSecureStorage();
   List productTitles = [];
   List productAvailableAmount = [];
   List productDescription = [];
   List productIdList = [];
   List productImageList = [];
+  List productUnitList = [];
   TabController? _tabController;
   String? companyName;
   String? imagePath;
@@ -43,7 +45,6 @@ class _ProfileScreenState extends State<ProfileScreen>
   String? from;
   String? to;
   int? fee;
-  final storage = const FlutterSecureStorage();
 
   Future getProductList() async {
     String? value = await storage.read(key: "token");
@@ -63,6 +64,7 @@ class _ProfileScreenState extends State<ProfileScreen>
             productAvailableAmount.add(admins[i]["availableAmount"]);
             productIdList.add(admins[i]["_id"]);
             productImageList.add(admins[i]["media"]);
+            productUnitList.add(admins[i]["unit"]);
           }
         });
         print(response.statusCode);
@@ -416,27 +418,28 @@ class _ProfileScreenState extends State<ProfileScreen>
                                   : 0,
                               itemBuilder: (BuildContext context, int index) {
                                 return ProductCard(
-                                    onTap: () async {
-                                      Storage.productId =
-                                          await productIdList[index];
-                                      Navigator.pushNamed(
-                                          context, ProductsMainPage.id);
-                                    },
-                                    title: productTitles[index],
-                                    availableAmount:
-                                        productAvailableAmount[index]
-                                            .toString(),
-                                    image: productImageList[index].isEmpty
-                                        ? const Image(
-                                            fit: BoxFit.cover,
-                                            image: AssetImage(
-                                              'images/staticImages/productStaticImage.jpg',
-                                            ),
-                                          )
-                                        : Image(
-                                            image: productDefaultPic(index),
-                                            fit: BoxFit.cover,
-                                          ));
+                                  onTap: () async {
+                                    Storage.productId =
+                                        await productIdList[index];
+                                    Navigator.pushNamed(
+                                        context, ProductsMainPage.id);
+                                  },
+                                  title: productTitles[index],
+                                  availableAmount:
+                                      productAvailableAmount[index].toString(),
+                                  image: productImageList[index].isEmpty
+                                      ? const Image(
+                                          fit: BoxFit.cover,
+                                          image: AssetImage(
+                                            'images/staticImages/productStaticImage.jpg',
+                                          ),
+                                        )
+                                      : Image(
+                                          image: productDefaultPic(index),
+                                          fit: BoxFit.cover,
+                                        ),
+                                  unit: "تعداد",
+                                );
                               },
                             ),
                             const NewsList(),

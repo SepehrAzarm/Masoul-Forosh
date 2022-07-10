@@ -37,9 +37,8 @@ class _ProvinceChooseState extends State<ProvinceChoose> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      BottomSheetLabelText(
+                      const BottomSheetLabelText(
                         text: 'انتخاب استان',
-                        fontSize: 22,
                       ),
                       IconButton(
                         icon: const Icon(Icons.close_rounded),

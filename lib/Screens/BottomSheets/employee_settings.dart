@@ -32,9 +32,8 @@ class EmployeesSettingsBSH extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      BottomSheetLabelText(
+                      const BottomSheetLabelText(
                         text: 'تنظیمات کارمندان',
-                        fontSize: 22,
                       ),
                       IconButton(
                         icon: const Icon(Icons.close_rounded),
@@ -67,12 +66,6 @@ class EmployeesSettingsBSH extends StatelessWidget {
                                   Navigator.pushNamed(context, EmployeeList.id);
                                 },
                               ),
-                            ),
-                            const Divider(thickness: 1),
-                            StatisticsBSHContent(
-                              image: historyIconImageAsset,
-                              text: 'تاریخچه',
-                              onTap: () {},
                             ),
                             const Divider(thickness: 1),
                           ],

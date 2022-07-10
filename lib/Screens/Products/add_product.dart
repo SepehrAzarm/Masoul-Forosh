@@ -687,6 +687,7 @@ class _AddProductPageState extends State<AddProductPage> {
                   OrangeButton(
                     text: 'انتخاب دسته بندی محصول',
                     onPressed: () {
+                      Storage.isEditProduct = false;
                       Navigator.pushNamed(context, CategoryFirstPage.id);
                     },
                   ),

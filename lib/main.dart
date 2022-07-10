@@ -4,10 +4,13 @@ import 'package:masoukharid/Screens/CategoryScreen/category_first_page.dart';
 import 'package:masoukharid/Screens/CategoryScreen/category_second_page.dart';
 import 'package:masoukharid/Screens/Employees/add_employee.dart';
 import 'package:masoukharid/Screens/Employees/employe_list.dart';
+import 'package:masoukharid/Screens/Employees/employee_lists.dart';
 import 'package:masoukharid/Screens/Employees/employee_profile.dart';
 import 'package:masoukharid/Screens/News/add_news.dart';
 import 'package:masoukharid/Screens/News/news_edit.dart';
 import 'package:masoukharid/Screens/News/news_main_page.dart';
+import 'package:masoukharid/Screens/Orders/order_screen.dart';
+import 'package:masoukharid/Screens/Orders/orders_list.dart';
 import 'package:masoukharid/Screens/Password_Recovery/enter_new_password.dart';
 import 'package:masoukharid/Screens/Password_Recovery/input_page.dart';
 import 'package:masoukharid/Screens/Password_Recovery/otp_input_page.dart';
@@ -18,13 +21,16 @@ import 'package:masoukharid/Screens/Statistics/factor_screen.dart';
 import 'package:masoukharid/Screens/Statistics/factors_list.dart';
 import 'package:masoukharid/Screens/Statistics/items_screen.dart';
 import 'package:masoukharid/Screens/Statistics/turnover_screen.dart';
+import 'package:masoukharid/Screens/Ticket/chat_screen.dart';
+import 'package:masoukharid/Screens/Ticket/tickets_list.dart';
+import 'package:masoukharid/Screens/Wallet/wallet_screen.dart';
 import 'package:masoukharid/Screens/account_settings.dart';
 import 'package:masoukharid/Screens/get_started_page.dart';
 import 'package:masoukharid/Screens/login_page.dart';
 import 'package:masoukharid/Screens/otp_verify_screen.dart';
 import 'package:masoukharid/Screens/profile_screen.dart';
 import 'package:masoukharid/Screens/splash_screen.dart';
-import 'package:masoukharid/Screens/support_ticket.dart';
+import 'package:masoukharid/Screens/Ticket/support_ticket.dart';
 
 void main() {
   runApp(const MasoulForosh());
@@ -53,7 +59,9 @@ class MasoulForosh extends StatelessWidget {
         SellingItemsScreen.id: (context) => const SellingItemsScreen(),
         CategorySecondList.id: (context) => const CategorySecondList(),
         CategoryFirstPage.id: (context) => const CategoryFirstPage(),
+        OrderDetailScreen.id: (context) => const OrderDetailScreen(),
         FactorListScreen.id: (context) => const FactorListScreen(),
+        TicketChatScreen.id: (context) => const TicketChatScreen(),
         ProductsMainPage.id: (context) => const ProductsMainPage(),
         InputNumberPage.id: (context) => const InputNumberPage(),
         AccountSettings.id: (context) => const AccountSettings(),
@@ -64,14 +72,18 @@ class MasoulForosh extends StatelessWidget {
         GetStartedPage.id: (context) => const GetStartedPage(),
         TurnOverScreen.id: (context) => const TurnOverScreen(),
         ProfileScreen.id: (context) => const ProfileScreen(),
+        EmployeeLists.id: (context) => const EmployeeLists(),
         SplashScreen.id: (context) => const SplashScreen(),
         FactorScreen.id: (context) => const FactorScreen(),
         OTPInputPage.id: (context) => const OTPInputPage(),
         EnterNewPass.id: (context) => const EnterNewPass(),
         EmployeeList.id: (context) => const EmployeeList(),
         NewsMainPage.id: (context) => const NewsMainPage(),
+        WalletScreen.id: (context) => const WalletScreen(),
+        TicketsList.id: (context) => const TicketsList(),
         AddNewsPage.id: (context) => const AddNewsPage(),
         ProductEdit.id: (context) => const ProductEdit(),
+        OrdersList.id: (context) => const OrdersList(),
         LoginPage.id: (context) => const LoginPage(),
         NewsEdit.id: (context) => const NewsEdit(),
       },

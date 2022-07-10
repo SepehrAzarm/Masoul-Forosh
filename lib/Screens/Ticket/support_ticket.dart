@@ -4,11 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:masoukharid/Classes/orange_button.dart';
+import 'package:masoukharid/Screens/Ticket/tickets_list.dart';
 import 'package:masoukharid/Screens/profile_screen.dart';
 
-import '../Constants/borders_decorations.dart';
-import '../Constants/colors.dart';
-import '../Constants/constants.dart';
+import '../../Constants/borders_decorations.dart';
+import '../../Constants/colors.dart';
+import '../../Constants/constants.dart';
 
 class SupportTicketScreen extends StatefulWidget {
   const SupportTicketScreen({Key? key}) : super(key: key);
@@ -32,7 +33,9 @@ class _SupportTicketScreenState extends State<SupportTicketScreen> {
     };
     Map data = {
       "title": title,
-      "message": {"text": text, "media": ""}
+      "message": {
+        "text": text,
+      }
     };
     var body = jsonEncode(data);
     try {
@@ -168,7 +171,11 @@ class _SupportTicketScreenState extends State<SupportTicketScreen> {
                       await postTicket();
                       // ignore: unnecessary_null_comparison
                       errorMassage == null
-                          ? Navigator.pushNamed(context, ProfileScreen.id)
+                          ? Navigator.pushNamedAndRemoveUntil(
+                              context,
+                              TicketsList.id,
+                              (Route<dynamic> route) => false,
+                            )
                           : showDialog(
                               context: context,
                               builder: (context) {

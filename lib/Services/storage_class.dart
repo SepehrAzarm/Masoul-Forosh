@@ -5,6 +5,10 @@ class Storage {
   static late String invoiceId;
   static late String categoryId;
   static late bool isEditProduct;
+  static late String depositId;
+  static late String withdrawalId;
+  static late String orderId;
+  static late String ticketId;
 
   static void resetEmployeeId() {
     employeeId = '';

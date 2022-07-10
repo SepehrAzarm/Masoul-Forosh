@@ -45,9 +45,8 @@ class _ActiveDaysBSHState extends State<ActiveDaysBSH> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      BottomSheetLabelText(
+                      const BottomSheetLabelText(
                         text: 'انتخاب روز های فعالیت',
-                        fontSize: 22,
                       ),
                       IconButton(
                         icon: const Icon(Icons.close_rounded),

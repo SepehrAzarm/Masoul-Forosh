@@ -11,15 +11,15 @@ import 'package:intl/intl.dart' as intl;
 import '../../Classes/Cards/factor_info_product.dart';
 import '../../Constants/colors.dart';
 
-class FactorScreen extends StatefulWidget {
-  const FactorScreen({Key? key}) : super(key: key);
-  static const String id = 'FactorScreen';
+class OrderDetailScreen extends StatefulWidget {
+  const OrderDetailScreen({Key? key}) : super(key: key);
+  static const String id = "OrderDetailScreen";
 
   @override
-  State<FactorScreen> createState() => _FactorScreenState();
+  State<OrderDetailScreen> createState() => _OrderDetailScreenState();
 }
 
-class _FactorScreenState extends State<FactorScreen> {
+class _OrderDetailScreenState extends State<OrderDetailScreen> {
   final storage = const FlutterSecureStorage();
   List itemsQuantity = [];
   List totalPrice = [];
@@ -29,13 +29,12 @@ class _FactorScreenState extends State<FactorScreen> {
   String productAmount = "1x";
   String? paymentReference;
   String? createdAt;
-  String? transactionMoment;
+  int? transactionMoment;
   int? totalFactorPrice;
   int? invoiceNumber;
   int? paymentMethod;
   int? tax;
   late Jalali j;
-  late Jalali transactionMomentTime;
 
   Map<int, String> paymentMethodMap = {
     0: 'نقدی',
@@ -51,7 +50,7 @@ class _FactorScreenState extends State<FactorScreen> {
     return '${f.y},${f.m},${f.d}-${j.hour}:${j.minute}';
   }
 
-  Future getFactorInfo() async {
+  Future getOrderDetail() async {
     String? value = await storage.read(key: "token");
 
     Map<String, String> headers = {
@@ -62,11 +61,11 @@ class _FactorScreenState extends State<FactorScreen> {
     try {
       var response = await http.get(
           Uri.parse(
-              "https://testapi.carbon-family.com/api/market/invoices/${Storage.invoiceId}"),
+              "https://testapi.carbon-family.com/api/market/orders/${Storage.orderId}"),
           headers: headers);
       if (response.statusCode == 200) {
         var data = response.body;
-        var items = jsonDecode(data)["invoice"]['items'];
+        var items = jsonDecode(data)["order"]['items'];
         setState(() {
           for (var i = 0; i < items.length; i++) {
             itemTitle.add(items[i]["title"]);
@@ -74,24 +73,21 @@ class _FactorScreenState extends State<FactorScreen> {
             totalPrice.add(items[i]["totalPrice"]);
             itemsQuantity.add(items[i]["quantity"]);
           }
-          if (jsonDecode(data)["invoice"]["shopId"] != null) {
-            shopUserName =
-                jsonDecode(data)["invoice"]["shopId"]["shopUserName"];
+          if (jsonDecode(data)["order"]["shopId"] != null) {
+            shopUserName = jsonDecode(data)["order"]["shopId"]["shopUserName"];
           }
-          transactionMoment = jsonDecode(data)["invoice"]["transactionMoment"];
-          paymentReference = jsonDecode(data)["invoice"]["paymentReference"];
-          createdAt = jsonDecode(data)["invoice"]["createdAt"];
-          paymentMethod = jsonDecode(data)["invoice"]["paymentMethod"];
-          totalFactorPrice = jsonDecode(data)["invoice"]["totalPrice"];
-          invoiceNumber = jsonDecode(data)["invoice"]["invoiceNumber"];
-          tax = jsonDecode(data)["invoice"]["tax"];
+          transactionMoment = jsonDecode(data)["order"]["transactionMoment"];
+          paymentReference = jsonDecode(data)["order"]["paymentReference"];
+          createdAt = jsonDecode(data)["order"]["createdAt"];
+          paymentMethod = jsonDecode(data)["order"]["paymentMethod"];
+          totalFactorPrice = jsonDecode(data)["order"]["totalPrice"];
+          invoiceNumber = jsonDecode(data)["order"]["invoiceNumber"];
+          tax = jsonDecode(data)["order"]["tax"];
         });
         var dateAndTime = DateTime.parse(createdAt!).toLocal();
         Gregorian g = Gregorian.fromDateTime(dateAndTime);
         j = Jalali.fromGregorian(g);
-        var dateAndTime2 = DateTime.parse(transactionMoment!).toLocal();
-        Gregorian g2 = Gregorian.fromDateTime(dateAndTime2);
-        transactionMomentTime = Jalali.fromGregorian(g2);
+        print(j);
         print(response.statusCode);
         print(response.body);
       } else {
@@ -107,12 +103,12 @@ class _FactorScreenState extends State<FactorScreen> {
     totalPrice = [];
     itemTitle = [];
     itemPPA = [];
-    getFactorInfo();
+    getOrderDetail();
   }
 
   @override
   void initState() {
-    getFactorInfo();
+    getOrderDetail();
     super.initState();
   }
 
@@ -136,7 +132,7 @@ class _FactorScreenState extends State<FactorScreen> {
                   color: Colors.black,
                 ),
                 title: const Text(
-                  'فاکتور فروش',
+                  'لیست سفارشات',
                   style: TextStyle(
                     fontFamily: "IranYekan",
                     fontWeight: FontWeight.bold,
@@ -161,7 +157,7 @@ class _FactorScreenState extends State<FactorScreen> {
                             height: 50,
                             child: Center(
                               child: Text(
-                                'فاکتور پرداختی',
+                                'لیست سفارشات',
                                 style: TextStyle(
                                   color: kFactorTitleTextColor,
                                   fontFamily: "IranSans",
@@ -280,9 +276,11 @@ class _FactorScreenState extends State<FactorScreen> {
                                           name: itemTitle[index] +
                                               ' ${itemsQuantity[index]}x ',
                                           pricePerAmount:
-                                              intl.NumberFormat.decimalPattern().format(itemPPA[index]),
+                                              intl.NumberFormat.decimalPattern()
+                                                  .format(itemPPA[index]),
                                           totalPrice:
-                                              intl.NumberFormat.decimalPattern().format(totalPrice[index]),
+                                              intl.NumberFormat.decimalPattern()
+                                                  .format(totalPrice[index]),
                                         );
                                       },
                                     ),
@@ -551,8 +549,7 @@ class _FactorScreenState extends State<FactorScreen> {
                                                         transactionMoment ==
                                                                 null
                                                             ? ''
-                                                            : toStringFormatter(
-                                                                transactionMomentTime),
+                                                            : "$transactionMoment",
                                                         style: const TextStyle(
                                                           fontWeight:
                                                               FontWeight.bold,

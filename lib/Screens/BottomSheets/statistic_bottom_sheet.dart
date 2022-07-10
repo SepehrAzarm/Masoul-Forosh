@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:masoukharid/Classes/Text&TextStyle/bottom_sheet_labeltext.dart';
 import 'package:masoukharid/Constants/colors.dart';
 import 'package:masoukharid/Methods/bottom_sheet_boxdecoration.dart';
+import 'package:masoukharid/Screens/Employees/employee_lists.dart';
+import 'package:masoukharid/Screens/Orders/orders_list.dart';
 import 'package:masoukharid/Screens/Statistics/factors_list.dart';
 import 'package:masoukharid/Screens/Statistics/items_screen.dart';
 import 'package:masoukharid/Screens/Statistics/turnover_screen.dart';
+import 'package:masoukharid/Screens/Wallet/wallet_screen.dart';
 
 import '../../Classes/statistics_bsh_content_widget.dart';
 
@@ -27,7 +30,7 @@ class _StatisticsBSHState extends State<StatisticsBSH> {
     return Container(
       color: kBottomSheetBackgroundColor,
       child: Container(
-        height: 350.0,
+        height: 600,
         decoration: bottomSheetBoxDecoration(),
         child: Container(
           margin: const EdgeInsets.symmetric(
@@ -43,9 +46,8 @@ class _StatisticsBSHState extends State<StatisticsBSH> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      BottomSheetLabelText(
+                      const BottomSheetLabelText(
                         text: 'انتخاب گزارشات',
-                        fontSize: 22,
                       ),
                       IconButton(
                         icon: const Icon(Icons.close_rounded),
@@ -61,12 +63,36 @@ class _StatisticsBSHState extends State<StatisticsBSH> {
                 const SizedBox(height: 10),
                 Center(
                   child: SizedBox(
-                    height: 250,
+                    height: 380,
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 30),
                       child: Center(
-                        child: Column(
+                        child: ListView(
                           children: [
+                            StatisticsBSHContent(
+                              image: employeeImageAsset,
+                              text: 'سفارشات',
+                              onTap: () {
+                                Navigator.pushNamed(context, OrdersList.id);
+                              },
+                            ),
+                            const Divider(thickness: 1, height: 4),
+                            StatisticsBSHContent(
+                              image: favtorImageAsset,
+                              text: 'کیف پول',
+                              onTap: () {
+                                Navigator.pushNamed(context, WalletScreen.id);
+                              },
+                            ),
+                            const Divider(thickness: 1, height: 4),
+                            StatisticsBSHContent(
+                              image: employeeImageAsset,
+                              text: 'کارمندان',
+                              onTap: () {
+                                Navigator.pushNamed(context, EmployeeLists.id);
+                              },
+                            ),
+                            const Divider(thickness: 1, height: 4),
                             StatisticsBSHContent(
                               image: favtorImageAsset,
                               text: 'فاکتور ها',
@@ -75,7 +101,7 @@ class _StatisticsBSHState extends State<StatisticsBSH> {
                                     context, FactorListScreen.id);
                               },
                             ),
-                            const Divider(thickness: 1),
+                            const Divider(thickness: 1, height: 4),
                             StatisticsBSHContent(
                               image: orangeShopImageAsset,
                               text: 'گردش مالی',
@@ -83,7 +109,7 @@ class _StatisticsBSHState extends State<StatisticsBSH> {
                                 Navigator.pushNamed(context, TurnOverScreen.id);
                               },
                             ),
-                            const Divider(thickness: 1),
+                            const Divider(thickness: 1, height: 4),
                             StatisticsBSHContent(
                               image: aghlamImageAsset,
                               text: 'اقلام فروش',
@@ -92,7 +118,7 @@ class _StatisticsBSHState extends State<StatisticsBSH> {
                                     context, SellingItemsScreen.id);
                               },
                             ),
-                            const Divider(thickness: 1),
+                            const Divider(thickness: 1, height: 4),
                           ],
                         ),
                       ),

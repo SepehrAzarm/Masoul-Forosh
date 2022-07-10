@@ -40,7 +40,6 @@ class _CountyBottomSheetState extends State<CountyBottomSheet> {
                     children: [
                       BottomSheetLabelText(
                         text: 'انتخاب شهرستان',
-                        fontSize: 22,
                       ),
                       IconButton(
                         icon: const Icon(Icons.close_rounded),

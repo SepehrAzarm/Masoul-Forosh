@@ -115,8 +115,7 @@ class _ProductEditState extends State<ProductEdit> {
           taxIsChecked = jsonDecode(data)["product"]["tax"]["status"];
           taxPercentage = jsonDecode(data)["product"]["tax"]["percentage"];
           taxValue = jsonDecode(data)["product"]["tax"]["value"];
-          availableCategory =
-              jsonDecode(data)["product"]["categoryStringPath"];
+          availableCategory = jsonDecode(data)["product"]["categoryStringPath"];
           dropDownValue = unit!;
           _title.text = '$title ';
           _description.text = '$description ';
@@ -166,7 +165,7 @@ class _ProductEditState extends State<ProductEdit> {
       "orderBoundery": {
         "minAmount": orderBoundary,
       },
-      "unit": "تعداد"
+      "unit": dropDownValue,
     };
     var body = jsonEncode(data);
     try {

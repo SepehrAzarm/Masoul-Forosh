@@ -20,7 +20,17 @@ class _FactorListScreenState extends State<FactorListScreen> {
   List invoiceNumber = [];
   List invoiceId = [];
   List storeName = [];
+  List itemStatus = [];
   final storage = const FlutterSecureStorage();
+  Map<int, String> statusMap = {
+    0: 'در حال پردازش',
+    1: 'پرداخت شده',
+    2: 'رد شده',
+    3: 'لغو شده',
+    4: 'در انتظار ارسال',
+    5: 'تحویل داده شده به پیک',
+    6: 'تحویل داده شده',
+  };
 
   Future getFactorsList() async {
     String? value = await storage.read(key: "token");
@@ -41,6 +51,7 @@ class _FactorListScreenState extends State<FactorListScreen> {
             storeName.add(factors[i]["shop"]["shopName"]);
             invoiceNumber.add(factors[i]["invoiceNumber"]);
             invoiceId.add(factors[i]["_id"]);
+            itemStatus.add(factors[i]["status"]);
           }
         });
         print(response.statusCode);
@@ -120,7 +131,7 @@ class _FactorListScreenState extends State<FactorListScreen> {
                                       style: TextStyle(
                                         fontFamily: "IranYekan",
                                         color: Color(0xFF888888),
-                                        fontSize: 15,
+                                        fontSize: 14,
                                       ),
                                     ),
                                     Text(
@@ -128,17 +139,23 @@ class _FactorListScreenState extends State<FactorListScreen> {
                                       style: TextStyle(
                                         fontFamily: "IranYekan",
                                         color: Color(0xFF888888),
-                                        fontSize: 15,
+                                        fontSize: 14,
                                       ),
                                     ),
                                     Text(
-                                      'فاکتور',
+                                      'وضعیت',
                                       style: TextStyle(
                                         fontFamily: "IranYekan",
                                         color: Color(0xFF888888),
-                                        fontSize: 15,
+                                        fontSize: 14,
                                       ),
                                     ),
+                                    Text('فاکتور',
+                                        style: TextStyle(
+                                          fontFamily: "IranYekan",
+                                          color: Color(0xFF888888),
+                                          fontSize: 14,
+                                        )),
                                   ],
                                 ),
                                 const Divider(
@@ -156,14 +173,23 @@ class _FactorListScreenState extends State<FactorListScreen> {
                                 itemCount:
                                     storeName.isNotEmpty ? storeName.length : 0,
                                 itemBuilder: (context, int index) {
+                                  String statusText() {
+                                    String? statusText;
+                                    int num = itemStatus[index];
+                                    statusText = statusMap[num];
+                                    return statusText!;
+                                  }
+
                                   return FactorListCard(
-                                      storeName: storeName[index],
-                                      invoiceNumber: invoiceNumber[index],
-                                      onTap: () {
-                                        Storage.invoiceId = invoiceId[index];
-                                        Navigator.pushNamed(
-                                            context, FactorScreen.id);
-                                      });
+                                    storeName: storeName[index] ?? '-----',
+                                    invoiceNumber: invoiceNumber[index],
+                                    onTap: () {
+                                      Storage.invoiceId = invoiceId[index];
+                                      Navigator.pushNamed(
+                                          context, FactorScreen.id);
+                                    },
+                                    status: statusText(),
+                                  );
                                 }),
                           )
                         ],

@@ -5,13 +5,11 @@ import '../../Constants/colors.dart';
 class FactorInfoCard extends StatelessWidget {
   const FactorInfoCard({
     Key? key,
-    required this.productAmount,
     required this.name,
     required this.pricePerAmount,
     required this.totalPrice,
   }) : super(key: key);
 
-  final String productAmount;
   final String name;
   final String pricePerAmount;
   final String totalPrice;
@@ -21,13 +19,12 @@ class FactorInfoCard extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10),
       child: SizedBox(
-        height: 55,
+        height: 50,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 5),
-            Container(
-              // color: Colors.tealAccent,
+            SizedBox(
               height: 37,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -35,8 +32,7 @@ class FactorInfoCard extends StatelessWidget {
                   //Title
                   Padding(
                     padding: const EdgeInsets.only(right: 17),
-                    child: Container(
-                      // color: Colors.orange,
+                    child: SizedBox(
                       height: double.infinity,
                       width: 100,
                       child: Center(
@@ -45,7 +41,7 @@ class FactorInfoCard extends StatelessWidget {
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             color: kFactorTitleTextColor,
-                            fontFamily: 'IranSans',
+                            fontFamily: 'IranYekan',
                             fontSize: 9,
                           ),
                         ),
@@ -53,27 +49,12 @@ class FactorInfoCard extends StatelessWidget {
                     ),
                   ),
                   //price
-                  Container(
+                  SizedBox(
                     // color: Colors.blue,
-                    width: 60,
-                    child: Text(
-                      '$pricePerAmount تومان',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: kFactorTitleTextColor,
-                        fontFamily: "IranYekan",
-                        fontSize: 9,
-                      ),
-                    ),
-                  ),
-                  //Total
-                  Padding(
-                    padding: const EdgeInsets.only(left: 20),
-                    child: Container(
-                      // color: Colors.blue,
-                      width: 60,
+                    width: 80,
+                    child: Center(
                       child: Text(
-                        '$totalPrice تومان',
+                        '$pricePerAmount تومان',
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           color: kFactorTitleTextColor,
@@ -83,18 +64,26 @@ class FactorInfoCard extends StatelessWidget {
                       ),
                     ),
                   ),
+                  //Total
+                  Padding(
+                    padding: const EdgeInsets.only(left: 20),
+                    child: SizedBox(
+                      // color: Colors.blue,
+                      width: 80,
+                      child: Center(
+                        child: Text(
+                          '$totalPrice تومان',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: kFactorTitleTextColor,
+                            fontFamily: "IranYekan",
+                            fontSize: 9,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
-              ),
-            ),
-            const Padding(
-              padding: EdgeInsets.only(right: 25),
-              child: Text(
-                'فروشگاه آذر مرغ',
-                style: TextStyle(
-                  fontFamily: "IranSans",
-                  color: Color(0xFF4A4A4A),
-                  fontSize: 4,
-                ),
               ),
             ),
             const SizedBox(height: 3),

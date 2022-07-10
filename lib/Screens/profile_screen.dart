@@ -16,9 +16,9 @@ import 'package:masoukharid/Screens/News/add_news.dart';
 import 'package:masoukharid/Screens/Products/add_product.dart';
 import 'package:masoukharid/Screens/Products/products_mainpage.dart';
 import 'package:masoukharid/Screens/PtofileScreenContent/news_list.dart';
+import 'package:masoukharid/Screens/Ticket/tickets_list.dart';
 import 'package:masoukharid/Screens/account_settings.dart';
 import 'package:masoukharid/Screens/login_page.dart';
-import 'package:masoukharid/Screens/support_ticket.dart';
 import 'package:masoukharid/Services/storage_class.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -406,7 +406,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                   Column(
                     children: [
                       SizedBox(
-                        height: 130 * productTitles.length.toDouble() + 100,
+                        height: 130 * productTitles.length.toDouble(),
                         width: MediaQuery.of(context).size.width,
                         child: TabBarView(
                           controller: _tabController,
@@ -442,7 +442,22 @@ class _ProfileScreenState extends State<ProfileScreen>
                                 );
                               },
                             ),
-                            const NewsList(),
+                            const SizedBox(
+                              height: 400,
+                              child: Padding(
+                                padding: EdgeInsets.only(top: 20),
+                                child: Text(
+                                  'به زودی',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontFamily: "Dana",
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 40,
+                                    color: kOrangeColor,
+                                  ),
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -537,7 +552,7 @@ class _ProfileScreenState extends State<ProfileScreen>
               text: 'شکایات و نظرات',
               image: 'images/SettingsIcons/Support.png',
               onTap: () {
-                Navigator.pushNamed(context, SupportTicketScreen.id);
+                Navigator.pushNamed(context, TicketsList.id);
               },
             ),
             SettingsBodyContent(

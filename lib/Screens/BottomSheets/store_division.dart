@@ -41,9 +41,8 @@ class _StoreDivisionBSHState extends State<StoreDivisionBSH> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      BottomSheetLabelText(
+                      const BottomSheetLabelText(
                         text: 'انتخاب دسته بندی فروشگاه',
-                        fontSize: 22,
                       ),
                       IconButton(
                         icon: const Icon(Icons.close_rounded),

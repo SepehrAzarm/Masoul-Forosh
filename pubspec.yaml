@@ -37,6 +37,8 @@ dependencies:
   jwt_decode: ^0.3.1
   cached_network_image: ^3.2.1
   flutter_multi_formatter: ^2.5.7
+  shamsi_date: ^1.0.1
+  intl: ^0.17.0
 
 
 dev_dependencies:

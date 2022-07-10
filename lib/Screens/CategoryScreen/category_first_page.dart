@@ -132,16 +132,13 @@ class _CategoryFirstPageState extends State<CategoryFirstPage> {
                   } else if (childrenList.isEmpty) {
                     Storage.categoryId = categoryId!;
                     if (mounted && Storage.isEditProduct == false) {
-                      Navigator.pushNamedAndRemoveUntil(
-                        context,
-                        AddProductPage.id,
-                        (Route<dynamic> route) => false,
+                      Navigator.of(context).popUntil(
+                        ModalRoute.withName(AddProductPage.id),
                       );
                     } else if (mounted && Storage.isEditProduct == true) {
-                      Navigator.pushNamedAndRemoveUntil(
-                        context,
-                        ProductEdit.id,
-                        (Route<dynamic> route) => false,
+                      Navigator.of(context).popUntil(
+                        ModalRoute.withName(ProductEdit.id),
+                        // (Route<dynamic> route) => false,
                       );
                     }
                   }

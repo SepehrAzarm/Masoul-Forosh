@@ -88,7 +88,6 @@ class _ActiveHoursBottomSheetState extends State<ActiveHoursBottomSheet> {
                     children: [
                       BottomSheetLabelText(
                         text: 'انتخاب ساعات فعالیت',
-                        fontSize: 22,
                       ),
                       IconButton(
                         icon: const Icon(Icons.close_rounded),

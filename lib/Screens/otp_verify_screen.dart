@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -20,10 +21,13 @@ class OTPVerifyScreen extends StatefulWidget {
 class _OTPVerifyScreenState extends State<OTPVerifyScreen> {
   final TextEditingController _otpController = TextEditingController();
   final storage = const FlutterSecureStorage();
+  Timer? countdownTimer;
+  Duration myDuration = const Duration(minutes: 5);
   String? code;
   bool obsText = true;
   String? errorText;
   bool visible = false;
+  bool resendVisible = false;
   Future postOTPVerify() async {
     String? value = await storage.read(key: "token");
     Map<String, String> headers = {
@@ -53,8 +57,73 @@ class _OTPVerifyScreenState extends State<OTPVerifyScreen> {
     }
   }
 
+  Future getOtp() async {
+    String? value = await storage.read(key: "token");
+    Map<String, String> headers = {'token': value!};
+    try {
+      var response = await http.get(
+        Uri.parse(
+            'https://testapi.carbon-family.com/api/market/authentication/verify'),
+        headers: headers,
+      );
+      if (response.statusCode == 200) {
+        print(response.statusCode);
+        print(response.body);
+      } else {
+        var data = await jsonDecode(response.body.toString());
+        errorText = await data['message'];
+        print(response.statusCode);
+        print(response.body);
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  @override
+  void initState() {
+    startTimer();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    setCountDown();
+    super.dispose();
+  }
+
+  void startTimer() {
+    countdownTimer =
+        Timer.periodic(Duration(seconds: 1), (_) => setCountDown());
+  }
+
+  void stopTimer() {
+    setState(() => countdownTimer!.cancel());
+  }
+
+  void resetTimer() {
+    stopTimer();
+    setState(() => myDuration = Duration(minutes: 5));
+  }
+
+  void setCountDown() {
+    const reduceSecondsBy = 1;
+    setState(() {
+      final seconds = myDuration.inSeconds - reduceSecondsBy;
+      if (seconds < 0) {
+        resendVisible = true;
+        countdownTimer!.cancel();
+      } else {
+        myDuration = Duration(seconds: seconds);
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    String strDigits(int n) => n.toString().padLeft(2, '0');
+    final minutes = strDigits(myDuration.inMinutes.remainder(60));
+    final seconds = strDigits(myDuration.inSeconds.remainder(60));
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -125,7 +194,43 @@ class _OTPVerifyScreenState extends State<OTPVerifyScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 80.0),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  height: 40,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Visibility(
+                        visible: resendVisible,
+                        child: GestureDetector(
+                          onTap: () async {
+                            resetTimer();
+                            startTimer();
+                            await getOtp();
+                          },
+                          child: const Text(
+                            'ارسال مجدد کد',
+                            style: TextStyle(
+                              fontFamily: "Dana",
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                              color: kOrangeColor,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Text(
+                        '$minutes:$seconds',
+                        style: const TextStyle(
+                            fontFamily: "IranYekan",
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                            fontSize: 14),
+                      ),
+                    ],
+                  ),
+                ),
+                // const SizedBox(height: 80.0),
                 const SizedBox(height: 280),
                 Center(
                   child: Visibility(
@@ -150,6 +255,7 @@ class _OTPVerifyScreenState extends State<OTPVerifyScreen> {
                       });
                       if (code != null) {
                         await postOTPVerify();
+
                         // ignore: unnecessary_null_comparison
                         errorText == null
                             // ignore: use_build_context_synchronously

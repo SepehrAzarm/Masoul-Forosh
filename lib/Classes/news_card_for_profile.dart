@@ -5,14 +5,13 @@ import 'package:masoukharid/Screens/News/news_main_page.dart';
 import 'package:masoukharid/Constants/colors.dart';
 
 class NewsCardProfile extends StatelessWidget {
-  NewsCardProfile({
+  const NewsCardProfile({
     Key? key,
-    this.image = 'images/Sale-News.png',
     required this.title,
     required this.contentText,
   }) : super(key: key);
 
-  late String image;
+
   final String title;
   final String contentText;
 
@@ -34,10 +33,10 @@ class NewsCardProfile extends StatelessWidget {
                 ),
                 width: 80,
                 height: 80,
-                child: Image(
+                child: const Image(
                   fit: BoxFit.fill,
                   image: AssetImage(
-                    image,
+                    'images/Sale-News.png',
                   ),
                 ),
               ),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:masoukharid/Constants/colors.dart';
+import 'package:masoul_kharid/Constants/colors.dart';
 
 class EmployeeLoginCard extends StatelessWidget {
   const EmployeeLoginCard({

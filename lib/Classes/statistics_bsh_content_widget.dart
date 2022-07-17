@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:masoukharid/Classes/Text&TextStyle/statistics_text.dart';
+import 'package:masoul_kharid/Classes/Text&TextStyle/statistics_text.dart';
 
 class StatisticsBSHContent extends StatelessWidget {
   const StatisticsBSHContent({

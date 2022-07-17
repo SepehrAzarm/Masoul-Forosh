@@ -3,16 +3,17 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
-import 'package:masoukharid/Classes/Cards/order_list_card.dart';
-import 'package:masoukharid/Classes/Dialogs/error_dialog.dart';
-import 'package:masoukharid/Classes/Text&TextStyle/textfield_label_text_style.dart';
-import 'package:masoukharid/Classes/orange_button.dart';
-import 'package:masoukharid/Constants/colors.dart';
-import 'package:masoukharid/Constants/constants.dart';
-import 'package:masoukharid/Methods/text_field_input_decorations.dart';
-import 'package:masoukharid/Screens/Orders/order_screen.dart';
-import 'package:masoukharid/Screens/profile_screen.dart';
-import 'package:masoukharid/Services/storage_class.dart';
+import 'package:masoul_kharid/Classes/Cards/order_list_card.dart';
+import 'package:masoul_kharid/Classes/Dialogs/error_dialog.dart';
+import 'package:masoul_kharid/Classes/Text&TextStyle/textfield_label_text_style.dart';
+import 'package:masoul_kharid/Classes/orange_button.dart';
+import 'package:masoul_kharid/Constants/colors.dart';
+import 'package:masoul_kharid/Constants/constants.dart';
+import 'package:masoul_kharid/Methods/text_field_input_decorations.dart';
+import 'package:masoul_kharid/Screens/Orders/order_delivery.dart';
+import 'package:masoul_kharid/Screens/Orders/order_screen.dart';
+import 'package:masoul_kharid/Screens/profile_screen.dart';
+import 'package:masoul_kharid/Services/storage_class.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 
 class OrdersList extends StatefulWidget {
@@ -45,7 +46,9 @@ class _OrdersListState extends State<OrdersList> {
   }
 
   String toStringFormatter(Jalali j) {
-    return '${j.hour}:${j.minute}';
+    final f = j.formatter;
+
+    return '${f.y},${f.m},${f.d}-${j.hour}:${j.minute}';
   }
 
   Future getOrderList() async {
@@ -166,7 +169,6 @@ class _OrdersListState extends State<OrdersList> {
   @override
   void initState() {
     orderListConfirm();
-    getOrderList();
     super.initState();
   }
 
@@ -183,8 +185,15 @@ class _OrdersListState extends State<OrdersList> {
               centerTitle: true,
               elevation: 0.5,
               backgroundColor: Colors.white,
-              leading: const BackButton(
+              leading: BackButton(
                 color: Colors.black,
+                onPressed: () {
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    ProfileScreen.id,
+                    (Route<dynamic> route) => false,
+                  );
+                },
               ),
               title: const Text(
                 'لیست سفارشات',
@@ -257,229 +266,8 @@ class _OrdersListState extends State<OrdersList> {
                               child: OrangeButton(
                                 text: 'تحویل',
                                 onPressed: () {
-                                  showDialog(
-                                      context: context,
-                                      builder: (context) {
-                                        return AlertDialog(
-                                          shape: const RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(20.0))),
-                                          content: SizedBox(
-                                            height: 100,
-                                            width: 300,
-                                            child: Center(
-                                              child: Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.start,
-                                                children: [
-                                                  Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment.start,
-                                                    children: [
-                                                      Container(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                    .only(
-                                                                right: 12),
-                                                        height:
-                                                            kLabelTextContainerHeight,
-                                                        child: const TextFieldLabel(
-                                                            text:
-                                                                'کد پیک را وارد نمائید '),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  Padding(
-                                                    padding: const EdgeInsets
-                                                            .symmetric(
-                                                        horizontal: 10),
-                                                    child: TextField(
-                                                      textInputAction:
-                                                          TextInputAction.next,
-                                                      keyboardType:
-                                                          TextInputType.number,
-                                                      // controller: _controllerPhoneNumber,
-                                                      cursorColor:
-                                                          kButtonOrangeColor,
-                                                      // textAlignVertical: TextAlignVertical.center,
-                                                      textAlign:
-                                                          TextAlign.center,
-                                                      onChanged:
-                                                          (String value) {
-                                                        verificationCode =
-                                                            value;
-                                                      },
-                                                      style: const TextStyle(
-                                                        fontFamily: 'IranYekan',
-                                                      ),
-                                                      decoration:
-                                                          textFieldDecorations(),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                          actions: [
-                                            OrangeButton(
-                                              text: 'تحویل',
-                                              onPressed: () async {
-                                                await getOrderAndCourierInfo();
-
-                                                errorText != null
-                                                    ? showDialog(
-                                                        context: context,
-                                                        builder: (context) {
-                                                          return ErrorDialog(
-                                                            errorText:
-                                                                '$errorText',
-                                                            onPressed: () {
-                                                              setState(() {
-                                                                errorText =
-                                                                    null;
-                                                              });
-                                                              Navigator.pop(
-                                                                  context);
-                                                            },
-                                                          );
-                                                        })
-                                                    : showDialog(
-                                                        context: context,
-                                                        builder: (context) {
-                                                          return AlertDialog(
-                                                            shape: const RoundedRectangleBorder(
-                                                                borderRadius: BorderRadius
-                                                                    .all(Radius
-                                                                        .circular(
-                                                                            20.0))),
-                                                            content: Container(
-                                                              // color: Colors
-                                                              //     .amberAccent,
-                                                              height: 300,
-                                                              width: 300,
-                                                              child: Column(
-                                                                mainAxisAlignment:
-                                                                    MainAxisAlignment
-                                                                        .spaceEvenly,
-                                                                children: [
-                                                                  CircleAvatar(
-                                                                    backgroundColor:
-                                                                        Colors
-                                                                            .white,
-                                                                    radius: 60,
-                                                                    backgroundImage:
-                                                                        courierPicInfo(),
-                                                                  ),
-                                                                  Column(
-                                                                    children: [
-                                                                      const Text(
-                                                                        'نام پیک',
-                                                                        style:
-                                                                            TextStyle(
-                                                                          fontFamily:
-                                                                              "Dana",
-                                                                          fontWeight:
-                                                                              FontWeight.bold,
-                                                                          color:
-                                                                              Color(0xFF707070),
-                                                                          fontSize:
-                                                                              12,
-                                                                        ),
-                                                                      ),
-                                                                      Text(
-                                                                        'آقای $firstName  $lastName',
-                                                                        style:
-                                                                            const TextStyle(
-                                                                          fontFamily:
-                                                                              "Dana",
-                                                                          fontWeight:
-                                                                              FontWeight.bold,
-                                                                          color:
-                                                                              Colors.black,
-                                                                          fontSize:
-                                                                              18,
-                                                                        ),
-                                                                      )
-                                                                    ],
-                                                                  ),
-                                                                  Column(
-                                                                    children: [
-                                                                      const Text(
-                                                                        'شماره تماس',
-                                                                        style:
-                                                                            TextStyle(
-                                                                          fontFamily:
-                                                                              "Dana",
-                                                                          fontWeight:
-                                                                              FontWeight.bold,
-                                                                          color:
-                                                                              Color(0xFF707070),
-                                                                          fontSize:
-                                                                              12,
-                                                                        ),
-                                                                      ),
-                                                                      Text(
-                                                                        '$mobile',
-                                                                        style:
-                                                                            const TextStyle(
-                                                                          fontFamily:
-                                                                              "IranYekan",
-                                                                          fontWeight:
-                                                                              FontWeight.bold,
-                                                                          color:
-                                                                              Colors.black,
-                                                                          fontSize:
-                                                                              18,
-                                                                        ),
-                                                                      )
-                                                                    ],
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            ),
-                                                            actions: [
-                                                              OrangeButton(
-                                                                text: 'تحویل',
-                                                                onPressed:
-                                                                    () async {
-                                                                  await postDeliveryConfirmation();
-
-                                                                  errorText ==
-                                                                          null
-                                                                      // ignore: use_build_context_synchronously
-                                                                      ? Navigator
-                                                                          .pushNamedAndRemoveUntil(
-                                                                          context,
-                                                                          OrdersList
-                                                                              .id,
-                                                                          (Route<dynamic> route) =>
-                                                                              false,
-                                                                        )
-                                                                      : showDialog(
-                                                                          context:
-                                                                              context,
-                                                                          builder:
-                                                                              (context) {
-                                                                            return ErrorDialog(
-                                                                              errorText: '$errorText',
-                                                                              onPressed: () {
-                                                                                setState(() {
-                                                                                  errorText = null;
-                                                                                });
-                                                                                Navigator.pop(context);
-                                                                              },
-                                                                            );
-                                                                          });
-                                                                },
-                                                              ),
-                                                            ],
-                                                          );
-                                                        });
-                                              },
-                                            ),
-                                          ],
-                                        );
-                                      });
+                                  Navigator.pushNamed(
+                                      context, OrdersDeliveryConfirmation.id);
                                 },
                               ),
                             ),

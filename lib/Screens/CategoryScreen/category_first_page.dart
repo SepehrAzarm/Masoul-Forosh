@@ -2,10 +2,10 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:masoukharid/Screens/CategoryScreen/category_second_page.dart';
-import 'package:masoukharid/Screens/Products/add_product.dart';
-import 'package:masoukharid/Screens/Products/product_edit.dart';
-import 'package:masoukharid/Services/storage_class.dart';
+import 'package:masoul_kharid/Screens/CategoryScreen/category_second_page.dart';
+import 'package:masoul_kharid/Screens/Products/add_product.dart';
+import 'package:masoul_kharid/Screens/Products/product_edit.dart';
+import 'package:masoul_kharid/Services/storage_class.dart';
 
 import '../../Constants/colors.dart';
 
@@ -131,14 +131,15 @@ class _CategoryFirstPageState extends State<CategoryFirstPage> {
                     Storage.categoryId = categoryId!;
                   } else if (childrenList.isEmpty) {
                     Storage.categoryId = categoryId!;
+                    Storage.categoryName = categoryList[index];
                     if (mounted && Storage.isEditProduct == false) {
-                      Navigator.of(context).popUntil(
+                      Navigator.pop(
+                        context,
                         ModalRoute.withName(AddProductPage.id),
                       );
                     } else if (mounted && Storage.isEditProduct == true) {
-                      Navigator.of(context).popUntil(
+                      Navigator.of(context).pop(
                         ModalRoute.withName(ProductEdit.id),
-                        // (Route<dynamic> route) => false,
                       );
                     }
                   }

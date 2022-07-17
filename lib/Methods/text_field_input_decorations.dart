@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:masoukharid/Constants/borders_decorations.dart';
-import 'package:masoukharid/Constants/constants.dart';
+import 'package:masoul_kharid/Constants/borders_decorations.dart';
+import 'package:masoul_kharid/Constants/constants.dart';
 
 InputDecoration textFieldDecorations({Widget? suffixIcon}) {
   return InputDecoration(

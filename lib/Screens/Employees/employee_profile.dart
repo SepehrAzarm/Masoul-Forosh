@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:masoukharid/Classes/orange_button.dart';
-import 'package:masoukharid/Constants/colors.dart';
+import 'package:masoul_kharid/Classes/orange_button.dart';
+import 'package:masoul_kharid/Constants/colors.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:masoukharid/Services/storage_class.dart';
+import 'package:masoul_kharid/Services/storage_class.dart';
 
 class EmployeeProfile extends StatefulWidget {
   const EmployeeProfile({Key? key}) : super(key: key);

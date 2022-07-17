@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:masoukharid/Classes/news_card_for_profile.dart';
-import 'package:masoukharid/Modals/news.dart';
+import 'package:masoul_kharid/Classes/news_card_for_profile.dart';
+import 'package:masoul_kharid/Modals/news.dart';
 
 class NewsList extends StatefulWidget {
   const NewsList({

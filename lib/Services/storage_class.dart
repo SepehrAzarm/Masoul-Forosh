@@ -9,6 +9,8 @@ class Storage {
   static late String withdrawalId;
   static late String orderId;
   static late String ticketId;
+  static late String categoryName;
+  static late String logId;
 
   static void resetEmployeeId() {
     employeeId = '';

@@ -3,12 +3,12 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
-import 'package:masoukharid/Classes/Cards/wallet_card.dart';
-import 'package:masoukharid/Classes/orange_button.dart';
-import 'package:masoukharid/Constants/colors.dart';
-import 'package:masoukharid/Screens/BottomSheets/deposit.dart';
-import 'package:masoukharid/Screens/BottomSheets/withdraw_bsh.dart';
-import 'package:masoukharid/Services/storage_class.dart';
+import 'package:masoul_kharid/Classes/Cards/wallet_card.dart';
+import 'package:masoul_kharid/Classes/orange_button.dart';
+import 'package:masoul_kharid/Constants/colors.dart';
+import 'package:masoul_kharid/Screens/BottomSheets/deposit.dart';
+import 'package:masoul_kharid/Screens/BottomSheets/withdraw_bsh.dart';
+import 'package:masoul_kharid/Services/storage_class.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 import 'package:intl/intl.dart' as intl;
 

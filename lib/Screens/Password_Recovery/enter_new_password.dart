@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:masoukharid/Classes/Text&TextStyle/orange_header_text.dart';
-import 'package:masoukharid/Classes/orange_button.dart';
-import 'package:masoukharid/Constants/colors.dart';
-import 'package:masoukharid/Screens/Password_Recovery/otp_input_page.dart';
+import 'package:masoul_kharid/Classes/Text&TextStyle/orange_header_text.dart';
+import 'package:masoul_kharid/Classes/orange_button.dart';
+import 'package:masoul_kharid/Constants/colors.dart';
+import 'package:masoul_kharid/Screens/Password_Recovery/otp_input_page.dart';
 
 class EnterNewPass extends StatefulWidget {
   const EnterNewPass({Key? key}) : super(key: key);

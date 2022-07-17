@@ -7,10 +7,10 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:masoukharid/Classes/Text&TextStyle/textfield_label_text_style.dart';
-import 'package:masoukharid/Classes/orange_button.dart';
-import 'package:masoukharid/Constants/colors.dart';
-import 'package:masoukharid/Screens/Employees/employe_list.dart';
+import 'package:masoul_kharid/Classes/Text&TextStyle/textfield_label_text_style.dart';
+import 'package:masoul_kharid/Classes/orange_button.dart';
+import 'package:masoul_kharid/Constants/colors.dart';
+import 'package:masoul_kharid/Screens/Employees/employe_list.dart';
 
 class AddNewEmployee extends StatefulWidget {
   const AddNewEmployee({Key? key}) : super(key: key);

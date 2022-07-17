@@ -1,36 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:masoukharid/Screens/CategoryScreen/category_first_page.dart';
-import 'package:masoukharid/Screens/CategoryScreen/category_second_page.dart';
-import 'package:masoukharid/Screens/Employees/add_employee.dart';
-import 'package:masoukharid/Screens/Employees/employe_list.dart';
-import 'package:masoukharid/Screens/Employees/employee_lists.dart';
-import 'package:masoukharid/Screens/Employees/employee_profile.dart';
-import 'package:masoukharid/Screens/News/add_news.dart';
-import 'package:masoukharid/Screens/News/news_edit.dart';
-import 'package:masoukharid/Screens/News/news_main_page.dart';
-import 'package:masoukharid/Screens/Orders/order_screen.dart';
-import 'package:masoukharid/Screens/Orders/orders_list.dart';
-import 'package:masoukharid/Screens/Password_Recovery/enter_new_password.dart';
-import 'package:masoukharid/Screens/Password_Recovery/input_page.dart';
-import 'package:masoukharid/Screens/Password_Recovery/otp_input_page.dart';
-import 'package:masoukharid/Screens/Products/add_product.dart';
-import 'package:masoukharid/Screens/Products/product_edit.dart';
-import 'package:masoukharid/Screens/Products/products_mainpage.dart';
-import 'package:masoukharid/Screens/Statistics/factor_screen.dart';
-import 'package:masoukharid/Screens/Statistics/factors_list.dart';
-import 'package:masoukharid/Screens/Statistics/items_screen.dart';
-import 'package:masoukharid/Screens/Statistics/turnover_screen.dart';
-import 'package:masoukharid/Screens/Ticket/chat_screen.dart';
-import 'package:masoukharid/Screens/Ticket/tickets_list.dart';
-import 'package:masoukharid/Screens/Wallet/wallet_screen.dart';
-import 'package:masoukharid/Screens/account_settings.dart';
-import 'package:masoukharid/Screens/get_started_page.dart';
-import 'package:masoukharid/Screens/login_page.dart';
-import 'package:masoukharid/Screens/otp_verify_screen.dart';
-import 'package:masoukharid/Screens/profile_screen.dart';
-import 'package:masoukharid/Screens/splash_screen.dart';
-import 'package:masoukharid/Screens/Ticket/support_ticket.dart';
+import 'package:masoul_kharid/Screens/CategoryScreen/category_first_page.dart';
+import 'package:masoul_kharid/Screens/CategoryScreen/category_second_page.dart';
+import 'package:masoul_kharid/Screens/Employees/add_employee.dart';
+import 'package:masoul_kharid/Screens/Employees/employe_list.dart';
+import 'package:masoul_kharid/Screens/Employees/employee_lists.dart';
+import 'package:masoul_kharid/Screens/Employees/employee_profile.dart';
+import 'package:masoul_kharid/Screens/News/add_news.dart';
+import 'package:masoul_kharid/Screens/News/news_edit.dart';
+import 'package:masoul_kharid/Screens/News/news_main_page.dart';
+import 'package:masoul_kharid/Screens/Orders/order_delivery.dart';
+import 'package:masoul_kharid/Screens/Orders/order_screen.dart';
+import 'package:masoul_kharid/Screens/Orders/orders_list.dart';
+import 'package:masoul_kharid/Screens/Password_Recovery/enter_new_password.dart';
+import 'package:masoul_kharid/Screens/Password_Recovery/input_page.dart';
+import 'package:masoul_kharid/Screens/Password_Recovery/otp_input_page.dart';
+import 'package:masoul_kharid/Screens/Products/add_product.dart';
+import 'package:masoul_kharid/Screens/Products/product_edit.dart';
+import 'package:masoul_kharid/Screens/Products/products_mainpage.dart';
+import 'package:masoul_kharid/Screens/Statistics/factor_screen.dart';
+import 'package:masoul_kharid/Screens/Statistics/factors_list.dart';
+import 'package:masoul_kharid/Screens/Statistics/items_screen.dart';
+import 'package:masoul_kharid/Screens/Statistics/turnover_screen.dart';
+import 'package:masoul_kharid/Screens/Ticket/chat_screen.dart';
+import 'package:masoul_kharid/Screens/Ticket/tickets_list.dart';
+import 'package:masoul_kharid/Screens/Wallet/wallet_screen.dart';
+import 'package:masoul_kharid/Screens/account_settings.dart';
+import 'package:masoul_kharid/Screens/get_started_page.dart';
+import 'package:masoul_kharid/Screens/login_page.dart';
+import 'package:masoul_kharid/Screens/otp_verify_screen.dart';
+import 'package:masoul_kharid/Screens/profile_screen.dart';
+import 'package:masoul_kharid/Screens/splash_screen.dart';
+import 'package:masoul_kharid/Screens/Ticket/support_ticket.dart';
 
 void main() {
   runApp(const MasoulForosh());
@@ -55,6 +56,7 @@ class MasoulForosh extends StatelessWidget {
       ],
       initialRoute: SplashScreen.id,
       routes: {
+        OrdersDeliveryConfirmation.id: (context) => const OrdersDeliveryConfirmation(),
         SupportTicketScreen.id: (context) => const SupportTicketScreen(),
         SellingItemsScreen.id: (context) => const SellingItemsScreen(),
         CategorySecondList.id: (context) => const CategorySecondList(),

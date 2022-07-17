@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:masoukharid/Constants/colors.dart';
+import 'package:masoul_kharid/Constants/colors.dart';
 
 class FactorListCard extends StatelessWidget {
   const FactorListCard({
@@ -24,7 +24,7 @@ class FactorListCard extends StatelessWidget {
           SizedBox(
             height: 50,
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 SizedBox(
                   height: 30,

@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:jwt_decode/jwt_decode.dart';
-import 'package:masoukharid/Classes/chat_text_and_avatar.dart';
-import 'package:masoukharid/Constants/colors.dart';
-import 'package:masoukharid/Services/storage_class.dart';
+import 'package:masoul_kharid/Classes/chat_text_and_avatar.dart';
+import 'package:masoul_kharid/Constants/colors.dart';
+import 'package:masoul_kharid/Screens/Ticket/tickets_list.dart';
+import 'package:masoul_kharid/Screens/profile_screen.dart';
+import 'package:masoul_kharid/Services/storage_class.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 
 class TicketChatScreen extends StatefulWidget {
@@ -312,8 +314,14 @@ class _TicketChatScreenState extends State<TicketChatScreen> {
                                                       child: TextButton(
                                                         onPressed: () async {
                                                           await putUpdateTicketStatus();
-                                                          Navigator.pop(
-                                                              context);
+                                                          Navigator
+                                                              .pushNamedAndRemoveUntil(
+                                                            context,
+                                                            TicketsList.id,
+                                                            (Route<dynamic>
+                                                                    route) =>
+                                                                false,
+                                                          );
                                                         },
                                                         child: const Center(
                                                           child: Text(

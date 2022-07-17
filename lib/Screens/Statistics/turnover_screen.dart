@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
-import 'package:masoukharid/Classes/Cards/turnover_card.dart';
-import 'package:masoukharid/Constants/colors.dart';
+import 'package:masoul_kharid/Classes/Cards/turnover_card.dart';
+import 'package:masoul_kharid/Constants/colors.dart';
 
 class TurnOverScreen extends StatefulWidget {
   const TurnOverScreen({Key? key}) : super(key: key);

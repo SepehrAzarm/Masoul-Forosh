@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:masoukharid/Classes/orange_button.dart';
+import 'package:masoul_kharid/Classes/orange_button.dart';
 
 class ErrorDialog extends StatelessWidget {
   const ErrorDialog(

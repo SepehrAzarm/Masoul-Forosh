@@ -1,10 +1,11 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
-import 'package:masoukharid/Methods/factors_orange_card.dart';
-import 'package:masoukharid/Services/storage_class.dart';
+import 'package:masoul_kharid/Methods/factors_orange_card.dart';
+import 'package:masoul_kharid/Services/storage_class.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 import 'package:intl/intl.dart' as intl;
 
@@ -29,6 +30,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   String productAmount = "1x";
   String? paymentReference;
   String? createdAt;
+  int? invoiceStatusType;
   int? transactionMoment;
   int? totalFactorPrice;
   int? invoiceNumber;
@@ -42,6 +44,16 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     2: 'کیف پول',
     3: 'داخلی',
     4: 'نامشخص',
+  };
+
+  Map<int, String> invoiceStatusTypeMap = {
+    0: 'در حال پردازش',
+    1: 'پرداخت شده',
+    2: 'رد شده',
+    3: 'لغو شده',
+    4: 'در انتظار ارسال',
+    5: 'تحویل داده شده به پیک',
+    6: 'تحویل داده شده',
   };
 
   String toStringFormatter(Jalali j) {
@@ -76,6 +88,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           if (jsonDecode(data)["order"]["shopId"] != null) {
             shopUserName = jsonDecode(data)["order"]["shopId"]["shopUserName"];
           }
+          invoiceStatusType = jsonDecode(data)["order"]["status"];
           transactionMoment = jsonDecode(data)["order"]["transactionMoment"];
           paymentReference = jsonDecode(data)["order"]["paymentReference"];
           createdAt = jsonDecode(data)["order"]["createdAt"];
@@ -114,6 +127,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final key = new GlobalKey<ScaffoldState>();
     return RefreshIndicator(
       onRefresh: refresh,
       child: itemTitle.isEmpty
@@ -445,7 +459,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                                             .spaceEvenly,
                                                     children: [
                                                       const Text(
-                                                        'مالیات پرداخت',
+                                                        'وضعیت پرداخت',
                                                         style: TextStyle(
                                                           fontWeight:
                                                               FontWeight.bold,
@@ -456,7 +470,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                                         ),
                                                       ),
                                                       Text(
-                                                        '$tax تومان',
+                                                        '${invoiceStatusTypeMap[invoiceStatusType]}',
                                                         style: const TextStyle(
                                                           fontWeight:
                                                               FontWeight.bold,
@@ -584,15 +598,23 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                                   fontSize: 10,
                                                 ),
                                               ),
-                                              Text(
-                                                paymentReference != null
-                                                    ? '$paymentReference'
-                                                    : '--',
-                                                style: const TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontFamily: 'IranYekan',
-                                                  color: Colors.black,
-                                                  fontSize: 8,
+                                              GestureDetector(
+                                                onLongPress: () {
+                                                  Clipboard.setData(
+                                                      ClipboardData(
+                                                          text:
+                                                              paymentReference));
+                                                },
+                                                child: SelectableText(
+                                                  paymentReference != null
+                                                      ? '$paymentReference'
+                                                      : '--',
+                                                  style: const TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontFamily: 'IranYekan',
+                                                    color: Colors.black,
+                                                    fontSize: 8,
+                                                  ),
                                                 ),
                                               ),
                                             ],

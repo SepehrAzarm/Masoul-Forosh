@@ -1,10 +1,11 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
-import 'package:masoukharid/Methods/factors_orange_card.dart';
-import 'package:masoukharid/Services/storage_class.dart';
+import 'package:masoul_kharid/Methods/factors_orange_card.dart';
+import 'package:masoul_kharid/Services/storage_class.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 import 'package:intl/intl.dart' as intl;
 
@@ -30,6 +31,7 @@ class _FactorScreenState extends State<FactorScreen> {
   String? paymentReference;
   String? createdAt;
   String? transactionMoment;
+  int? invoiceStatusType;
   int? totalFactorPrice;
   int? invoiceNumber;
   int? paymentMethod;
@@ -43,6 +45,16 @@ class _FactorScreenState extends State<FactorScreen> {
     2: 'کیف پول',
     3: 'داخلی',
     4: 'نامشخص',
+  };
+
+  Map<int, String> invoiceStatusTypeMap = {
+    0: 'در حال پردازش',
+    1: 'پرداخت شده',
+    2: 'رد شده',
+    3: 'لغو شده',
+    4: 'در انتظار ارسال',
+    5: 'تحویل داده شده به پیک',
+    6: 'تحویل داده شده',
   };
 
   String toStringFormatter(Jalali j) {
@@ -78,6 +90,7 @@ class _FactorScreenState extends State<FactorScreen> {
             shopUserName =
                 jsonDecode(data)["invoice"]["shopId"]["shopUserName"];
           }
+          invoiceStatusType = jsonDecode(data)["invoice"]["status"];
           transactionMoment = jsonDecode(data)["invoice"]["transactionMoment"];
           paymentReference = jsonDecode(data)["invoice"]["paymentReference"];
           createdAt = jsonDecode(data)["invoice"]["createdAt"];
@@ -280,9 +293,11 @@ class _FactorScreenState extends State<FactorScreen> {
                                           name: itemTitle[index] +
                                               ' ${itemsQuantity[index]}x ',
                                           pricePerAmount:
-                                              intl.NumberFormat.decimalPattern().format(itemPPA[index]),
+                                              intl.NumberFormat.decimalPattern()
+                                                  .format(itemPPA[index]),
                                           totalPrice:
-                                              intl.NumberFormat.decimalPattern().format(totalPrice[index]),
+                                              intl.NumberFormat.decimalPattern()
+                                                  .format(totalPrice[index]),
                                         );
                                       },
                                     ),
@@ -447,7 +462,7 @@ class _FactorScreenState extends State<FactorScreen> {
                                                             .spaceEvenly,
                                                     children: [
                                                       const Text(
-                                                        'مالیات پرداخت',
+                                                        'وضعیت پرداخت',
                                                         style: TextStyle(
                                                           fontWeight:
                                                               FontWeight.bold,
@@ -458,7 +473,7 @@ class _FactorScreenState extends State<FactorScreen> {
                                                         ),
                                                       ),
                                                       Text(
-                                                        '$tax تومان',
+                                                        '${invoiceStatusTypeMap[invoiceStatusType]}',
                                                         style: const TextStyle(
                                                           fontWeight:
                                                               FontWeight.bold,
@@ -587,15 +602,23 @@ class _FactorScreenState extends State<FactorScreen> {
                                                   fontSize: 10,
                                                 ),
                                               ),
-                                              Text(
-                                                paymentReference != null
-                                                    ? '$paymentReference'
-                                                    : '--',
-                                                style: const TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontFamily: 'IranYekan',
-                                                  color: Colors.black,
-                                                  fontSize: 8,
+                                              GestureDetector(
+                                                onLongPress: () {
+                                                  Clipboard.setData(
+                                                      ClipboardData(
+                                                          text:
+                                                              paymentReference));
+                                                },
+                                                child: SelectableText(
+                                                  paymentReference != null
+                                                      ? '$paymentReference'
+                                                      : '--',
+                                                  style: const TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontFamily: 'IranYekan',
+                                                    color: Colors.black,
+                                                    fontSize: 8,
+                                                  ),
                                                 ),
                                               ),
                                             ],

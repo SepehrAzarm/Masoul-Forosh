@@ -5,21 +5,21 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
-import 'package:masoukharid/Classes/Cards/product_card.dart';
-import 'package:masoukharid/Classes/Dialogs/aboutus_dialog.dart';
-import 'package:masoukharid/Classes/settings_body_content.dart';
-import 'package:masoukharid/Constants/colors.dart';
-import 'package:masoukharid/Screens/BottomSheets/employee_settings.dart';
-import 'package:masoukharid/Screens/BottomSheets/statistic_bottom_sheet.dart';
-import 'package:masoukharid/Screens/Employees/add_employee.dart';
-import 'package:masoukharid/Screens/News/add_news.dart';
-import 'package:masoukharid/Screens/Products/add_product.dart';
-import 'package:masoukharid/Screens/Products/products_mainpage.dart';
-import 'package:masoukharid/Screens/PtofileScreenContent/news_list.dart';
-import 'package:masoukharid/Screens/Ticket/tickets_list.dart';
-import 'package:masoukharid/Screens/account_settings.dart';
-import 'package:masoukharid/Screens/login_page.dart';
-import 'package:masoukharid/Services/storage_class.dart';
+import 'package:masoul_kharid/Classes/Cards/product_card.dart';
+import 'package:masoul_kharid/Classes/Dialogs/aboutus_dialog.dart';
+import 'package:masoul_kharid/Classes/settings_body_content.dart';
+import 'package:masoul_kharid/Constants/colors.dart';
+import 'package:masoul_kharid/Screens/BottomSheets/employee_settings.dart';
+import 'package:masoul_kharid/Screens/BottomSheets/statistic_bottom_sheet.dart';
+import 'package:masoul_kharid/Screens/Employees/add_employee.dart';
+import 'package:masoul_kharid/Screens/Employees/employe_list.dart';
+import 'package:masoul_kharid/Screens/News/add_news.dart';
+import 'package:masoul_kharid/Screens/Products/add_product.dart';
+import 'package:masoul_kharid/Screens/Products/product_edit.dart';
+import 'package:masoul_kharid/Screens/Ticket/tickets_list.dart';
+import 'package:masoul_kharid/Screens/account_settings.dart';
+import 'package:masoul_kharid/Screens/login_page.dart';
+import 'package:masoul_kharid/Services/storage_class.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -422,7 +422,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                                     Storage.productId =
                                         await productIdList[index];
                                     Navigator.pushNamed(
-                                        context, ProductsMainPage.id);
+                                        context, ProductEdit.id);
                                   },
                                   title: productTitles[index],
                                   availableAmount:
@@ -543,9 +543,7 @@ class _ProfileScreenState extends State<ProfileScreen>
               text: 'تنظیمات کارمندان',
               image: 'images/SettingsIcons/EmployeeSettings.png',
               onTap: () {
-                showModalBottomSheet(
-                    context: context,
-                    builder: (context) => const EmployeesSettingsBSH());
+                Navigator.pushNamed(context, EmployeeList.id);
               },
             ),
             SettingsBodyContent(

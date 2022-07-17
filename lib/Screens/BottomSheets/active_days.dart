@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:masoukharid/Constants/colors.dart';
-import 'package:masoukharid/Classes/orange_button.dart';
-import 'package:masoukharid/Classes/Text&TextStyle/bottom_sheet_labeltext.dart';
-import 'package:masoukharid/Methods/bottom_sheet_boxdecoration.dart';
-import 'package:masoukharid/Classes/Text&TextStyle/week_days_text.dart';
+import 'package:masoul_kharid/Constants/colors.dart';
+import 'package:masoul_kharid/Classes/orange_button.dart';
+import 'package:masoul_kharid/Classes/Text&TextStyle/bottom_sheet_labeltext.dart';
+import 'package:masoul_kharid/Methods/bottom_sheet_boxdecoration.dart';
+import 'package:masoul_kharid/Classes/Text&TextStyle/week_days_text.dart';
 
 class ActiveDaysBSH extends StatefulWidget {
   const ActiveDaysBSH({Key? key}) : super(key: key);
@@ -13,7 +13,7 @@ class ActiveDaysBSH extends StatefulWidget {
 }
 
 class _ActiveDaysBSHState extends State<ActiveDaysBSH> {
-  List<String> activeDaysList = [];
+  List<int> activeDaysList = [];
   bool isCheckedAll = false;
   bool isCheckedSat = false;
   bool isCheckedSun = false;
@@ -22,6 +22,17 @@ class _ActiveDaysBSHState extends State<ActiveDaysBSH> {
   bool isCheckedWed = false;
   bool isCheckedThu = false;
   bool isCheckedFri = false;
+
+  Map<String, int> activeDaysMap = {
+    'دوشنبه': 0,
+    'سه شنبه': 1,
+    'چهارشنبه': 2,
+    'پنج شنبه': 3,
+    'جمعه': 4,
+    'شنبه': 5,
+    'یکشنبه': 6,
+  };
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -96,13 +107,13 @@ class _ActiveDaysBSHState extends State<ActiveDaysBSH> {
                                             isCheckedWed = true;
                                             isCheckedThu = true;
                                             isCheckedFri = true;
-                                            activeDaysList.add("Saturday");
-                                            activeDaysList.add("Sunday");
-                                            activeDaysList.add("Monday");
-                                            activeDaysList.add("Tuesday");
-                                            activeDaysList.add("Wednesday");
-                                            activeDaysList.add("Thursday");
-                                            activeDaysList.add("Friday");
+                                            activeDaysList.add(0);
+                                            activeDaysList.add(1);
+                                            activeDaysList.add(2);
+                                            activeDaysList.add(3);
+                                            activeDaysList.add(4);
+                                            activeDaysList.add(5);
+                                            activeDaysList.add(6);
                                           } else {
                                             isCheckedSat = false;
                                             isCheckedSun = false;
@@ -141,7 +152,7 @@ class _ActiveDaysBSHState extends State<ActiveDaysBSH> {
                                       onChanged: (bool? value) {
                                         setState(() {
                                           isCheckedSat = value!;
-                                          activeDaysList.add("Saturday");
+                                          activeDaysList.add(5);
                                         });
                                       },
                                     ),
@@ -171,7 +182,7 @@ class _ActiveDaysBSHState extends State<ActiveDaysBSH> {
                                       onChanged: (bool? value) {
                                         setState(() {
                                           isCheckedSun = value!;
-                                          activeDaysList.add("Sunday");
+                                          activeDaysList.add(6);
                                         });
                                       },
                                     ),
@@ -201,7 +212,7 @@ class _ActiveDaysBSHState extends State<ActiveDaysBSH> {
                                       onChanged: (bool? value) {
                                         setState(() {
                                           isCheckedMon = value!;
-                                          activeDaysList.add("Monday");
+                                          activeDaysList.add(0);
                                         });
                                       },
                                     ),
@@ -231,7 +242,7 @@ class _ActiveDaysBSHState extends State<ActiveDaysBSH> {
                                       onChanged: (bool? value) {
                                         setState(() {
                                           isCheckedTue = value!;
-                                          activeDaysList.add("Tuesday");
+                                          activeDaysList.add(1);
                                         });
                                       },
                                     ),
@@ -261,7 +272,7 @@ class _ActiveDaysBSHState extends State<ActiveDaysBSH> {
                                       onChanged: (bool? value) {
                                         setState(() {
                                           isCheckedWed = value!;
-                                          activeDaysList.add("Wednesday");
+                                          activeDaysList.add(2);
                                         });
                                       },
                                     ),
@@ -291,7 +302,7 @@ class _ActiveDaysBSHState extends State<ActiveDaysBSH> {
                                       onChanged: (bool? value) {
                                         setState(() {
                                           isCheckedThu = value!;
-                                          activeDaysList.add("Thursday");
+                                          activeDaysList.add(3);
                                         });
                                       },
                                     ),
@@ -321,7 +332,7 @@ class _ActiveDaysBSHState extends State<ActiveDaysBSH> {
                                       onChanged: (bool? value) {
                                         setState(() {
                                           isCheckedFri = value!;
-                                          activeDaysList.add("Friday");
+                                          activeDaysList.add(4);
                                         });
                                       },
                                     ),

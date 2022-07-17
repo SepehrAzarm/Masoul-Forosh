@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:masoukharid/Constants/colors.dart';
+import 'package:masoul_kharid/Constants/colors.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 
 class StatisticCard extends StatelessWidget {

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:masoukharid/Constants/text_styles.dart';
-import 'package:masoukharid/Screens/News/news_main_page.dart';
+import 'package:masoul_kharid/Constants/text_styles.dart';
+import 'package:masoul_kharid/Screens/News/news_main_page.dart';
 
-import 'package:masoukharid/Constants/colors.dart';
+import 'package:masoul_kharid/Constants/colors.dart';
 
 class NewsCardProfile extends StatelessWidget {
   const NewsCardProfile({

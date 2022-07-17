@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:masoukharid/Classes/Cards/activity_log_card.dart';
-import 'package:masoukharid/Classes/Cards/employee_login_card.dart';
+import 'package:masoul_kharid/Classes/Cards/activity_log_card.dart';
+import 'package:masoul_kharid/Classes/Cards/employee_login_card.dart';
+import 'package:masoul_kharid/Classes/orange_button.dart';
+import 'package:masoul_kharid/Services/storage_class.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -19,6 +21,8 @@ class _EmployeeListsState extends State<EmployeeLists> {
   final storage = const FlutterSecureStorage();
   List loginActivityList = [];
   List activityLogsList = [];
+  String? logDescription;
+  String? logTitle;
 
   String createdAtTimeFormatter(Jalali j) {
     return '${j.hour}:${j.minute}';
@@ -74,6 +78,35 @@ class _EmployeeListsState extends State<EmployeeLists> {
           for (var i = 0; i < items.length; i++) {
             activityLogsList.add(items[i]);
           }
+        });
+        print(response.statusCode);
+        print(response.body);
+      } else {
+        print(response.statusCode);
+        print(response.body);
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future getLogInfo() async {
+    String? value = await storage.read(key: "token");
+    Map<String, String> headers = {
+      'token': value!,
+      "Accept": "application/json",
+      "Content-Type": "application/json"
+    };
+    try {
+      var response = await http.get(
+          Uri.parse(
+              "https://testapi.carbon-family.com/api/market/history/userActionsLogs/${Storage.logId}"),
+          headers: headers);
+      if (response.statusCode == 200) {
+        var data = response.body;
+        setState(() {
+          logTitle = jsonDecode(data)["data"]["action"];
+          logDescription = jsonDecode(data)["data"]["descriptions"];
         });
         print(response.statusCode);
         print(response.body);
@@ -160,6 +193,50 @@ class _EmployeeListsState extends State<EmployeeLists> {
                           ' ' +
                           activityLogsList[index]["user"]["lastName"],
                       time: createdAtTimeFormatter(j),
+                      onTap: () async {
+                        Storage.logId = activityLogsList[index]["_id"];
+                        await getLogInfo();
+                        showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                shape: const RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.all(
+                                        Radius.circular(20.0))),
+                                title: Center(
+                                  child: Text(
+                                    '$logTitle',
+                                    style: const TextStyle(
+                                      fontFamily: 'Dana',
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ),
+                                content: Container(
+                                  height: 450,
+                                  width: 300,
+                                  // color: Colors.amberAccent,
+                                  child: Text(
+                                    '$logDescription',
+                                    style: const TextStyle(
+                                      fontFamily: 'IranYekan',
+                                      fontSize: 16,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ),
+                                actions: [
+                                  OrangeButton(
+                                    text: 'بستن',
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                ],
+                              );
+                            });
+                      },
                     );
                   }),
             ),

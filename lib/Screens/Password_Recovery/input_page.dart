@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:masoukharid/Classes/Text&TextStyle/orange_header_text.dart';
-import 'package:masoukharid/Classes/orange_button.dart';
-import 'package:masoukharid/Constants/colors.dart';
+import 'package:masoul_kharid/Classes/Text&TextStyle/orange_header_text.dart';
+import 'package:masoul_kharid/Classes/orange_button.dart';
+import 'package:masoul_kharid/Constants/colors.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:masoukharid/Screens/otp_verify_screen.dart';
+import 'package:masoul_kharid/Screens/Password_Recovery/otp_input_page.dart';
+import 'package:masoul_kharid/Screens/otp_verify_screen.dart';
 
 class InputNumberPage extends StatefulWidget {
   const InputNumberPage({Key? key}) : super(key: key);
@@ -28,6 +29,7 @@ class _InputNumberPageState extends State<InputNumberPage> {
       );
       if (response.statusCode == 200) {
         print(response.statusCode);
+        print(response.body);
       } else {
         print(response.statusCode);
         print(response.body);
@@ -140,40 +142,40 @@ class _InputNumberPageState extends State<InputNumberPage> {
                         errorText == null
                             ? Navigator.pushNamed(
                                 context,
-                                OTPVerifyScreen.id,
+                                OTPInputPage.id,
                               )
                             : showDialog(
-                            context: context,
-                            builder: (context) {
-                              return AlertDialog(
-                                title: const Center(
-                                  child: SizedBox(
-                                    width: 80,
-                                    height: 80,
-                                    child: Image(
-                                      image: AssetImage(
-                                          'images/ErroIcon.png'),
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    title: const Center(
+                                      child: SizedBox(
+                                        width: 80,
+                                        height: 80,
+                                        child: Image(
+                                          image:
+                                              AssetImage('images/ErroIcon.png'),
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                ),
-                                content: Text(
-                                  '$errorText',
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                    fontFamily: 'IranYekan',
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                actions: [
-                                  OrangeButton(
-                                      text: 'بستن',
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                      })
-                                ],
-                              );
-                            });
+                                    content: Text(
+                                      '$errorText',
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(
+                                        fontFamily: 'IranYekan',
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    actions: [
+                                      OrangeButton(
+                                          text: 'بستن',
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          })
+                                    ],
+                                  );
+                                });
                         print(errorText);
                       } else {
                         showDialog(
@@ -185,8 +187,7 @@ class _InputNumberPageState extends State<InputNumberPage> {
                                     width: 80,
                                     height: 80,
                                     child: Image(
-                                      image: AssetImage(
-                                          'images/ErroIcon.png'),
+                                      image: AssetImage('images/ErroIcon.png'),
                                     ),
                                   ),
                                 ),

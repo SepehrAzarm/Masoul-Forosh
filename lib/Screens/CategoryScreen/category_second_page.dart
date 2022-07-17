@@ -2,10 +2,10 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:masoukharid/Constants/colors.dart';
-import 'package:masoukharid/Screens/Products/add_product.dart';
-import 'package:masoukharid/Screens/Products/product_edit.dart';
-import 'package:masoukharid/Services/storage_class.dart';
+import 'package:masoul_kharid/Constants/colors.dart';
+import 'package:masoul_kharid/Screens/Products/add_product.dart';
+import 'package:masoul_kharid/Screens/Products/product_edit.dart';
+import 'package:masoul_kharid/Services/storage_class.dart';
 
 class CategorySecondList extends StatefulWidget {
   const CategorySecondList({Key? key}) : super(key: key);
@@ -132,6 +132,7 @@ class _CategorySecondListState extends State<CategorySecondList> {
                     }
                   } else if (childrenList.isEmpty) {
                     Storage.categoryId = categoryId!;
+                    Storage.categoryName = categoryList[index];
                     if (mounted && Storage.isEditProduct == false) {
                       Navigator.of(context).popUntil(
                         ModalRoute.withName(AddProductPage.id),

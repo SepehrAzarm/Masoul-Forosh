@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:masoukharid/Classes/Text&TextStyle/bottom_sheet_labeltext.dart';
-import 'package:masoukharid/Classes/statistics_bsh_content_widget.dart';
-import 'package:masoukharid/Methods/bottom_sheet_boxdecoration.dart';
-import 'package:masoukharid/Screens/Employees/employe_list.dart';
-import 'package:masoukharid/Constants/colors.dart';
+import 'package:masoul_kharid/Classes/Text&TextStyle/bottom_sheet_labeltext.dart';
+import 'package:masoul_kharid/Classes/statistics_bsh_content_widget.dart';
+import 'package:masoul_kharid/Methods/bottom_sheet_boxdecoration.dart';
+import 'package:masoul_kharid/Screens/Employees/employe_list.dart';
+import 'package:masoul_kharid/Constants/colors.dart';
 
 class EmployeesSettingsBSH extends StatelessWidget {
   const EmployeesSettingsBSH({Key? key}) : super(key: key);

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:masoukharid/Constants/colors.dart';
-import 'package:masoukharid/Constants/strings.dart';
+import 'package:masoul_kharid/Constants/colors.dart';
+import 'package:masoul_kharid/Constants/strings.dart';
 
 class AboutUsDialog extends StatelessWidget {
   const AboutUsDialog({

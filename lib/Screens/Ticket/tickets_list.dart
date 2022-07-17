@@ -3,11 +3,12 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
-import 'package:masoukharid/Classes/Cards/ticket_list_card.dart';
-import 'package:masoukharid/Constants/colors.dart';
-import 'package:masoukharid/Screens/Ticket/chat_screen.dart';
-import 'package:masoukharid/Screens/Ticket/support_ticket.dart';
-import 'package:masoukharid/Services/storage_class.dart';
+import 'package:masoul_kharid/Classes/Cards/ticket_list_card.dart';
+import 'package:masoul_kharid/Constants/colors.dart';
+import 'package:masoul_kharid/Screens/Ticket/chat_screen.dart';
+import 'package:masoul_kharid/Screens/Ticket/support_ticket.dart';
+import 'package:masoul_kharid/Screens/profile_screen.dart';
+import 'package:masoul_kharid/Services/storage_class.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 
 class TicketsList extends StatefulWidget {
@@ -55,7 +56,6 @@ class _TicketsListState extends State<TicketsList> {
             } else if (items[i]["status"] == false) {
               closedTicketsList.add(items[i]);
             }
-            ;
           }
         });
         print(response.statusCode);
@@ -93,8 +93,11 @@ class _TicketsListState extends State<TicketsList> {
           ),
           elevation: 0,
           backgroundColor: Colors.white,
-          leading: const BackButton(
+          leading: BackButton(
             color: Colors.black,
+            onPressed: () {
+              Navigator.pushNamed(context, ProfileScreen.id);
+            },
           ),
           bottom: const TabBar(
             labelPadding: EdgeInsets.all(4),

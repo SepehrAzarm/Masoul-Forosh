@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
-import 'package:masoukharid/Screens/Statistics/factor_screen.dart';
-import 'package:masoukharid/Services/storage_class.dart';
+import 'package:masoul_kharid/Screens/Statistics/factor_screen.dart';
+import 'package:masoul_kharid/Services/storage_class.dart';
 
 import '../../Classes/Cards/factor_list_card.dart';
 import '../../Constants/colors.dart';

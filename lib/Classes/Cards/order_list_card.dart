@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:masoukharid/Constants/colors.dart';
+import 'package:masoul_kharid/Constants/colors.dart';
 
 class OrderListCard extends StatelessWidget {
   const OrderListCard({
@@ -47,6 +47,7 @@ class OrderListCard extends StatelessWidget {
               ),
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(
                     height: 22,
@@ -61,7 +62,7 @@ class OrderListCard extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    'زمان ایجاد سفارش: $time',
+                    time,
                     style: const TextStyle(
                       fontFamily: "IranYekan",
                       color: Color(0xFF707070),

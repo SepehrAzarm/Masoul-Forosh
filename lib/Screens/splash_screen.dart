@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:masoukharid/Screens/get_started_page.dart';
-import 'package:masoukharid/Screens/profile_screen.dart';
+import 'package:masoul_kharid/Screens/get_started_page.dart';
+import 'package:masoul_kharid/Screens/profile_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);

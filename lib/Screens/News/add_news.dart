@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:masoukharid/Classes/orange_button.dart';
-import 'package:masoukharid/Classes/Text&TextStyle/orange_header_text.dart';
-import 'package:masoukharid/Constants/borders_decorations.dart';
-import 'package:masoukharid/Constants/colors.dart';
-import 'package:masoukharid/Constants/constants.dart';
+import 'package:masoul_kharid/Classes/orange_button.dart';
+import 'package:masoul_kharid/Classes/Text&TextStyle/orange_header_text.dart';
+import 'package:masoul_kharid/Constants/borders_decorations.dart';
+import 'package:masoul_kharid/Constants/colors.dart';
+import 'package:masoul_kharid/Constants/constants.dart';
 
 class AddNewsPage extends StatefulWidget {
   const AddNewsPage({Key? key}) : super(key: key);

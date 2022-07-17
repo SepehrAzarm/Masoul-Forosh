@@ -6,16 +6,16 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:jwt_decode/jwt_decode.dart';
-import 'package:masoukharid/Classes/Text&TextStyle/orange_header_text.dart';
-import 'package:masoukharid/Classes/Text&TextStyle/textfield_label_text_style.dart';
-import 'package:masoukharid/Classes/orange_button.dart';
-import 'package:masoukharid/Constants/colors.dart';
-import 'package:masoukharid/Constants/constants.dart';
-import 'package:masoukharid/Methods/text_field_input_decorations.dart';
-import 'package:masoukharid/Screens/Password_Recovery/input_page.dart';
-import 'package:masoukharid/Screens/otp_verify_screen.dart';
-import 'package:masoukharid/Screens/profile_screen.dart';
-import 'package:masoukharid/Classes/Dialogs/error_dialog.dart';
+import 'package:masoul_kharid/Classes/Text&TextStyle/orange_header_text.dart';
+import 'package:masoul_kharid/Classes/Text&TextStyle/textfield_label_text_style.dart';
+import 'package:masoul_kharid/Classes/orange_button.dart';
+import 'package:masoul_kharid/Constants/colors.dart';
+import 'package:masoul_kharid/Constants/constants.dart';
+import 'package:masoul_kharid/Methods/text_field_input_decorations.dart';
+import 'package:masoul_kharid/Screens/Password_Recovery/input_page.dart';
+import 'package:masoul_kharid/Screens/otp_verify_screen.dart';
+import 'package:masoul_kharid/Screens/profile_screen.dart';
+import 'package:masoul_kharid/Classes/Dialogs/error_dialog.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -186,253 +186,262 @@ class _LoginPageState extends State<LoginPage> {
         ),
         child: SafeArea(
           child: Container(
+            height: MediaQuery.of(context).size.height,
             margin:
                 const EdgeInsets.symmetric(vertical: 20.0, horizontal: 15.0),
-            child: ListView(
-              physics: const NeverScrollableScrollPhysics(),
-              children: [
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    const SizedBox(height: 80),
-                    // Header Text
-                    Padding(
-                      padding: const EdgeInsets.only(right: 10),
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: OrangeHeaderText(
-                          text: 'ورود',
-                          fontSize: 40.0,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 40,
-                    ),
-                    SizedBox(
-                      height: MediaQuery.of(context).size.height,
-                      width: MediaQuery.of(context).size.width,
-                      child: Column(
-                        children: [
-                          //Phone Number
-                          Container(
-                            padding: const EdgeInsets.only(
-                              left: 115,
-                              right: 12,
-                            ),
-                            width: double.infinity,
-                            height: kLabelTextContainerHeight,
-                            child: const TextFieldLabel(text: 'شماره موبایل'),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 10),
-                            child: TextField(
-                                textInputAction: TextInputAction.next,
-                                keyboardType: TextInputType.number,
-                                controller: _controllerPhoneNumber,
-                                cursorColor: kButtonOrangeColor,
-                                textAlignVertical: TextAlignVertical.center,
-                                textAlign: TextAlign.center,
-                                onChanged: (String value) {
-                                  setState(() {
-                                    phoneNumber = value;
-                                    value != null
-                                        ? phoneColor = kButtonOrangeColor
-                                        : phoneColor = kTextFieldBorderColor;
-                                  });
-                                },
-                                style: const TextStyle(
-                                  fontFamily: 'IranYekan',
-                                ),
-                                decoration: textFieldDecorations(
-                                  suffixIcon: Container(
-                                    margin: const EdgeInsets.all(10.0),
-                                    child: ImageIcon(
-                                      const AssetImage(
-                                        'images/Icons/phoneIcon.png',
-                                      ),
-                                      color: phoneColor,
-                                      size: 10,
-                                    ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.75,
+                    // color: Colors.pinkAccent,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        SizedBox(
+                          // height: MediaQuery.of(context).size.height,
+                          width: MediaQuery.of(context).size.width,
+                          child: Column(
+                            children: [
+                              const SizedBox(height: 80),
+                              // Header Text
+                              Padding(
+                                padding: const EdgeInsets.only(right: 10),
+                                child: SizedBox(
+                                  width: double.infinity,
+                                  child: OrangeHeaderText(
+                                    text: 'ورود',
+                                    fontSize: 40.0,
                                   ),
-                                )),
-                          ),
-                          const SizedBox(height: 40),
-                          // Password Field
-                          Container(
-                            padding: const EdgeInsets.only(
-                              left: 115,
-                              right: 12,
-                            ),
-                            width: double.infinity,
-                            height: kLabelTextContainerHeight,
-                            child: const TextFieldLabel(text: 'رمز عبور'),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 10),
-                            child: TextField(
-                              obscuringCharacter: '*',
-                              obscureText: obsText,
-                              textAlign: TextAlign.center,
-                              controller: _controllerPassword,
-                              onChanged: (String value) {
-                                setState(() {
-                                  password = value;
-                                });
-                              },
-                              decoration: textFieldDecorations(
-                                suffixIcon: IconButton(
-                                  iconSize: 24.0,
-                                  icon: Icon(obsText == true
-                                      ? Icons.visibility
-                                      : Icons.visibility_off),
-                                  onPressed: () {
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 40,
+                              ),
+                              //Phone Number
+                              Container(
+                                padding: const EdgeInsets.only(
+                                  left: 115,
+                                  right: 12,
+                                ),
+                                width: double.infinity,
+                                height: kLabelTextContainerHeight,
+                                child:
+                                    const TextFieldLabel(text: 'شماره موبایل'),
+                              ),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 10),
+                                child: TextField(
+                                    textInputAction: TextInputAction.next,
+                                    keyboardType: TextInputType.number,
+                                    controller: _controllerPhoneNumber,
+                                    cursorColor: kButtonOrangeColor,
+                                    textAlignVertical: TextAlignVertical.center,
+                                    textAlign: TextAlign.center,
+                                    onChanged: (String value) {
+                                      setState(() {
+                                        phoneNumber = value;
+                                        value != null
+                                            ? phoneColor = kButtonOrangeColor
+                                            : phoneColor =
+                                                kTextFieldBorderColor;
+                                      });
+                                    },
+                                    style: const TextStyle(
+                                      fontFamily: 'IranYekan',
+                                    ),
+                                    decoration: textFieldDecorations(
+                                      suffixIcon: Container(
+                                        margin: const EdgeInsets.all(10.0),
+                                        child: ImageIcon(
+                                          const AssetImage(
+                                            'images/Icons/phoneIcon.png',
+                                          ),
+                                          color: phoneColor,
+                                          size: 10,
+                                        ),
+                                      ),
+                                    )),
+                              ),
+                              const SizedBox(height: 40),
+                              // Password Field
+                              Container(
+                                padding: const EdgeInsets.only(
+                                  left: 115,
+                                  right: 12,
+                                ),
+                                width: double.infinity,
+                                height: kLabelTextContainerHeight,
+                                child: const TextFieldLabel(text: 'رمز عبور'),
+                              ),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 10),
+                                child: TextField(
+                                  obscuringCharacter: '*',
+                                  obscureText: obsText,
+                                  textAlign: TextAlign.center,
+                                  controller: _controllerPassword,
+                                  onChanged: (String value) {
                                     setState(() {
-                                      obsText == true
-                                          ? obsText = false
-                                          : obsText = true;
+                                      password = value;
                                     });
                                   },
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 7),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.pushNamed(context, InputNumberPage.id);
-                            },
-                            child: const Padding(
-                              padding: EdgeInsets.only(left: 20),
-                              child: Text(
-                                'رمز عبور خود را فراموش کرده اید؟',
-                                textAlign: TextAlign.end,
-                                style: TextStyle(
-                                  fontSize: 8,
-                                  fontFamily: 'IranYekan',
-                                  color: Color(0xFF0088FF),
-                                ),
-                              ),
-                            ),
-                          ),
-
-                          const SizedBox(height: 190),
-                          Center(
-                            child: Visibility(
-                              maintainSize: true,
-                              maintainAnimation: true,
-                              maintainState: true,
-                              visible: visible,
-                              child: const SizedBox(
-                                height: 40,
-                                width: 40,
-                                child: CircularProgressIndicator(
-                                  color: kOrangeColor,
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                          //Bottom Button
-                          Container(
-                            padding: const EdgeInsets.only(bottom: 10),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                OrangeButton(
-                                  text: 'ورود',
-                                  onPressed: () async {
-                                    if (phoneNumber != null &&
-                                        password != null) {
-                                      print(phoneNumber);
-                                      print(password);
-                                      setState(() {
-                                        visible = true;
-                                      });
-                                      await authenticateUser();
-                                      // ignore: unnecessary_null_comparison
-                                      if (isVerified == true) {
-                                        errorText != null
-                                            ? showDialog(
-                                                context: context,
-                                                builder: (context) {
-                                                  return ErrorDialog(
-                                                    errorText: '$errorText',
-                                                    onPressed: () {
-                                                      setState(() {
-                                                        errorText = null;
-                                                        visible = false;
-                                                      });
-                                                      Navigator.pop(context);
-                                                    },
-                                                  );
-                                                })
-                                            // ignore: use_build_context_synchronously
-                                            : Navigator.pushNamedAndRemoveUntil(
-                                                context,
-                                                ProfileScreen.id,
-                                                (Route<dynamic> route) => false,
-                                              );
-                                      } else {
-                                        getOtp();
-                                        // ignore: use_build_context_synchronously
-                                        Navigator.pushNamed(
-                                          context,
-                                          OTPVerifyScreen.id,
-                                        );
-                                      }
-                                    } else {
-                                      showDialog(
-                                          context: context,
-                                          builder: (context) {
-                                            return ErrorDialog(
-                                              errorText: 'لطفا شماره موبایل و رمز عبور خود را وارد نمایید',
-                                              onPressed: () {
-                                                setState(() {
-                                                  errorText = null;
-                                                  visible = false;
-                                                });
-                                                Navigator.pop(context);
-                                              },
-                                            );
-                                          });
-                                    }
-                                  },
-                                ),
-                                const SizedBox(
-                                  height: 7.0,
-                                ),
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: const [
-                                    Text(
-                                      'تمامی حقوق مادی و معنوی مربوط به',
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 10.0,
-                                        fontFamily: 'Dana',
-                                      ),
+                                  decoration: textFieldDecorations(
+                                    suffixIcon: IconButton(
+                                      iconSize: 24.0,
+                                      icon: Icon(obsText == true
+                                          ? Icons.visibility
+                                          : Icons.visibility_off),
+                                      onPressed: () {
+                                        setState(() {
+                                          obsText == true
+                                              ? obsText = false
+                                              : obsText = true;
+                                        });
+                                      },
                                     ),
-                                    Text(
-                                      ' اپلیکیشن مسئول فروش میباشد',
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 10.0,
-                                        fontFamily: 'Dana',
-                                      ),
-                                    ),
-                                  ],
+                                  ),
                                 ),
-                              ],
+                              ),
+                              const SizedBox(height: 7),
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.pushNamed(
+                                      context, InputNumberPage.id);
+                                },
+                                child: const Padding(
+                                  padding: EdgeInsets.only(left: 20),
+                                  child: Text(
+                                    'رمز عبور خود را فراموش کرده اید؟',
+                                    textAlign: TextAlign.end,
+                                    style: TextStyle(
+                                      fontSize: 8,
+                                      fontFamily: 'IranYekan',
+                                      color: Color(0xFF0088FF),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Center(
+                          child: Visibility(
+                            maintainSize: true,
+                            maintainAnimation: true,
+                            maintainState: true,
+                            visible: visible,
+                            child: const SizedBox(
+                              height: 40,
+                              width: 40,
+                              child: CircularProgressIndicator(
+                                color: kOrangeColor,
+                              ),
                             ),
                           ),
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-              ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    height: 130,
+                    // color: Colors.amberAccent,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        OrangeButton(
+                          text: 'ورود',
+                          onPressed: () async {
+                            if (phoneNumber != null && password != null) {
+                              print(phoneNumber);
+                              print(password);
+                              setState(() {
+                                visible = true;
+                              });
+                              await authenticateUser();
+                              // ignore: unnecessary_null_comparison
+                              if (isVerified == true) {
+                                errorText != null
+                                    ? showDialog(
+                                        context: context,
+                                        builder: (context) {
+                                          return ErrorDialog(
+                                            errorText: '$errorText',
+                                            onPressed: () {
+                                              setState(() {
+                                                errorText = null;
+                                                visible = false;
+                                              });
+                                              Navigator.pop(context);
+                                            },
+                                          );
+                                        })
+                                    // ignore: use_build_context_synchronously
+                                    : Navigator.pushNamedAndRemoveUntil(
+                                        context,
+                                        ProfileScreen.id,
+                                        (Route<dynamic> route) => false,
+                                      );
+                              } else {
+                                getOtp();
+                                // ignore: use_build_context_synchronously
+                                Navigator.pushNamed(
+                                  context,
+                                  OTPVerifyScreen.id,
+                                );
+                              }
+                            } else {
+                              showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return ErrorDialog(
+                                      errorText:
+                                          'لطفا شماره موبایل و رمز عبور خود را وارد نمایید',
+                                      onPressed: () {
+                                        setState(() {
+                                          errorText = null;
+                                          visible = false;
+                                        });
+                                        Navigator.pop(context);
+                                      },
+                                    );
+                                  });
+                            }
+                          },
+                        ),
+                        const SizedBox(
+                          height: 5.0,
+                        ),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: const [
+                            Text(
+                              'تمامی حقوق مادی و معنوی مربوط به',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 10.0,
+                                fontFamily: 'Dana',
+                              ),
+                            ),
+                            Text(
+                              ' اپلیکیشن مسئول فروش میباشد',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 10.0,
+                                fontFamily: 'Dana',
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
             ),
           ),
         ),

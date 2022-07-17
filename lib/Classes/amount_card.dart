@@ -1,8 +1,8 @@
 // ignore_for_file: must_be_immutable
 
 import 'package:flutter/material.dart';
-import 'package:masoukharid/Constants/colors.dart';
-import 'package:masoukharid/Constants/constants.dart';
+import 'package:masoul_kharid/Constants/colors.dart';
+import 'package:masoul_kharid/Constants/constants.dart';
 
 class AmountWidget extends StatelessWidget {
   AmountWidget({
@@ -65,6 +65,7 @@ class AmountWidget extends StatelessWidget {
               keyboardType: TextInputType.number,
               textAlignVertical: TextAlignVertical.center,
               textAlign: TextAlign.center,
+              textInputAction: TextInputAction.next,
               decoration: InputDecoration(
                 contentPadding: kTextFieldPadding,
                 filled: true,

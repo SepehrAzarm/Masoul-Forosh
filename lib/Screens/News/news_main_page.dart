@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:masoukharid/Classes/Dialogs/delete_dialog.dart';
-import 'package:masoukharid/Classes/orange_button.dart';
-import 'package:masoukharid/Constants/strings.dart';
-import 'package:masoukharid/Screens/News/news_edit.dart';
+import 'package:masoul_kharid/Classes/Dialogs/delete_dialog.dart';
+import 'package:masoul_kharid/Classes/orange_button.dart';
+import 'package:masoul_kharid/Constants/strings.dart';
+import 'package:masoul_kharid/Screens/News/news_edit.dart';
 
-import 'package:masoukharid/Constants/colors.dart';
-import 'package:masoukharid/Constants/text_styles.dart';
+import 'package:masoul_kharid/Constants/colors.dart';
+import 'package:masoul_kharid/Constants/text_styles.dart';
 
 class NewsMainPage extends StatefulWidget {
   const NewsMainPage({Key? key}) : super(key: key);

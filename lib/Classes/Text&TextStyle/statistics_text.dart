@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:masoukharid/Constants/colors.dart';
-import 'package:masoukharid/Constants/constants.dart';
+import 'package:masoul_kharid/Constants/colors.dart';
+import 'package:masoul_kharid/Constants/constants.dart';
 
 class StatisticsBSHTextStyle extends StatelessWidget {
   const StatisticsBSHTextStyle({Key? key, required this.text})

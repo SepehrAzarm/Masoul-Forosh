@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:masoukharid/Constants/colors.dart';
-import 'package:masoukharid/Screens/login_page.dart';
+import 'package:masoul_kharid/Classes/orange_button.dart';
+import 'package:masoul_kharid/Constants/colors.dart';
+import 'package:masoul_kharid/Screens/login_page.dart';
 import 'package:page_transition/page_transition.dart';
 
 class GetStartedPage extends StatelessWidget {
@@ -37,7 +38,8 @@ class GetStartedPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  TextButton(
+                  OrangeButton(
+                    text: 'ورود',
                     onPressed: () {
                       Navigator.push(
                           context,
@@ -45,24 +47,6 @@ class GetStartedPage extends StatelessWidget {
                               child: const LoginPage(),
                               type: PageTransitionType.leftToRightWithFade));
                     },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: kButtonOrangeColor,
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      width: 360.0,
-                      height: 57.0,
-                      child: const Center(
-                        child: Text(
-                          'ورود',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontFamily: 'Dana',
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
                   ),
                 ],
               ),

@@ -4,11 +4,11 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
-import 'package:masoukharid/Classes/Dialogs/error_dialog.dart';
-import 'package:masoukharid/Classes/Text&TextStyle/orange_header_text.dart';
-import 'package:masoukharid/Classes/orange_button.dart';
-import 'package:masoukharid/Constants/colors.dart';
-import 'package:masoukharid/Screens/profile_screen.dart';
+import 'package:masoul_kharid/Classes/Dialogs/error_dialog.dart';
+import 'package:masoul_kharid/Classes/Text&TextStyle/orange_header_text.dart';
+import 'package:masoul_kharid/Classes/orange_button.dart';
+import 'package:masoul_kharid/Constants/colors.dart';
+import 'package:masoul_kharid/Screens/profile_screen.dart';
 
 class OTPVerifyScreen extends StatefulWidget {
   const OTPVerifyScreen({Key? key}) : super(key: key);
@@ -88,7 +88,11 @@ class _OTPVerifyScreenState extends State<OTPVerifyScreen> {
 
   @override
   void dispose() {
-    setCountDown();
+    if(mounted){
+      setState(() {
+        stopTimer();
+      });
+    }
     super.dispose();
   }
 
@@ -98,7 +102,8 @@ class _OTPVerifyScreenState extends State<OTPVerifyScreen> {
   }
 
   void stopTimer() {
-    setState(() => countdownTimer!.cancel());
+    if(mounted){
+    setState(() => countdownTimer!.cancel());}
   }
 
   void resetTimer() {
@@ -117,7 +122,7 @@ class _OTPVerifyScreenState extends State<OTPVerifyScreen> {
         myDuration = Duration(seconds: seconds);
       }
     });
-  }
+  } 
 
   @override
   Widget build(BuildContext context) {

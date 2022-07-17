@@ -3,9 +3,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
-import 'package:masoukharid/Classes/Cards/statistic_card.dart';
-import 'package:masoukharid/Constants/colors.dart';
-import 'package:masoukharid/Services/storage_class.dart';
+import 'package:masoul_kharid/Classes/Cards/statistic_card.dart';
+import 'package:masoul_kharid/Classes/Dialogs/error_dialog.dart';
+import 'package:masoul_kharid/Constants/colors.dart';
+import 'package:masoul_kharid/Screens/profile_screen.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 
 class SellingItemsScreen extends StatefulWidget {
@@ -79,8 +80,29 @@ class _SellingItemsScreenState extends State<SellingItemsScreen> {
     return height;
   }
 
+  sellItemsListConfirm() async {
+    await getSellItemsList();
+    if (itemsListTitle.isEmpty) {
+      return showDialog(
+          context: context,
+          builder: (context) {
+            return ErrorDialog(
+              errorText: 'لیست اقلام فروش شما خالی میباشد',
+              onPressed: () {
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  ProfileScreen.id,
+                  (Route<dynamic> route) => false,
+                );
+              },
+            );
+          });
+    }
+  }
+
   @override
   void initState() {
+    sellItemsListConfirm();
     getSellItemsList();
     super.initState();
   }

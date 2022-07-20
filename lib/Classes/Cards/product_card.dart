@@ -7,16 +7,12 @@ class ProductCard extends StatelessWidget {
     Key? key,
     required this.onTap,
     required this.title,
-    required this.availableAmount,
-    required this.unit,
     required this.image,
   }) : super(key: key);
 
-  final String availableAmount;
   final Function()? onTap;
   final String title;
   final Widget image;
-  final String unit;
 
   @override
   Widget build(BuildContext context) {

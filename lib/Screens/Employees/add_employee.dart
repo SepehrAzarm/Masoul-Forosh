@@ -11,6 +11,7 @@ import 'package:masoul_kharid/Classes/Text&TextStyle/textfield_label_text_style.
 import 'package:masoul_kharid/Classes/orange_button.dart';
 import 'package:masoul_kharid/Constants/colors.dart';
 import 'package:masoul_kharid/Screens/Employees/employe_list.dart';
+import 'package:masoul_kharid/Screens/login_page.dart';
 
 class AddNewEmployee extends StatefulWidget {
   const AddNewEmployee({Key? key}) : super(key: key);
@@ -75,6 +76,14 @@ class _AddNewEmployeeState extends State<AddNewEmployee> {
         });
         print(response.statusCode);
         print(response.body);
+        if (response.statusCode == 401) {
+          // ignore: use_build_context_synchronously
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            LoginPage.id,
+            (Route<dynamic> route) => false,
+          );
+        }
       }
     } catch (e) {
       print(e);

@@ -11,6 +11,7 @@ class Storage {
   static late String ticketId;
   static late String categoryName;
   static late String logId;
+  static late String mobile;
 
   static void resetEmployeeId() {
     employeeId = '';

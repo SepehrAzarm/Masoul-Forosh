@@ -7,6 +7,7 @@ import 'package:jwt_decode/jwt_decode.dart';
 import 'package:masoul_kharid/Classes/chat_text_and_avatar.dart';
 import 'package:masoul_kharid/Constants/colors.dart';
 import 'package:masoul_kharid/Screens/Ticket/tickets_list.dart';
+import 'package:masoul_kharid/Screens/login_page.dart';
 import 'package:masoul_kharid/Screens/profile_screen.dart';
 import 'package:masoul_kharid/Services/storage_class.dart';
 import 'package:shamsi_date/shamsi_date.dart';
@@ -70,6 +71,14 @@ class _TicketChatScreenState extends State<TicketChatScreen> {
       } else {
         print(response.statusCode);
         print(response.body);
+        if (response.statusCode == 401) {
+          // ignore: use_build_context_synchronously
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            LoginPage.id,
+            (Route<dynamic> route) => false,
+          );
+        }
       }
     } catch (e) {
       print(e);

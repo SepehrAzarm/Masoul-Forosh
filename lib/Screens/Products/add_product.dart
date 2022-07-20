@@ -17,6 +17,7 @@ import 'package:masoul_kharid/Constants/colors.dart';
 import 'package:masoul_kharid/Constants/constants.dart';
 import 'package:masoul_kharid/Methods/text_field_input_decorations.dart';
 import 'package:masoul_kharid/Screens/CategoryScreen/category_first_page.dart';
+import 'package:masoul_kharid/Screens/login_page.dart';
 import 'package:masoul_kharid/Screens/profile_screen.dart';
 import 'package:masoul_kharid/Services/storage_class.dart';
 
@@ -153,6 +154,14 @@ class _AddProductPageState extends State<AddProductPage> {
         });
         print(response.statusCode);
         print(response.body);
+        if (response.statusCode == 401) {
+          // ignore: use_build_context_synchronously
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            LoginPage.id,
+            (Route<dynamic> route) => false,
+          );
+        }
       }
     } catch (e) {
       print(e);

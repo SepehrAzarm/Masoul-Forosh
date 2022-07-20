@@ -11,6 +11,7 @@ import 'package:masoul_kharid/Classes/Dialogs/error_dialog.dart';
 import 'package:masoul_kharid/Classes/orange_button.dart';
 import 'package:masoul_kharid/Constants/colors.dart';
 import 'package:masoul_kharid/Screens/BottomSheets/active_days.dart';
+import 'package:masoul_kharid/Screens/login_page.dart';
 import 'package:masoul_kharid/Screens/profile_screen.dart';
 
 class AccountSettings extends StatefulWidget {
@@ -52,6 +53,13 @@ class _AccountSettingsState extends State<AccountSettings> {
         print(response.statusCode);
         print(response.body);
       } else {
+        if (response.statusCode == 401) {
+          // ignore: use_build_context_synchronously
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            LoginPage.id,
+            (Route<dynamic> route) => false,
+          );}
         print(response.statusCode);
         print(response.body);
       }

@@ -5,6 +5,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:masoul_kharid/Classes/orange_button.dart';
 import 'package:masoul_kharid/Screens/Ticket/tickets_list.dart';
+import 'package:masoul_kharid/Screens/login_page.dart';
 import 'package:masoul_kharid/Screens/profile_screen.dart';
 
 import '../../Constants/borders_decorations.dart';
@@ -53,6 +54,14 @@ class _SupportTicketScreenState extends State<SupportTicketScreen> {
         errorMassage = await errorData['message'];
         print(response.statusCode);
         print(response.body);
+        if (response.statusCode == 401) {
+          // ignore: use_build_context_synchronously
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            LoginPage.id,
+            (Route<dynamic> route) => false,
+          );
+        }
       }
     } catch (e) {
       print(e);

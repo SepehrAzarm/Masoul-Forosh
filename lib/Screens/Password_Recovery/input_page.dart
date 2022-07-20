@@ -5,7 +5,7 @@ import 'package:masoul_kharid/Constants/colors.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:masoul_kharid/Screens/Password_Recovery/otp_input_page.dart';
-import 'package:masoul_kharid/Screens/otp_verify_screen.dart';
+import 'package:masoul_kharid/Services/storage_class.dart';
 
 class InputNumberPage extends StatefulWidget {
   const InputNumberPage({Key? key}) : super(key: key);
@@ -108,7 +108,7 @@ class _InputNumberPageState extends State<InputNumberPage> {
                     ),
                     hintText: 'شماره موبایل',
                     hintStyle: TextStyle(
-                      fontFamily: 'Dana',
+                      fontFamily: 'IranYekan',
                       fontSize: 13,
                       color: Color(0xFF707070),
                     ),
@@ -137,6 +137,7 @@ class _InputNumberPageState extends State<InputNumberPage> {
                         visible = true;
                       });
                       if (mobile != null) {
+                        Storage.mobile = mobile!;
                         await getOTPVerify();
                         // ignore: unnecessary_null_comparison
                         errorText == null

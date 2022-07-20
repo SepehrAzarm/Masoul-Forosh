@@ -4,6 +4,7 @@ import 'package:masoul_kharid/Classes/orange_button.dart';
 import 'package:masoul_kharid/Constants/colors.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:masoul_kharid/Screens/login_page.dart';
 import 'package:masoul_kharid/Services/storage_class.dart';
 
 class EmployeeProfile extends StatefulWidget {
@@ -16,6 +17,10 @@ class EmployeeProfile extends StatefulWidget {
 
 class _EmployeeProfileState extends State<EmployeeProfile> {
   List<dynamic> marketAdminUserAccess = [];
+  Map accessMap = {};
+  List accessListKeys = [];
+  List accessListValues = [];
+  List toggled = [];
   final storage = const FlutterSecureStorage();
   bool visible = false;
   bool history = false;
@@ -29,7 +34,6 @@ class _EmployeeProfileState extends State<EmployeeProfile> {
   String? role;
   String? errorText;
   bool? status;
-
 
   getAccessInfo() async {
     await getEmployeeInfo();
@@ -71,6 +75,49 @@ class _EmployeeProfileState extends State<EmployeeProfile> {
         });
         print(response.statusCode);
         print(response.body);
+      } else {
+        print(response.statusCode);
+        print(response.body);
+        if (response.statusCode == 401) {
+          // ignore: use_build_context_synchronously
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            LoginPage.id,
+            (Route<dynamic> route) => false,
+          );
+        }
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future getEmployeeAccessList() async {
+    String? value = await storage.read(key: "token");
+    Map<String, String> headers = {
+      'token': value!,
+      "Accept": "application/json",
+      "Content-Type": "application/json"
+    };
+    try {
+      var response = await http.get(
+        Uri.parse(
+            "https://testapi.carbon-family.com/api/market/users/access/list"),
+        headers: headers,
+      );
+      if (response.statusCode == 200) {
+        var data = response.body;
+        setState(() {
+          accessMap = jsonDecode(data)["data"];
+          accessMap.forEach((key, value) {
+            accessListKeys.add(key);
+            accessListValues.add(value);
+          });
+          print(accessListKeys);
+          print(accessListValues);
+        });
+        print(response.statusCode);
+        // print(response.body);
       } else {
         print(response.statusCode);
         print(response.body);
@@ -148,8 +195,8 @@ class _EmployeeProfileState extends State<EmployeeProfile> {
 
   @override
   void initState() {
-    getEmployeeInfo();
     getAccessInfo();
+    getEmployeeAccessList();
     super.initState();
   }
 
@@ -303,7 +350,8 @@ class _EmployeeProfileState extends State<EmployeeProfile> {
                           const SizedBox(height: 40),
                           SizedBox(
                             height: 250,
-                            child: ListView(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 const SizedBox(
                                   height: 40,
@@ -316,131 +364,53 @@ class _EmployeeProfileState extends State<EmployeeProfile> {
                                     ),
                                   ),
                                 ),
-                                SizedBox(
-                                  height: 35,
-                                  width: 175,
-                                  child: Row(
-                                    children: [
-                                      Checkbox(
-                                        activeColor: kButtonOrangeColor,
-                                        value: marketProfile,
-                                        onChanged: (bool? value) {
-                                          setState(() {
-                                            marketProfile = value!;
-                                            if (marketProfile == true) {
-                                              marketAdminUserAccess
-                                                  .add("marketProfile");
-                                            } else {
-                                              marketAdminUserAccess
-                                                  .remove("marketProfile");
-                                            }
-                                          });
-                                        },
-                                      ),
-                                      const Text(
-                                        'ویرایش پروفایل فروشگاه',
-                                        style: TextStyle(
-                                          fontFamily: 'Dana',
-                                          fontSize: 14,
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(height: 10),
-                                SizedBox(
-                                  height: 35,
-                                  width: 175,
-                                  child: Row(
-                                    children: [
-                                      Checkbox(
-                                        activeColor: kButtonOrangeColor,
-                                        value: products,
-                                        onChanged: (bool? value) {
-                                          setState(() {
-                                            products = value!;
-                                            if (products == true) {
-                                              marketAdminUserAccess
-                                                  .add("products");
-                                            } else {
-                                              marketAdminUserAccess
-                                                  .remove("products");
-                                            }
-                                          });
-                                        },
-                                      ),
-                                      const Text(
-                                        'محصولات',
-                                        style: TextStyle(
-                                          fontFamily: 'Dana',
-                                          fontSize: 14,
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(height: 10),
-                                SizedBox(
-                                  height: 35,
-                                  width: 175,
-                                  child: Row(
-                                    children: [
-                                      Checkbox(
-                                        activeColor: kButtonOrangeColor,
-                                        value: news,
-                                        onChanged: (bool? value) {
-                                          setState(() {
-                                            news = value!;
-                                            if (news == true) {
-                                              marketAdminUserAccess.add("news");
-                                            } else {
-                                              marketAdminUserAccess
-                                                  .remove("news");
-                                            }
-                                          });
-                                        },
-                                      ),
-                                      const Text(
-                                        'اخبار',
-                                        style: TextStyle(
-                                          fontFamily: 'Dana',
-                                          fontSize: 14,
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(height: 10),
-                                SizedBox(
-                                  height: 35,
-                                  width: 175,
-                                  child: Row(
-                                    children: [
-                                      Checkbox(
-                                        activeColor: kButtonOrangeColor,
-                                        value: history,
-                                        onChanged: (bool? value) {
-                                          setState(() {
-                                            history = value!;
-                                            if (history == true) {
-                                              marketAdminUserAccess
-                                                  .add("history");
-                                            } else {
-                                              marketAdminUserAccess
-                                                  .remove("history");
-                                            }
-                                          });
-                                        },
-                                      ),
-                                      const Text(
-                                        'تاریخچه',
-                                        style: TextStyle(
-                                          fontFamily: 'Dana',
-                                          fontSize: 14,
-                                        ),
-                                      )
-                                    ],
-                                  ),
+                                Expanded(
+                                  child: ListView.builder(
+                                      itemCount: accessListValues.length,
+                                      itemBuilder: (context, int index) {
+                                        if (marketAdminUserAccess
+                                            .contains(accessListKeys[index])) {
+                                          toggled.add(index);
+                                        }
+                                        return SizedBox(
+                                          height: 35,
+                                          width: 175,
+                                          child: Row(
+                                            children: [
+                                              Checkbox(
+                                                activeColor: kButtonOrangeColor,
+                                                value: toggled.contains(index)
+                                                    ? true
+                                                    : false,
+                                                onChanged: (bool? value) {
+                                                  setState(() {
+                                                    if (toggled
+                                                        .contains(index)) {
+                                                      toggled.clear();
+                                                      marketAdminUserAccess
+                                                          .remove(
+                                                              accessListKeys[
+                                                                  index]);
+                                                    } else {
+                                                      toggled.add(index);
+                                                      marketAdminUserAccess.add(
+                                                          accessListKeys[
+                                                              index]);
+                                                    }
+                                                  });
+                                                },
+                                              ),
+                                              Text(
+                                                '${accessListValues[index]}',
+                                                style: const TextStyle(
+                                                  fontFamily: 'Dana',
+                                                  fontSize: 14,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      }),
                                 ),
                               ],
                             ),

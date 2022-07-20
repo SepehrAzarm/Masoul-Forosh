@@ -32,12 +32,7 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen>
     with SingleTickerProviderStateMixin {
   final storage = const FlutterSecureStorage();
-  List productTitles = [];
-  List productAvailableAmount = [];
-  List productDescription = [];
-  List productIdList = [];
-  List productImageList = [];
-  List productUnitList = [];
+  List productsList = [];
   TabController? _tabController;
   String? companyName;
   String? imagePath;
@@ -45,26 +40,40 @@ class _ProfileScreenState extends State<ProfileScreen>
   String? from;
   String? to;
   int? fee;
+  int page = 1;
+  bool _hasNextPage = true;
+  bool _isFirstLoadRunning = false;
+  bool _isLoadMoreRunning = false;
+  late ScrollController _controller;
+
+  productDefaultPic(int index) {
+    if (productsList[index]["media"].isEmpty) {
+      return const AssetImage(
+        'images/staticImages/productStaticImage.jpg',
+      );
+    } else {
+      return NetworkImage(
+          'https://testapi.carbon-family.com/${productsList[index]["media"][0]}');
+    }
+  }
 
   Future getProductList() async {
     String? value = await storage.read(key: "token");
     Map<String, String> headers = {'token': value!};
     print(value);
+    setState(() {
+      _isFirstLoadRunning = true;
+    });
     try {
       var response = await http.get(
           Uri.parse("https://testapi.carbon-family.com/api/market/products"),
           headers: headers);
       if (response.statusCode == 200) {
         var data = response.body;
-        var admins = jsonDecode(data)['products'];
+        var products = jsonDecode(data)['products'];
         setState(() {
-          for (var i = 0; i < admins.length; i++) {
-            productTitles.add(admins[i]["title"]);
-            productDescription.add(admins[i]["description"]);
-            productAvailableAmount.add(admins[i]["availableAmount"]);
-            productIdList.add(admins[i]["_id"]);
-            productImageList.add(admins[i]["media"]);
-            productUnitList.add(admins[i]["unit"]);
+          for (var i = 0; i < products.length; i++) {
+            productsList.add(products[i]);
           }
         });
         print(response.statusCode);
@@ -72,9 +81,68 @@ class _ProfileScreenState extends State<ProfileScreen>
       } else {
         print(response.statusCode);
         print(response.body);
+        if (response.statusCode == 401) {
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            LoginPage.id,
+            (Route<dynamic> route) => false,
+          );
+        }
       }
     } catch (e) {
       print(e);
+    }
+    setState(() {
+      _isFirstLoadRunning = false;
+    });
+  }
+
+  Future loadMoreProducts() async {
+    String? value = await storage.read(key: "token");
+    Map<String, String> headers = {
+      'token': value!,
+      "Accept": "application/json",
+      "Content-Type": "application/json"
+    };
+    if (_hasNextPage == true &&
+        _isFirstLoadRunning == false &&
+        _isLoadMoreRunning == false &&
+        _controller.position.extentAfter < 100) {
+      page += 1;
+      print(page);
+      setState(() {
+        _isLoadMoreRunning = true;
+      });
+      try {
+        final response = await http.get(
+          Uri.parse(
+              "https://testapi.carbon-family.com/api/market/products?page=$page"),
+          headers: headers,
+        );
+        final List fetchedPosts = [];
+        if (response.statusCode == 200) {
+          var data = response.body;
+          var items = jsonDecode(data)["products"];
+          for (var i = 0; i < items.length; i++) {
+            fetchedPosts.add(items[i]);
+          }
+          print(response.statusCode);
+          print(response.body);
+        }
+        if (fetchedPosts.isNotEmpty) {
+          setState(() {
+            productsList.addAll(fetchedPosts);
+            _isLoadMoreRunning = false;
+          });
+        } else {
+          setState(() {
+            _hasNextPage = false;
+            _isLoadMoreRunning = false;
+          });
+        }
+      } catch (err) {
+        print(err);
+      }
     }
   }
 
@@ -108,11 +176,7 @@ class _ProfileScreenState extends State<ProfileScreen>
   }
 
   Future<void> _refresh() async {
-    productTitles = [];
-    productAvailableAmount = [];
-    productDescription = [];
-    productIdList = [];
-    productImageList = [];
+    productsList = [];
     getProductList();
     getMarketInfo();
   }
@@ -127,23 +191,19 @@ class _ProfileScreenState extends State<ProfileScreen>
     }
   }
 
-  productDefaultPic(int index) {
-    if (productImageList.isEmpty) {
-      return const AssetImage(
-        'images/staticImages/productStaticImage.jpg',
-      );
-    } else {
-      return NetworkImage(
-          'https://testapi.carbon-family.com/${productImageList[index][0]}');
-    }
-  }
-
   @override
   void initState() {
     _tabController = TabController(length: 2, vsync: this);
+    _controller = ScrollController()..addListener(loadMoreProducts);
     getMarketInfo();
     getProductList();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _controller.removeListener(loadMoreProducts);
+    super.dispose();
   }
 
   int _selectedIndex = 0;
@@ -167,6 +227,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                 color: kOrangeColor,
               ))
             : ListView(
+                controller: _controller,
                 shrinkWrap: true,
                 children: [
                   Stack(
@@ -393,7 +454,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                           right: 20,
                         ),
                         child: CircleAvatar(
-                          backgroundColor: kOrangeColor,
+                          backgroundColor: Colors.white,
                           radius: 60,
                           child: CircleAvatar(
                             radius: 57,
@@ -406,41 +467,69 @@ class _ProfileScreenState extends State<ProfileScreen>
                   Column(
                     children: [
                       SizedBox(
-                        height: 130 * productTitles.length.toDouble(),
+                        height: 120 * productsList.length.toDouble(),
                         width: MediaQuery.of(context).size.width,
                         child: TabBarView(
                           controller: _tabController,
                           children: [
-                            ListView.builder(
-                              physics: const NeverScrollableScrollPhysics(),
-                              itemCount: productTitles.isNotEmpty
-                                  ? productTitles.length
-                                  : 0,
-                              itemBuilder: (BuildContext context, int index) {
-                                return ProductCard(
-                                  onTap: () async {
-                                    Storage.productId =
-                                        await productIdList[index];
-                                    Navigator.pushNamed(
-                                        context, ProductEdit.id);
-                                  },
-                                  title: productTitles[index],
-                                  availableAmount:
-                                      productAvailableAmount[index].toString(),
-                                  image: productImageList[index].isEmpty
-                                      ? const Image(
-                                          fit: BoxFit.cover,
-                                          image: AssetImage(
-                                            'images/staticImages/productStaticImage.jpg',
-                                          ),
-                                        )
-                                      : Image(
-                                          image: productDefaultPic(index),
-                                          fit: BoxFit.cover,
+                            Column(
+                              children: [
+                                Expanded(
+                                  child: ListView.builder(
+                                    physics:
+                                        const NeverScrollableScrollPhysics(),
+                                    itemCount: productsList.isNotEmpty
+                                        ? productsList.length
+                                        : 0,
+                                    itemBuilder:
+                                        (BuildContext context, int index) {
+                                      return ProductCard(
+                                        onTap: () async {
+                                          Storage.productId =
+                                              await productsList[index]["_id"];
+                                          Navigator.pushNamed(
+                                              context, ProductEdit.id);
+                                        },
+                                        title: productsList[index]["title"],
+                                        image: productsList[index]["media"]
+                                                .isEmpty
+                                            ? const Image(
+                                                fit: BoxFit.cover,
+                                                image: AssetImage(
+                                                  'images/staticImages/productStaticImage.jpg',
+                                                ),
+                                              )
+                                            : Image(
+                                                image: productDefaultPic(index),
+                                                fit: BoxFit.cover,
+                                              ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                                if (_isLoadMoreRunning == true)
+                                  const Padding(
+                                    padding: EdgeInsets.only(top: 10),
+                                    child: Center(
+                                      child: CircularProgressIndicator(
+                                        color: kOrangeColor,
+                                      ),
+                                    ),
+                                  ),
+                                if (_hasNextPage == false)
+                                  Container(
+                                    padding: const EdgeInsets.only(
+                                        top: 30, bottom: 40),
+                                    child: const Center(
+                                      child: Text(
+                                        'پایان لیست',
+                                        style: TextStyle(
+                                          fontFamily: "Dana",
                                         ),
-                                  unit: "تعداد",
-                                );
-                              },
+                                      ),
+                                    ),
+                                  ),
+                              ],
                             ),
                             const SizedBox(
                               height: 400,

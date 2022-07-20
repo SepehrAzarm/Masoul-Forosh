@@ -5,6 +5,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:masoul_kharid/Classes/Cards/turnover_card.dart';
 import 'package:masoul_kharid/Constants/colors.dart';
+import 'package:masoul_kharid/Screens/login_page.dart';
 
 class TurnOverScreen extends StatefulWidget {
   const TurnOverScreen({Key? key}) : super(key: key);
@@ -44,6 +45,14 @@ class _TurnOverScreenState extends State<TurnOverScreen> {
       } else {
         print(response.statusCode);
         print(response.body);
+        if (response.statusCode == 401) {
+          // ignore: use_build_context_synchronously
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            LoginPage.id,
+            (Route<dynamic> route) => false,
+          );
+        }
       }
     } catch (e) {
       print(e);

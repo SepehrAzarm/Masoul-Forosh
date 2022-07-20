@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:masoul_kharid/Classes/Cards/statistic_card.dart';
 import 'package:masoul_kharid/Classes/Dialogs/error_dialog.dart';
 import 'package:masoul_kharid/Constants/colors.dart';
+import 'package:masoul_kharid/Screens/login_page.dart';
 import 'package:masoul_kharid/Screens/profile_screen.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 
@@ -53,6 +54,14 @@ class _SellingItemsScreenState extends State<SellingItemsScreen> {
       } else {
         print(response.statusCode);
         print(response.body);
+        if (response.statusCode == 401) {
+          // ignore: use_build_context_synchronously
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            LoginPage.id,
+            (Route<dynamic> route) => false,
+          );
+        }
       }
     } catch (e) {
       print(e);

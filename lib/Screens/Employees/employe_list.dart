@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:masoul_kharid/Classes/Cards/employee_list_card.dart';
 import 'package:masoul_kharid/Constants/colors.dart';
 import 'package:masoul_kharid/Screens/Employees/employee_profile.dart';
+import 'package:masoul_kharid/Screens/login_page.dart';
 import 'package:masoul_kharid/Screens/profile_screen.dart';
 import 'package:masoul_kharid/Services/storage_class.dart';
 
@@ -55,7 +56,16 @@ class _EmployeeListState extends State<EmployeeList> {
       } else {
         print(response.statusCode);
         print(response.body);
+        if (response.statusCode == 401) {
+          // ignore: use_build_context_synchronously
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            LoginPage.id,
+            (Route<dynamic> route) => false,
+          );
+        }
       }
+
     } catch (e) {
       print(e);
     }

@@ -8,6 +8,7 @@ import 'package:masoul_kharid/Classes/orange_button.dart';
 import 'package:masoul_kharid/Constants/colors.dart';
 import 'package:masoul_kharid/Screens/BottomSheets/deposit.dart';
 import 'package:masoul_kharid/Screens/BottomSheets/withdraw_bsh.dart';
+import 'package:masoul_kharid/Screens/login_page.dart';
 import 'package:masoul_kharid/Services/storage_class.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 import 'package:intl/intl.dart' as intl;
@@ -154,6 +155,16 @@ class _WalletScreenState extends State<WalletScreen> {
   late Jalali depositCreated;
   late Jalali depositTAM;
 
+  int depositPage = 1;
+  int withdrawalPage = 1;
+  bool _depositHasNextPage = true;
+  bool _withdrawalHasNextPage = true;
+  bool _depositIsFirstLoadRunning = false;
+  bool _withdrawalIsFirstLoadRunning = false;
+  bool _depositIsLoadMoreRunning = false;
+  bool _withdrawalIsLoadMoreRunning = false;
+  late ScrollController _controller;
+
   Future<void> _refresh() async {
     depositsList = [];
     withdrawalsList = [];
@@ -171,6 +182,9 @@ class _WalletScreenState extends State<WalletScreen> {
   Future getDepositsList() async {
     String? value = await storage.read(key: "token");
     Map<String, String> headers = {'token': value!};
+    setState(() {
+      _depositIsFirstLoadRunning = true;
+    });
     try {
       var response = await http.get(
           Uri.parse(
@@ -188,17 +202,80 @@ class _WalletScreenState extends State<WalletScreen> {
         print(response.statusCode);
         print(response.body);
       } else {
+        if (response.statusCode == 401) {
+          // ignore: use_build_context_synchronously
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            LoginPage.id,
+            (Route<dynamic> route) => false,
+          );
+        }
         print(response.statusCode);
         print(response.body);
       }
     } catch (e) {
       print(e);
     }
+    setState(() {
+      _depositIsFirstLoadRunning = false;
+    });
+  }
+
+  Future loadMoreDepositList() async {
+    String? value = await storage.read(key: "token");
+    Map<String, String> headers = {
+      'token': value!,
+      "Accept": "application/json",
+      "Content-Type": "application/json"
+    };
+    if (_depositHasNextPage == true &&
+        _depositIsFirstLoadRunning == false &&
+        _depositIsLoadMoreRunning == false &&
+        _controller.position.extentAfter < 100) {
+      depositPage += 1;
+      print(depositPage);
+      setState(() {
+        _depositIsLoadMoreRunning = true;
+      });
+      try {
+        final response = await http.get(
+          Uri.parse(
+              "https://testapi.carbon-family.com/api/market/history/deposits?page=$depositPage"),
+          headers: headers,
+        );
+        final List<Map> fetchedPosts = [];
+        if (response.statusCode == 200) {
+          var data = response.body;
+          var items = jsonDecode(data)["deposits"];
+          for (var i = 0; i < items.length; i++) {
+            fetchedPosts.add(items[i]);
+          }
+          print(response.statusCode);
+          print(response.body);
+        }
+        if (fetchedPosts.isNotEmpty) {
+          setState(() {
+            depositsList.addAll(fetchedPosts);
+            _depositIsLoadMoreRunning = false;
+          });
+        } else {
+          setState(() {
+            _depositHasNextPage = false;
+            _depositIsLoadMoreRunning = false;
+          });
+        }
+      } catch (err) {
+        print(err);
+      }
+    }
   }
 
   Future getWithdrawalsList() async {
     String? value = await storage.read(key: "token");
     Map<String, String> headers = {'token': value!};
+    setState(() {
+      _withdrawalIsFirstLoadRunning = true;
+    });
     try {
       var response = await http.get(
           Uri.parse(
@@ -221,6 +298,58 @@ class _WalletScreenState extends State<WalletScreen> {
       }
     } catch (e) {
       print(e);
+    }
+    setState(() {
+      _withdrawalIsFirstLoadRunning = false;
+    });
+  }
+
+  Future loadMoreWithdrawalList() async {
+    String? value = await storage.read(key: "token");
+    Map<String, String> headers = {
+      'token': value!,
+      "Accept": "application/json",
+      "Content-Type": "application/json"
+    };
+    if (_withdrawalHasNextPage == true &&
+        _withdrawalIsFirstLoadRunning == false &&
+        _withdrawalIsLoadMoreRunning == false &&
+        _controller.position.extentAfter < 100) {
+      withdrawalPage += 1;
+      print(withdrawalPage);
+      setState(() {
+        _withdrawalIsLoadMoreRunning = true;
+      });
+      try {
+        final response = await http.get(
+          Uri.parse(
+              "https://testapi.carbon-family.com/api/market/history/withdrawals?page=$withdrawalPage"),
+          headers: headers,
+        );
+        final List<Map> fetchedPosts = [];
+        if (response.statusCode == 200) {
+          var data = response.body;
+          var items = jsonDecode(data)["withdrawals"];
+          for (var i = 0; i < items.length; i++) {
+            fetchedPosts.add(items[i]);
+          }
+          print(response.statusCode);
+          print(response.body);
+        }
+        if (fetchedPosts.isNotEmpty) {
+          setState(() {
+            withdrawalsList.addAll(fetchedPosts);
+            _withdrawalIsLoadMoreRunning = false;
+          });
+        } else {
+          setState(() {
+            _withdrawalHasNextPage = false;
+            _withdrawalIsLoadMoreRunning = false;
+          });
+        }
+      } catch (err) {
+        print(err);
+      }
     }
   }
 
@@ -352,6 +481,12 @@ class _WalletScreenState extends State<WalletScreen> {
     getDepositsList();
     getWithdrawalsList();
     getBalance();
+    _controller = ScrollController()..addListener(loadMoreWithdrawalList);
+  }
+
+  void dispose() {
+    _controller.removeListener(loadMoreWithdrawalList);
+    super.dispose();
   }
 
   @override
@@ -392,6 +527,7 @@ class _WalletScreenState extends State<WalletScreen> {
                     child: Container(
                       color: Colors.white,
                       child: ListView(
+                        controller: _controller,
                         // crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           //Card
@@ -559,466 +695,500 @@ class _WalletScreenState extends State<WalletScreen> {
                               children: [
                                 Padding(
                                   padding: const EdgeInsets.only(top: 10),
-                                  child: ListView.builder(
-                                    physics:
-                                        const NeverScrollableScrollPhysics(),
-                                    itemCount: withdrawalsList.isNotEmpty
-                                        ? withdrawalsList.length
-                                        : 0,
-                                    itemBuilder:
-                                        (BuildContext context, int index) {
-                                      var dateAndTime = DateTime.parse(
-                                              withdrawalsList[index]
-                                                  ["createdAt"]!)
-                                          .toLocal();
-                                      Gregorian g =
-                                          Gregorian.fromDateTime(dateAndTime);
-                                      Jalali j = Jalali.fromGregorian(g);
-                                      return WalletCard(
-                                        type: 'برداشت',
-                                        amount:
-                                            intl.NumberFormat.decimalPattern()
-                                                .format(withdrawalsList[index]
-                                                    ["amount"]),
-                                        dateAndTime: toStringFormatter(j),
-                                        status: statusMap[withdrawalsList[index]
-                                            ["status"]]!,
-                                        onTap: () async {
-                                          Storage.withdrawalId =
-                                              withdrawalsList[index]["_id"];
-                                          await getWithdrawalInfo();
-                                          showDialog(
-                                              context: context,
-                                              builder: (context) {
-                                                return AlertDialog(
-                                                  shape:
-                                                      const RoundedRectangleBorder(
-                                                          borderRadius:
-                                                              BorderRadius.all(
-                                                                  Radius.circular(
-                                                                      20.0))),
-                                                  title: SizedBox(
-                                                    height: 150,
-                                                    width: 300,
-                                                    child: Center(
-                                                      child: SizedBox(
-                                                        width: 300,
-                                                        child: Column(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .center,
-                                                          children: [
-                                                            const Text(
-                                                              'مقدار',
-                                                              style: TextStyle(
-                                                                  fontFamily:
-                                                                      "Dana",
-                                                                  fontSize: 9,
-                                                                  color: Color(
-                                                                      0xFF929292)),
-                                                            ),
-                                                            Text(
-                                                              'تومان ${intl.NumberFormat.decimalPattern().format(amount)}',
-                                                              style:
-                                                                  const TextStyle(
-                                                                fontFamily:
-                                                                    "IranYekan",
-                                                                fontSize: 22,
-                                                                color: Colors
-                                                                    .black,
+                                  child: Column(
+                                    children: [
+                                      Expanded(
+                                        child: ListView.builder(
+                                          physics:
+                                              const NeverScrollableScrollPhysics(),
+                                          itemCount: withdrawalsList.isNotEmpty
+                                              ? withdrawalsList.length
+                                              : 0,
+                                          itemBuilder: (BuildContext context,
+                                              int index) {
+                                            var dateAndTime = DateTime.parse(
+                                                    withdrawalsList[index]
+                                                        ["createdAt"]!)
+                                                .toLocal();
+                                            Gregorian g =
+                                                Gregorian.fromDateTime(
+                                                    dateAndTime);
+                                            Jalali j = Jalali.fromGregorian(g);
+                                            return WalletCard(
+                                              type: 'برداشت',
+                                              amount: intl.NumberFormat
+                                                      .decimalPattern()
+                                                  .format(withdrawalsList[index]
+                                                      ["amount"]),
+                                              dateAndTime: toStringFormatter(j),
+                                              status: statusMap[
+                                                  withdrawalsList[index]
+                                                      ["status"]]!,
+                                              onTap: () async {
+                                                Storage.withdrawalId =
+                                                    withdrawalsList[index]
+                                                        ["_id"];
+                                                await getWithdrawalInfo();
+                                                showDialog(
+                                                    context: context,
+                                                    builder: (context) {
+                                                      return AlertDialog(
+                                                        shape: const RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius.all(
+                                                                    Radius.circular(
+                                                                        20.0))),
+                                                        title: SizedBox(
+                                                          height: 150,
+                                                          width: 300,
+                                                          child: Center(
+                                                            child: SizedBox(
+                                                              width: 300,
+                                                              child: Column(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .center,
+                                                                children: [
+                                                                  const Text(
+                                                                    'مقدار',
+                                                                    style: TextStyle(
+                                                                        fontFamily:
+                                                                            "Dana",
+                                                                        fontSize:
+                                                                            9,
+                                                                        color: Color(
+                                                                            0xFF929292)),
+                                                                  ),
+                                                                  Text(
+                                                                    'تومان ${intl.NumberFormat.decimalPattern().format(amount)}',
+                                                                    style:
+                                                                        const TextStyle(
+                                                                      fontFamily:
+                                                                          "IranYekan",
+                                                                      fontSize:
+                                                                          22,
+                                                                      color: Colors
+                                                                          .black,
+                                                                    ),
+                                                                  ),
+                                                                  dialogStatusMap[
+                                                                      status!]!,
+                                                                ],
                                                               ),
                                                             ),
-                                                            dialogStatusMap[
-                                                                status!]!,
-                                                          ],
+                                                          ),
                                                         ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  content: SizedBox(
-                                                    height: 170,
-                                                    width: 300,
-                                                    child: Column(
-                                                      children: [
-                                                        SizedBox(
-                                                          height: 50,
+                                                        content: SizedBox(
+                                                          height: 170,
+                                                          width: 300,
                                                           child: Column(
                                                             children: [
                                                               SizedBox(
-                                                                height: 45,
-                                                                child: Row(
-                                                                  mainAxisAlignment:
-                                                                      MainAxisAlignment
-                                                                          .spaceBetween,
+                                                                height: 50,
+                                                                child: Column(
                                                                   children: [
-                                                                    const Text(
-                                                                      'زمان تراکنش',
-                                                                      style: TextStyle(
-                                                                          fontFamily:
-                                                                              "Dana",
-                                                                          fontSize:
-                                                                              12,
-                                                                          color:
-                                                                              Color(0xFF929292)),
+                                                                    SizedBox(
+                                                                      height:
+                                                                          45,
+                                                                      child:
+                                                                          Row(
+                                                                        mainAxisAlignment:
+                                                                            MainAxisAlignment.spaceBetween,
+                                                                        children: [
+                                                                          const Text(
+                                                                            'زمان تراکنش',
+                                                                            style: TextStyle(
+                                                                                fontFamily: "Dana",
+                                                                                fontSize: 12,
+                                                                                color: Color(0xFF929292)),
+                                                                          ),
+                                                                          Text(
+                                                                            toStringFormatter(depositCreated),
+                                                                            style: const TextStyle(
+                                                                                fontFamily: "IranYekan",
+                                                                                fontWeight: FontWeight.bold,
+                                                                                fontSize: 10,
+                                                                                color: Colors.black),
+                                                                          ),
+                                                                        ],
+                                                                      ),
                                                                     ),
-                                                                    Text(
-                                                                      toStringFormatter(
-                                                                          depositCreated),
-                                                                      style: const TextStyle(
-                                                                          fontFamily:
-                                                                              "IranYekan",
-                                                                          fontWeight: FontWeight
-                                                                              .bold,
-                                                                          fontSize:
-                                                                              10,
-                                                                          color:
-                                                                              Colors.black),
-                                                                    ),
+                                                                    const Divider(
+                                                                      thickness:
+                                                                          1,
+                                                                      height: 1,
+                                                                    )
                                                                   ],
                                                                 ),
                                                               ),
-                                                              const Divider(
-                                                                thickness: 1,
-                                                                height: 1,
-                                                              )
-                                                            ],
-                                                          ),
-                                                        ),
-                                                        SizedBox(
-                                                          height: 50,
-                                                          child: Column(
-                                                            children: [
                                                               SizedBox(
-                                                                height: 45,
-                                                                child: Row(
-                                                                  mainAxisAlignment:
-                                                                      MainAxisAlignment
-                                                                          .spaceBetween,
+                                                                height: 50,
+                                                                child: Column(
                                                                   children: [
-                                                                    const Text(
-                                                                      'زمان ایجاد تراکنش',
-                                                                      style: TextStyle(
-                                                                          fontFamily:
-                                                                              "Dana",
-                                                                          fontSize:
-                                                                              12,
-                                                                          color:
-                                                                              Color(0xFF929292)),
+                                                                    SizedBox(
+                                                                      height:
+                                                                          45,
+                                                                      child:
+                                                                          Row(
+                                                                        mainAxisAlignment:
+                                                                            MainAxisAlignment.spaceBetween,
+                                                                        children: [
+                                                                          const Text(
+                                                                            'زمان ایجاد تراکنش',
+                                                                            style: TextStyle(
+                                                                                fontFamily: "Dana",
+                                                                                fontSize: 12,
+                                                                                color: Color(0xFF929292)),
+                                                                          ),
+                                                                          Text(
+                                                                            toStringFormatter(depositTAM),
+                                                                            style: const TextStyle(
+                                                                                fontFamily: "IranYekan",
+                                                                                fontWeight: FontWeight.bold,
+                                                                                fontSize: 10,
+                                                                                color: Colors.black),
+                                                                          ),
+                                                                        ],
+                                                                      ),
                                                                     ),
-                                                                    Text(
-                                                                      toStringFormatter(
-                                                                          depositTAM),
-                                                                      style: const TextStyle(
-                                                                          fontFamily:
-                                                                              "IranYekan",
-                                                                          fontWeight: FontWeight
-                                                                              .bold,
-                                                                          fontSize:
-                                                                              10,
-                                                                          color:
-                                                                              Colors.black),
-                                                                    ),
+                                                                    const Divider(
+                                                                      thickness:
+                                                                          1,
+                                                                      height: 1,
+                                                                    )
                                                                   ],
                                                                 ),
                                                               ),
-                                                              const Divider(
-                                                                thickness: 1,
-                                                                height: 1,
-                                                              )
-                                                            ],
-                                                          ),
-                                                        ),
-                                                        SizedBox(
-                                                          height: 50,
-                                                          child: Column(
-                                                            children: [
                                                               SizedBox(
-                                                                height: 45,
-                                                                child: Row(
-                                                                  mainAxisAlignment:
-                                                                      MainAxisAlignment
-                                                                          .spaceBetween,
+                                                                height: 50,
+                                                                child: Column(
                                                                   children: [
-                                                                    const Text(
-                                                                      'کد پیگیری',
-                                                                      style: TextStyle(
-                                                                          fontFamily:
-                                                                              "Dana",
-                                                                          fontSize:
-                                                                              12,
-                                                                          color:
-                                                                              Color(0xFF929292)),
+                                                                    SizedBox(
+                                                                      height:
+                                                                          45,
+                                                                      child:
+                                                                          Row(
+                                                                        mainAxisAlignment:
+                                                                            MainAxisAlignment.spaceBetween,
+                                                                        children: [
+                                                                          const Text(
+                                                                            'کد پیگیری',
+                                                                            style: TextStyle(
+                                                                                fontFamily: "Dana",
+                                                                                fontSize: 12,
+                                                                                color: Color(0xFF929292)),
+                                                                          ),
+                                                                          Text(
+                                                                            '$causeReference',
+                                                                            style: const TextStyle(
+                                                                                fontFamily: "IranYekan",
+                                                                                fontWeight: FontWeight.bold,
+                                                                                fontSize: 10,
+                                                                                color: Colors.black),
+                                                                          ),
+                                                                        ],
+                                                                      ),
                                                                     ),
-                                                                    Text(
-                                                                      '$causeReference',
-                                                                      style: const TextStyle(
-                                                                          fontFamily:
-                                                                              "IranYekan",
-                                                                          fontWeight: FontWeight
-                                                                              .bold,
-                                                                          fontSize:
-                                                                              10,
-                                                                          color:
-                                                                              Colors.black),
-                                                                    ),
+                                                                    const Divider(
+                                                                      thickness:
+                                                                          1,
+                                                                      height: 1,
+                                                                    )
                                                                   ],
                                                                 ),
                                                               ),
-                                                              const Divider(
-                                                                thickness: 1,
-                                                                height: 1,
-                                                              )
                                                             ],
                                                           ),
                                                         ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  actions: [
-                                                    OrangeButton(
-                                                      text: 'بستن',
-                                                      onPressed: () {
-                                                        Navigator.pop(context);
-                                                      },
-                                                    ),
-                                                  ],
-                                                );
-                                              });
-                                        },
-                                      );
-                                    },
+                                                        actions: [
+                                                          OrangeButton(
+                                                            text: 'بستن',
+                                                            onPressed: () {
+                                                              Navigator.pop(
+                                                                  context);
+                                                            },
+                                                          ),
+                                                        ],
+                                                      );
+                                                    });
+                                              },
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                      if (_withdrawalIsLoadMoreRunning == true)
+                                        const Padding(
+                                          padding: EdgeInsets.only(
+                                              top: 10, bottom: 10),
+                                          child: Center(
+                                            child: CircularProgressIndicator(
+                                              color: kOrangeColor,
+                                            ),
+                                          ),
+                                        ),
+                                      if (_withdrawalHasNextPage == false)
+                                        Container(
+                                          padding: const EdgeInsets.only(
+                                              top: 10, bottom: 10),
+                                          child: const Center(
+                                            child: Text(
+                                              'پایان لیست',
+                                              style: TextStyle(
+                                                fontFamily: "Dana",
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                    ],
                                   ),
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.only(top: 10),
-                                  child: ListView.builder(
-                                    physics:
-                                        const NeverScrollableScrollPhysics(),
-                                    itemCount: depositsList.isNotEmpty
-                                        ? depositsList.length
-                                        : 0,
-                                    itemBuilder:
-                                        (BuildContext context, int index) {
-                                      var dateAndTime = DateTime.parse(
-                                              depositsList[index]["createdAt"]!)
-                                          .toLocal();
-                                      Gregorian g =
-                                          Gregorian.fromDateTime(dateAndTime);
-                                      Jalali j = Jalali.fromGregorian(g);
-                                      return WalletCard(
-                                        type: 'واریز',
-                                        amount:
-                                            intl.NumberFormat.decimalPattern()
-                                                .format(depositsList[index]
-                                                    ["amount"]),
-                                        dateAndTime: toStringFormatter(j),
-                                        status: statusMap[depositsList[index]
-                                            ["status"]]!,
-                                        onTap: () async {
-                                          Storage.depositId =
-                                              depositsList[index]["_id"];
-                                          await getDepositInfo();
-                                          showDialog(
-                                              context: context,
-                                              builder: (context) {
-                                                return AlertDialog(
-                                                  shape:
-                                                      const RoundedRectangleBorder(
-                                                          borderRadius:
-                                                              BorderRadius.all(
-                                                                  Radius.circular(
-                                                                      20.0))),
-                                                  title: SizedBox(
-                                                    height: 150,
-                                                    width: 300,
-                                                    child: Center(
-                                                      child: SizedBox(
-                                                        width: 300,
-                                                        child: Column(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .center,
-                                                          children: [
-                                                            const Text(
-                                                              'مقدار',
-                                                              style: TextStyle(
-                                                                  fontFamily:
-                                                                      "Dana",
-                                                                  fontSize: 9,
-                                                                  color: Color(
-                                                                      0xFF929292)),
-                                                            ),
-                                                            Text(
-                                                              'تومان ${intl.NumberFormat.decimalPattern().format(amount)}',
-                                                              style:
-                                                                  const TextStyle(
-                                                                fontFamily:
-                                                                    "IranYekan",
-                                                                fontSize: 22,
-                                                                color: Colors
-                                                                    .black,
+                                  child: Column(
+                                    children: [
+                                      Expanded(
+                                        child: ListView.builder(
+                                          physics:
+                                              const NeverScrollableScrollPhysics(),
+                                          itemCount: depositsList.isNotEmpty
+                                              ? depositsList.length
+                                              : 0,
+                                          itemBuilder: (BuildContext context,
+                                              int index) {
+                                            var dateAndTime = DateTime.parse(
+                                                    depositsList[index]
+                                                        ["createdAt"]!)
+                                                .toLocal();
+                                            Gregorian g =
+                                                Gregorian.fromDateTime(
+                                                    dateAndTime);
+                                            Jalali j = Jalali.fromGregorian(g);
+                                            return WalletCard(
+                                              type: 'واریز',
+                                              amount: intl.NumberFormat
+                                                      .decimalPattern()
+                                                  .format(depositsList[index]
+                                                      ["amount"]),
+                                              dateAndTime: toStringFormatter(j),
+                                              status: statusMap[
+                                                  depositsList[index]
+                                                      ["status"]]!,
+                                              onTap: () async {
+                                                Storage.depositId =
+                                                    depositsList[index]["_id"];
+                                                await getDepositInfo();
+                                                showDialog(
+                                                    context: context,
+                                                    builder: (context) {
+                                                      return AlertDialog(
+                                                        shape: const RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius.all(
+                                                                    Radius.circular(
+                                                                        20.0))),
+                                                        title: SizedBox(
+                                                          height: 150,
+                                                          width: 300,
+                                                          child: Center(
+                                                            child: SizedBox(
+                                                              width: 300,
+                                                              child: Column(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .center,
+                                                                children: [
+                                                                  const Text(
+                                                                    'مقدار',
+                                                                    style: TextStyle(
+                                                                        fontFamily:
+                                                                            "Dana",
+                                                                        fontSize:
+                                                                            9,
+                                                                        color: Color(
+                                                                            0xFF929292)),
+                                                                  ),
+                                                                  Text(
+                                                                    'تومان ${intl.NumberFormat.decimalPattern().format(amount)}',
+                                                                    style:
+                                                                        const TextStyle(
+                                                                      fontFamily:
+                                                                          "IranYekan",
+                                                                      fontSize:
+                                                                          22,
+                                                                      color: Colors
+                                                                          .black,
+                                                                    ),
+                                                                  ),
+                                                                  dialogStatusMap[
+                                                                      status!]!,
+                                                                ],
                                                               ),
                                                             ),
-                                                            dialogStatusMap[
-                                                                status!]!,
-                                                          ],
+                                                          ),
                                                         ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  content: SizedBox(
-                                                    height: 170,
-                                                    width: 300,
-                                                    // color: Colors.amberAccent,
-                                                    child: Column(
-                                                      children: [
-                                                        SizedBox(
-                                                          height: 50,
+                                                        content: SizedBox(
+                                                          height: 170,
+                                                          width: 300,
+                                                          // color: Colors.amberAccent,
                                                           child: Column(
                                                             children: [
                                                               SizedBox(
-                                                                height: 45,
-                                                                child: Row(
-                                                                  mainAxisAlignment:
-                                                                      MainAxisAlignment
-                                                                          .spaceBetween,
+                                                                height: 50,
+                                                                child: Column(
                                                                   children: [
-                                                                    const Text(
-                                                                      'زمان تراکنش',
-                                                                      style: TextStyle(
-                                                                          fontFamily:
-                                                                              "Dana",
-                                                                          fontSize:
-                                                                              12,
-                                                                          color:
-                                                                              Color(0xFF929292)),
+                                                                    SizedBox(
+                                                                      height:
+                                                                          45,
+                                                                      child:
+                                                                          Row(
+                                                                        mainAxisAlignment:
+                                                                            MainAxisAlignment.spaceBetween,
+                                                                        children: [
+                                                                          const Text(
+                                                                            'زمان تراکنش',
+                                                                            style: TextStyle(
+                                                                                fontFamily: "Dana",
+                                                                                fontSize: 12,
+                                                                                color: Color(0xFF929292)),
+                                                                          ),
+                                                                          Text(
+                                                                            toStringFormatter(depositCreated),
+                                                                            style: const TextStyle(
+                                                                                fontFamily: "IranYekan",
+                                                                                fontWeight: FontWeight.bold,
+                                                                                fontSize: 10,
+                                                                                color: Colors.black),
+                                                                          ),
+                                                                        ],
+                                                                      ),
                                                                     ),
-                                                                    Text(
-                                                                      toStringFormatter(
-                                                                          depositCreated),
-                                                                      style: const TextStyle(
-                                                                          fontFamily:
-                                                                              "IranYekan",
-                                                                          fontWeight: FontWeight
-                                                                              .bold,
-                                                                          fontSize:
-                                                                              10,
-                                                                          color:
-                                                                              Colors.black),
-                                                                    ),
+                                                                    const Divider(
+                                                                      thickness:
+                                                                          1,
+                                                                      height: 1,
+                                                                    )
                                                                   ],
                                                                 ),
                                                               ),
-                                                              const Divider(
-                                                                thickness: 1,
-                                                                height: 1,
-                                                              )
-                                                            ],
-                                                          ),
-                                                        ),
-                                                        SizedBox(
-                                                          height: 50,
-                                                          child: Column(
-                                                            children: [
                                                               SizedBox(
-                                                                height: 45,
-                                                                child: Row(
-                                                                  mainAxisAlignment:
-                                                                      MainAxisAlignment
-                                                                          .spaceBetween,
+                                                                height: 50,
+                                                                child: Column(
                                                                   children: [
-                                                                    const Text(
-                                                                      'زمان ایجاد تراکنش',
-                                                                      style: TextStyle(
-                                                                          fontFamily:
-                                                                              "Dana",
-                                                                          fontSize:
-                                                                              12,
-                                                                          color:
-                                                                              Color(0xFF929292)),
+                                                                    SizedBox(
+                                                                      height:
+                                                                          45,
+                                                                      child:
+                                                                          Row(
+                                                                        mainAxisAlignment:
+                                                                            MainAxisAlignment.spaceBetween,
+                                                                        children: [
+                                                                          const Text(
+                                                                            'زمان ایجاد تراکنش',
+                                                                            style: TextStyle(
+                                                                                fontFamily: "Dana",
+                                                                                fontSize: 12,
+                                                                                color: Color(0xFF929292)),
+                                                                          ),
+                                                                          Text(
+                                                                            toStringFormatter(depositTAM),
+                                                                            style: const TextStyle(
+                                                                                fontFamily: "IranYekan",
+                                                                                fontWeight: FontWeight.bold,
+                                                                                fontSize: 10,
+                                                                                color: Colors.black),
+                                                                          ),
+                                                                        ],
+                                                                      ),
                                                                     ),
-                                                                    Text(
-                                                                      toStringFormatter(
-                                                                          depositTAM),
-                                                                      style: const TextStyle(
-                                                                          fontFamily:
-                                                                              "IranYekan",
-                                                                          fontWeight: FontWeight
-                                                                              .bold,
-                                                                          fontSize:
-                                                                              10,
-                                                                          color:
-                                                                              Colors.black),
-                                                                    ),
+                                                                    const Divider(
+                                                                      thickness:
+                                                                          1,
+                                                                      height: 1,
+                                                                    )
                                                                   ],
                                                                 ),
                                                               ),
-                                                              const Divider(
-                                                                thickness: 1,
-                                                                height: 1,
-                                                              )
-                                                            ],
-                                                          ),
-                                                        ),
-                                                        SizedBox(
-                                                          height: 50,
-                                                          child: Column(
-                                                            children: [
                                                               SizedBox(
-                                                                height: 45,
-                                                                child: Row(
-                                                                  mainAxisAlignment:
-                                                                      MainAxisAlignment
-                                                                          .spaceBetween,
+                                                                height: 50,
+                                                                child: Column(
                                                                   children: [
-                                                                    const Text(
-                                                                      'کد پیگیری',
-                                                                      style: TextStyle(
-                                                                          fontFamily:
-                                                                              "Dana",
-                                                                          fontSize:
-                                                                              12,
-                                                                          color:
-                                                                              Color(0xFF929292)),
+                                                                    SizedBox(
+                                                                      height:
+                                                                          45,
+                                                                      child:
+                                                                          Row(
+                                                                        mainAxisAlignment:
+                                                                            MainAxisAlignment.spaceBetween,
+                                                                        children: [
+                                                                          const Text(
+                                                                            'کد پیگیری',
+                                                                            style: TextStyle(
+                                                                                fontFamily: "Dana",
+                                                                                fontSize: 12,
+                                                                                color: Color(0xFF929292)),
+                                                                          ),
+                                                                          Text(
+                                                                            '$causeReference',
+                                                                            style: const TextStyle(
+                                                                                fontFamily: "IranYekan",
+                                                                                fontWeight: FontWeight.bold,
+                                                                                fontSize: 10,
+                                                                                color: Colors.black),
+                                                                          ),
+                                                                        ],
+                                                                      ),
                                                                     ),
-                                                                    Text(
-                                                                      '$causeReference',
-                                                                      style: const TextStyle(
-                                                                          fontFamily:
-                                                                              "IranYekan",
-                                                                          fontWeight: FontWeight
-                                                                              .bold,
-                                                                          fontSize:
-                                                                              10,
-                                                                          color:
-                                                                              Colors.black),
-                                                                    ),
+                                                                    const Divider(
+                                                                      thickness:
+                                                                          1,
+                                                                      height: 1,
+                                                                    )
                                                                   ],
                                                                 ),
                                                               ),
-                                                              const Divider(
-                                                                thickness: 1,
-                                                                height: 1,
-                                                              )
                                                             ],
                                                           ),
                                                         ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  actions: [
-                                                    OrangeButton(
-                                                      text: 'بستن',
-                                                      onPressed: () {
-                                                        Navigator.pop(context);
-                                                      },
-                                                    ),
-                                                  ],
-                                                );
-                                              });
-                                        },
-                                      );
-                                    },
+                                                        actions: [
+                                                          OrangeButton(
+                                                            text: 'بستن',
+                                                            onPressed: () {
+                                                              Navigator.pop(
+                                                                  context);
+                                                            },
+                                                          ),
+                                                        ],
+                                                      );
+                                                    });
+                                              },
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                      if (_depositIsLoadMoreRunning == true)
+                                        const Padding(
+                                          padding: EdgeInsets.only(
+                                              top: 10, bottom: 10),
+                                          child: Center(
+                                            child: CircularProgressIndicator(
+                                              color: kOrangeColor,
+                                            ),
+                                          ),
+                                        ),
+                                      if (_depositHasNextPage == false)
+                                        Container(
+                                          padding: const EdgeInsets.only(
+                                              top: 10, bottom: 10),
+                                          child: const Center(
+                                            child: Text(
+                                              'پایان لیست',
+                                              style: TextStyle(
+                                                fontFamily: "Dana",
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                    ],
                                   ),
                                 ),
                               ],

@@ -281,7 +281,6 @@ class _WithdrawBSHState extends State<WithdrawBSH> {
                                                 }
                                                 bankAccountInfo =
                                                     bankAccounts[index];
-                                                print(bankAccountInfo);
                                               });
                                             },
                                           ),

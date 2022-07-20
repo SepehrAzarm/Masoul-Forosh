@@ -1,15 +1,18 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:masoul_kharid/Classes/Dialogs/error_dialog.dart';
 import 'package:masoul_kharid/Classes/Text&TextStyle/orange_header_text.dart';
 import 'package:masoul_kharid/Classes/orange_button.dart';
 import 'package:masoul_kharid/Constants/colors.dart';
 import 'package:masoul_kharid/Screens/Password_Recovery/enter_new_password.dart';
-import 'package:otp_text_field/otp_field.dart';
-import 'package:otp_text_field/style.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
+import 'package:masoul_kharid/Screens/login_page.dart';
+import 'package:masoul_kharid/Services/storage_class.dart';
 
 class OTPInputPage extends StatefulWidget {
   const OTPInputPage({Key? key}) : super(key: key);
@@ -32,27 +35,41 @@ class _OTPInputPageState extends State<OTPInputPage> {
   bool visible = false;
   bool resendVisible = false;
 
-  Future postOTPVerify() async {
+  Future getOtp() async {
     String? value = await storage.read(key: "token");
-    Map<String, String> headers = {
-      'token': value!,
-      "Accept": "application/json",
-    };
+    Map<String, String> headers = {'token': value!};
+    try {
+      var response = await http.get(
+        Uri.parse(
+            'https://testapi.carbon-family.com/api/market/authentication/verify'),
+        headers: headers,
+      );
+      if (response.statusCode == 200) {
+        print(response.statusCode);
+        print(response.body);
+      } else {
+        var data = await jsonDecode(response.body.toString());
+        errorText = await data['message'];
+        print(response.statusCode);
+        print(response.body);
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future postOTPVerify() async {
     var response = await http.post(
         Uri.parse(
             'https://testapi.carbon-family.com/api/market/authentication/forgetpassword'),
-        headers: headers,
         body: {
-          "mobile": "string",
+          "mobile": Storage.mobile,
           "verificationCode": code,
           "newPassword": newPass,
         });
     if (response.statusCode == 201) {
       var data = await jsonDecode(response.body.toString());
-      await storage.delete(key: "token");
-      await storage.write(key: "token", value: data["token"]);
-      String? value = await storage.read(key: "token");
-      print(value);
+
       print(response.body);
       print(response.statusCode);
     } else {
@@ -112,6 +129,9 @@ class _OTPInputPageState extends State<OTPInputPage> {
 
   @override
   Widget build(BuildContext context) {
+    String strDigits(int n) => n.toString().padLeft(2, '0');
+    final minutes = strDigits(myDuration.inMinutes.remainder(60));
+    final seconds = strDigits(myDuration.inSeconds.remainder(60));
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -192,9 +212,9 @@ class _OTPInputPageState extends State<OTPInputPage> {
                         visible: false,
                         child: GestureDetector(
                           onTap: () async {
-                            // resetTimer();
-                            // startTimer();
-                            // await getOtp();
+                            resetTimer();
+                            startTimer();
+                            await getOtp();
                           },
                           child: const Text(
                             'ارسال مجدد کد',
@@ -207,10 +227,9 @@ class _OTPInputPageState extends State<OTPInputPage> {
                           ),
                         ),
                       ),
-                      const Text(
-                        'موز',
-                        // '$minutes:$seconds',
-                        style: TextStyle(
+                      Text(
+                        '$minutes:$seconds',
+                        style: const TextStyle(
                             fontFamily: "IranYekan",
                             fontWeight: FontWeight.bold,
                             color: Colors.black,
@@ -224,8 +243,11 @@ class _OTPInputPageState extends State<OTPInputPage> {
                   width: MediaQuery.of(context).size.width,
                   height: 60,
                   child: TextField(
+                    obscureText: true,
                     controller: _newPassword,
-                    onChanged: (value) {},
+                    onChanged: (value) {
+                      newPass = value;
+                    },
                     cursorColor: kButtonOrangeColor,
                     decoration: const InputDecoration(
                       focusedBorder: UnderlineInputBorder(
@@ -243,8 +265,32 @@ class _OTPInputPageState extends State<OTPInputPage> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 400),
-                OrangeButton(text: 'دریافت کد تایید', onPressed: () {}),
+                const SizedBox(height: 300),
+                OrangeButton(
+                    text: 'تغییر رمز عبور',
+                    onPressed: () async {
+                      await postOTPVerify();
+                      errorText != null
+                          ? showDialog(
+                              context: context,
+                              builder: (context) {
+                                return ErrorDialog(
+                                  errorText: '$errorText',
+                                  onPressed: () {
+                                    setState(() {
+                                      errorText = null;
+                                      visible = false;
+                                    });
+                                    Navigator.pop(context);
+                                  },
+                                );
+                              })
+                          : Navigator.pushNamedAndRemoveUntil(
+                              context,
+                              LoginPage.id,
+                              (Route<dynamic> route) => false,
+                            );
+                    }),
               ],
             ),
           ),

@@ -7,6 +7,7 @@ import 'package:masoul_kharid/Classes/Cards/ticket_list_card.dart';
 import 'package:masoul_kharid/Constants/colors.dart';
 import 'package:masoul_kharid/Screens/Ticket/chat_screen.dart';
 import 'package:masoul_kharid/Screens/Ticket/support_ticket.dart';
+import 'package:masoul_kharid/Screens/login_page.dart';
 import 'package:masoul_kharid/Screens/profile_screen.dart';
 import 'package:masoul_kharid/Services/storage_class.dart';
 import 'package:shamsi_date/shamsi_date.dart';
@@ -24,6 +25,14 @@ class _TicketsListState extends State<TicketsList> {
   List ticketsList = [];
   List closedTicketsList = [];
   late Jalali j;
+
+  int page = 1;
+  int logPage = 1;
+  bool _hasNextPage = true;
+  bool _isFirstLoadRunning = false;
+  bool _isLoadMoreRunning = false;
+  late ScrollController _controller;
+  late ScrollController _closedController;
 
   String createdAtTimeFormatter(Jalali j) {
     final f = j.formatter;
@@ -63,16 +72,89 @@ class _TicketsListState extends State<TicketsList> {
       } else {
         print(response.statusCode);
         print(response.body);
+        if (response.statusCode == 401) {
+          // ignore: use_build_context_synchronously
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            LoginPage.id,
+            (Route<dynamic> route) => false,
+          );
+        }
       }
     } catch (e) {
       print(e);
     }
   }
 
+  Future laodMoreTickets() async {
+    String? value = await storage.read(key: "token");
+    Map<String, String> headers = {
+      'token': value!,
+      "Accept": "application/json",
+      "Content-Type": "application/json"
+    };
+    if (_hasNextPage == true &&
+            _isFirstLoadRunning == false &&
+            _isLoadMoreRunning == false &&
+            _controller.position.extentAfter < 100 ||
+        _closedController.position.extentAfter < 100) {
+      page += 1;
+      print(page);
+      setState(() {
+        _isLoadMoreRunning = true;
+      });
+      try {
+        final response = await http.get(
+          Uri.parse(
+              "https://testapi.carbon-family.com/api/market/tickets?page=$page"),
+          headers: headers,
+        );
+        final List fetchedOpenTickets = [];
+        final List fetchedClosedTickets = [];
+        if (response.statusCode == 200) {
+          var data = response.body;
+          var items = jsonDecode(data)["tickets"];
+          for (var i = 0; i < items.length; i++) {
+            if (items[i]["status"] == true) {
+              fetchedOpenTickets.add(items[i]);
+            } else if (items[i]["status"] == false) {
+              fetchedClosedTickets.add(items[i]);
+            }
+          }
+          print(response.statusCode);
+          print(response.body);
+        }
+        if (fetchedOpenTickets.isNotEmpty) {
+          setState(() {
+            ticketsList.addAll(fetchedOpenTickets);
+            closedTicketsList.addAll(fetchedClosedTickets);
+            _isLoadMoreRunning = false;
+          });
+        } else {
+          setState(() {
+            _hasNextPage = false;
+            _isLoadMoreRunning = false;
+          });
+        }
+      } catch (err) {
+        print(err);
+      }
+    }
+  }
+
   @override
   void initState() {
+    _controller = ScrollController()..addListener(laodMoreTickets);
+    _closedController = ScrollController()..addListener(laodMoreTickets);
     getTicketsList();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _controller.removeListener(laodMoreTickets);
+    _closedController.removeListener(laodMoreTickets);
+    super.dispose();
   }
 
   @override
@@ -130,45 +212,101 @@ class _TicketsListState extends State<TicketsList> {
                 horizontal: 10,
                 vertical: 10,
               ),
-              child: ListView.builder(
-                  itemCount: ticketsList.length,
-                  itemBuilder: (context, int index) {
-                    var dateAndTime =
-                        DateTime.parse(ticketsList[index]["createdAt"]!)
-                            .toLocal();
-                    Gregorian g = Gregorian.fromDateTime(dateAndTime);
-                    j = Jalali.fromGregorian(g);
-                    return TicketListCard(
-                      name: ticketsList[index]["lastAnsweredBy"],
-                      createdAt: createdAtTimeFormatter(j),
-                      time: toStringFormatter(j),
-                      onTap: () {
-                        Storage.ticketId = ticketsList[index]["_id"];
-                        Navigator.pushNamed(context, TicketChatScreen.id);
-                      },
-                    );
-                  }),
+              child: Column(
+                children: [
+                  Expanded(
+                    child: ListView.builder(
+                        controller: _controller,
+                        itemCount: ticketsList.length,
+                        itemBuilder: (context, int index) {
+                          var dateAndTime =
+                              DateTime.parse(ticketsList[index]["createdAt"]!)
+                                  .toLocal();
+                          Gregorian g = Gregorian.fromDateTime(dateAndTime);
+                          j = Jalali.fromGregorian(g);
+                          return TicketListCard(
+                            name: ticketsList[index]["lastAnsweredBy"],
+                            createdAt: createdAtTimeFormatter(j),
+                            time: toStringFormatter(j),
+                            onTap: () {
+                              Storage.ticketId = ticketsList[index]["_id"];
+                              Navigator.pushNamed(context, TicketChatScreen.id);
+                            },
+                          );
+                        }),
+                  ),
+                  if (_isLoadMoreRunning == true)
+                    const Padding(
+                      padding: EdgeInsets.only(top: 10),
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          color: kOrangeColor,
+                        ),
+                      ),
+                    ),
+                  if (_hasNextPage == false)
+                    Container(
+                      padding: const EdgeInsets.only(top: 30, bottom: 40),
+                      child: const Center(
+                        child: Text(
+                          'پایان لیست',
+                          style: TextStyle(
+                            fontFamily: "Dana",
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: 10,
                 vertical: 10,
               ),
-              child: ListView.builder(
-                  itemCount: closedTicketsList.length,
-                  itemBuilder: (context, int index) {
-                    var dateAndTime =
-                        DateTime.parse(closedTicketsList[index]["createdAt"]!)
-                            .toLocal();
-                    Gregorian g = Gregorian.fromDateTime(dateAndTime);
-                    j = Jalali.fromGregorian(g);
-                    return TicketListCard(
-                      name: closedTicketsList[index]["lastAnsweredBy"],
-                      createdAt: createdAtTimeFormatter(j),
-                      time: toStringFormatter(j),
-                      onTap: () {},
-                    );
-                  }),
+              child: Column(
+                children: [
+                  Expanded(
+                    child: ListView.builder(
+                        controller: _closedController,
+                        itemCount: closedTicketsList.length,
+                        itemBuilder: (context, int index) {
+                          var dateAndTime = DateTime.parse(
+                                  closedTicketsList[index]["createdAt"]!)
+                              .toLocal();
+                          Gregorian g = Gregorian.fromDateTime(dateAndTime);
+                          j = Jalali.fromGregorian(g);
+                          return TicketListCard(
+                            name: closedTicketsList[index]["lastAnsweredBy"],
+                            createdAt: createdAtTimeFormatter(j),
+                            time: toStringFormatter(j),
+                            onTap: () {},
+                          );
+                        }),
+                  ),
+                  if (_isLoadMoreRunning == true)
+                    const Padding(
+                      padding: EdgeInsets.only(top: 10),
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          color: kOrangeColor,
+                        ),
+                      ),
+                    ),
+                  if (_hasNextPage == false)
+                    Container(
+                      padding: const EdgeInsets.only(top: 30, bottom: 40),
+                      child: const Center(
+                        child: Text(
+                          'پایان لیست',
+                          style: TextStyle(
+                            fontFamily: "Dana",
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
             ),
           ],
         ),

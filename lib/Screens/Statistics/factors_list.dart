@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:masoul_kharid/Screens/Statistics/factor_screen.dart';
+import 'package:masoul_kharid/Screens/login_page.dart';
 import 'package:masoul_kharid/Services/storage_class.dart';
 
 import '../../Classes/Cards/factor_list_card.dart';
@@ -17,10 +18,8 @@ class FactorListScreen extends StatefulWidget {
 }
 
 class _FactorListScreenState extends State<FactorListScreen> {
-  List invoiceNumber = [];
-  List invoiceId = [];
-  List storeName = [];
-  List itemStatus = [];
+  List invoices = [];
+
   final storage = const FlutterSecureStorage();
   Map<int, String> statusMap = {
     0: 'در حال پردازش',
@@ -32,6 +31,12 @@ class _FactorListScreenState extends State<FactorListScreen> {
     6: 'تحویل داده شده',
   };
 
+  int page = 1;
+  bool _hasNextPage = true;
+  bool _isFirstLoadRunning = false;
+  bool _isLoadMoreRunning = false;
+  late ScrollController _controller;
+
   Future getFactorsList() async {
     String? value = await storage.read(key: "token");
     Map<String, String> headers = {
@@ -39,6 +44,9 @@ class _FactorListScreenState extends State<FactorListScreen> {
       "Accept": "application/json",
       "Content-Type": "application/json"
     };
+    setState(() {
+      _isFirstLoadRunning = true;
+    });
     try {
       var response = await http.get(
           Uri.parse("https://testapi.carbon-family.com/api/market/invoices"),
@@ -48,10 +56,7 @@ class _FactorListScreenState extends State<FactorListScreen> {
         var factors = jsonDecode(data)["invoices"];
         setState(() {
           for (var i = 0; i < factors.length; i++) {
-            storeName.add(factors[i]["shop"]["shopName"]);
-            invoiceNumber.add(factors[i]["invoiceNumber"]);
-            invoiceId.add(factors[i]["_id"]);
-            itemStatus.add(factors[i]["status"]);
+            invoices.add(factors[i]);
           }
         });
         print(response.statusCode);
@@ -59,23 +64,88 @@ class _FactorListScreenState extends State<FactorListScreen> {
       } else {
         print(response.statusCode);
         print(response.body);
+        if (response.statusCode == 401) {
+          // ignore: use_build_context_synchronously
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            LoginPage.id,
+            (Route<dynamic> route) => false,
+          );
+        }
       }
     } catch (e) {
       print(e);
     }
+    setState(() {
+      _isFirstLoadRunning = false;
+    });
+  }
+
+  Future loadMoreLoginActivity() async {
+    String? value = await storage.read(key: "token");
+    Map<String, String> headers = {
+      'token': value!,
+      "Accept": "application/json",
+      "Content-Type": "application/json"
+    };
+    if (_hasNextPage == true &&
+        _isFirstLoadRunning == false &&
+        _isLoadMoreRunning == false &&
+        _controller.position.extentAfter < 100) {
+      page += 1;
+      print(page);
+      setState(() {
+        _isLoadMoreRunning = true;
+      });
+      try {
+        final response = await http.get(
+          Uri.parse(
+              "https://testapi.carbon-family.com/api/market/invoices?page=$page"),
+          headers: headers,
+        );
+        final List fetchedPosts = [];
+        if (response.statusCode == 200) {
+          var data = response.body;
+          var items = jsonDecode(data)["invoices"];
+          for (var i = 0; i < items.length; i++) {
+            fetchedPosts.add(items[i]);
+          }
+          print(response.statusCode);
+          print(response.body);
+        }
+        if (fetchedPosts.isNotEmpty) {
+          setState(() {
+            invoices.addAll(fetchedPosts);
+            _isLoadMoreRunning = false;
+          });
+        } else {
+          setState(() {
+            _hasNextPage = false;
+            _isLoadMoreRunning = false;
+          });
+        }
+      } catch (err) {
+        print(err);
+      }
+    }
   }
 
   Future<void> refresh() async {
-    storeName = [];
-    invoiceId = [];
-    invoiceNumber = [];
+    invoices = [];
     getFactorsList();
   }
 
   @override
   void initState() {
     getFactorsList();
+    _controller = ScrollController()..addListener(loadMoreLoginActivity);
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _controller.removeListener(loadMoreLoginActivity);
+    super.dispose();
   }
 
   @override
@@ -83,7 +153,7 @@ class _FactorListScreenState extends State<FactorListScreen> {
     return RefreshIndicator(
         color: kOrangeColor,
         onRefresh: refresh,
-        child: storeName.isEmpty
+        child: invoices.isEmpty
             ? const Center(
                 child: CircularProgressIndicator(
                 color: kOrangeColor,
@@ -169,28 +239,63 @@ class _FactorListScreenState extends State<FactorListScreen> {
                           SizedBox(
                             height: 700,
                             width: double.infinity,
-                            child: ListView.builder(
-                                itemCount:
-                                    storeName.isNotEmpty ? storeName.length : 0,
-                                itemBuilder: (context, int index) {
-                                  String statusText() {
-                                    String? statusText;
-                                    int num = itemStatus[index];
-                                    statusText = statusMap[num];
-                                    return statusText!;
-                                  }
+                            child: Column(
+                              children: [
+                                Expanded(
+                                  child: ListView.builder(
+                                      controller: _controller,
+                                      itemCount: invoices.isNotEmpty
+                                          ? invoices.length
+                                          : 0,
+                                      itemBuilder: (context, int index) {
+                                        String statusText() {
+                                          String? statusText;
+                                          int num = invoices[index]["status"];
+                                          statusText = statusMap[num];
+                                          return statusText!;
+                                        }
 
-                                  return FactorListCard(
-                                    storeName: storeName[index] ?? '-----',
-                                    invoiceNumber: invoiceNumber[index],
-                                    onTap: () {
-                                      Storage.invoiceId = invoiceId[index];
-                                      Navigator.pushNamed(
-                                          context, FactorScreen.id);
-                                    },
-                                    status: statusText(),
-                                  );
-                                }),
+                                        return FactorListCard(
+                                          storeName: invoices[index]["shop"]
+                                                  ["shopName"] ??
+                                              '-----',
+                                          invoiceNumber: invoices[index]
+                                              ["invoiceNumber"],
+                                          onTap: () {
+                                            Storage.invoiceId =
+                                                invoices[index]["_id"];
+                                            Navigator.pushNamed(
+                                                context, FactorScreen.id);
+                                          },
+                                          status: statusText(),
+                                        );
+                                      }),
+                                ),
+                                if (_isLoadMoreRunning == true)
+                                  const Padding(
+                                    padding:
+                                        EdgeInsets.only(top: 10, bottom: 10),
+                                    child: Center(
+                                      child: CircularProgressIndicator(
+                                        color: kOrangeColor,
+                                      ),
+                                    ),
+                                  ),
+                                if (_hasNextPage == false)
+                                  Container(
+                                    padding: const EdgeInsets.only(
+                                        top: 30, bottom: 40),
+                                    child: const Center(
+                                      child: Text(
+                                        'پایان لیست',
+                                        style: TextStyle(
+                                          fontFamily: "Dana",
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
                           )
                         ],
                       ),

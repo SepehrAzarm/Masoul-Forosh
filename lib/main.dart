@@ -32,6 +32,7 @@ import 'package:masoul_kharid/Screens/otp_verify_screen.dart';
 import 'package:masoul_kharid/Screens/profile_screen.dart';
 import 'package:masoul_kharid/Screens/splash_screen.dart';
 import 'package:masoul_kharid/Screens/Ticket/support_ticket.dart';
+import 'package:masoul_kharid/Screens/terms_and_conditions.dart';
 
 void main() {
   runApp(const MasoulForosh());
@@ -56,7 +57,10 @@ class MasoulForosh extends StatelessWidget {
       ],
       initialRoute: SplashScreen.id,
       routes: {
-        OrdersDeliveryConfirmation.id: (context) => const OrdersDeliveryConfirmation(),
+        OrdersDeliveryConfirmation.id: (context) =>
+            const OrdersDeliveryConfirmation(),
+        TermsAndConditionsScreen.id: (context) =>
+            const TermsAndConditionsScreen(),
         SupportTicketScreen.id: (context) => const SupportTicketScreen(),
         SellingItemsScreen.id: (context) => const SellingItemsScreen(),
         CategorySecondList.id: (context) => const CategorySecondList(),

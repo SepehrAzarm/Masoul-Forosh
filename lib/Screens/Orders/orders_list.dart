@@ -12,6 +12,7 @@ import 'package:masoul_kharid/Constants/constants.dart';
 import 'package:masoul_kharid/Methods/text_field_input_decorations.dart';
 import 'package:masoul_kharid/Screens/Orders/order_delivery.dart';
 import 'package:masoul_kharid/Screens/Orders/order_screen.dart';
+import 'package:masoul_kharid/Screens/login_page.dart';
 import 'package:masoul_kharid/Screens/profile_screen.dart';
 import 'package:masoul_kharid/Services/storage_class.dart';
 import 'package:shamsi_date/shamsi_date.dart';
@@ -34,6 +35,12 @@ class _OrdersListState extends State<OrdersList> {
   String? profileImage;
   String? errorText;
   late Jalali j;
+
+  int page = 1;
+  bool _hasNextPage = true;
+  bool _isFirstLoadRunning = false;
+  bool _isLoadMoreRunning = false;
+  late ScrollController _controller;
 
   courierPicInfo() {
     if (profileImage == null) {
@@ -58,6 +65,9 @@ class _OrdersListState extends State<OrdersList> {
       "Accept": "application/json",
       "Content-Type": "application/json"
     };
+    setState(() {
+      _isFirstLoadRunning = true;
+    });
     try {
       var response = await http.get(
           Uri.parse(
@@ -76,9 +86,68 @@ class _OrdersListState extends State<OrdersList> {
       } else {
         print(response.statusCode);
         print(response.body);
+        if (response.statusCode == 401) {
+          // ignore: use_build_context_synchronously
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            LoginPage.id,
+            (Route<dynamic> route) => false,
+          );}
       }
     } catch (e) {
       print(e);
+    }
+    setState(() {
+      _isFirstLoadRunning = false;
+    });
+  }
+
+  Future loadMoreLoginList() async {
+    String? value = await storage.read(key: "token");
+    Map<String, String> headers = {
+      'token': value!,
+      "Accept": "application/json",
+      "Content-Type": "application/json"
+    };
+    if (_hasNextPage == true &&
+        _isFirstLoadRunning == false &&
+        _isLoadMoreRunning == false &&
+        _controller.position.extentAfter < 100) {
+      page += 1;
+      print(page);
+      setState(() {
+        _isLoadMoreRunning = true;
+      });
+      try {
+        final response = await http.get(
+          Uri.parse(
+              "https://testapi.carbon-family.com/api/market/orders/list/basedOnShops?page=$page"),
+          headers: headers,
+        );
+        final List fetchedPosts = [];
+        if (response.statusCode == 200) {
+          var data = response.body;
+          var items = jsonDecode(data)["orders"];
+          for (var i = 0; i < items.length; i++) {
+            fetchedPosts.add(items[i]);
+          }
+          print(response.statusCode);
+          print(response.body);
+        }
+        if (fetchedPosts.isNotEmpty) {
+          setState(() {
+            orderedItems.addAll(fetchedPosts);
+            _isLoadMoreRunning = false;
+          });
+        } else {
+          setState(() {
+            _hasNextPage = false;
+            _isLoadMoreRunning = false;
+          });
+        }
+      } catch (err) {
+        print(err);
+      }
     }
   }
 
@@ -169,7 +238,14 @@ class _OrdersListState extends State<OrdersList> {
   @override
   void initState() {
     orderListConfirm();
+    _controller = ScrollController()..addListener(loadMoreLoginList);
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _controller.removeListener(loadMoreLoginList);
+    super.dispose();
   }
 
   @override
@@ -206,77 +282,83 @@ class _OrdersListState extends State<OrdersList> {
               ),
             ),
             body: SafeArea(
-              child: Column(
-                children: [
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 15, vertical: 15),
-                      child: Column(
-                        children: [
-                          Expanded(
-                            flex: 8,
-                            child: ListView.builder(
-                                itemCount: orderedItems.length,
-                                itemBuilder: (context, int index) {
-                                  Widget picFunc() {
-                                    if (orderedItems[index]["shop"]
-                                            ["shopLogo"] ==
-                                        null) {
-                                      return const Image(
-                                        fit: BoxFit.cover,
-                                        image: AssetImage(
-                                          'images/staticImages/ShopDefaultPic.png',
-                                        ),
-                                      );
-                                    } else {
-                                      return Image(
-                                        image: NetworkImage(
-                                            'https://testapi.carbon-family.com/${orderedItems[index]["shop"]["shopLogo"]}'),
-                                        fit: BoxFit.cover,
-                                      );
-                                    }
-                                  }
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: ListView.builder(
+                          controller: _controller,
+                          itemCount: orderedItems.length,
+                          itemBuilder: (context, int index) {
+                            Widget picFunc() {
+                              if (orderedItems[index]["shop"]["shopLogo"] ==
+                                  null) {
+                                return const Image(
+                                  fit: BoxFit.cover,
+                                  image: AssetImage(
+                                    'images/staticImages/ShopDefaultPic.png',
+                                  ),
+                                );
+                              } else {
+                                return Image(
+                                  image: NetworkImage(
+                                      'https://testapi.carbon-family.com/${orderedItems[index]["shop"]["shopLogo"]}'),
+                                  fit: BoxFit.cover,
+                                );
+                              }
+                            }
 
-                                  var dateAndTime = DateTime.parse(
-                                          orderedItems[index]["createdAt"]!)
-                                      .toLocal();
-                                  Gregorian g =
-                                      Gregorian.fromDateTime(dateAndTime);
-                                  j = Jalali.fromGregorian(g);
-                                  return OrderListCard(
-                                    shopName: orderedItems[index]["shop"]
-                                        ["shopName"],
-                                    orderNumber: orderedItems[index]
-                                            ["orderNumber"]
-                                        .toString(),
-                                    time: toStringFormatter(j),
-                                    onTap: () {
-                                      Storage.orderId =
-                                          orderedItems[index]["_id"];
-                                      Navigator.pushNamed(
-                                          context, OrderDetailScreen.id);
-                                    },
-                                    image: picFunc(),
-                                  );
-                                }),
+                            var dateAndTime = DateTime.parse(
+                                    orderedItems[index]["createdAt"]!)
+                                .toLocal();
+                            Gregorian g = Gregorian.fromDateTime(dateAndTime);
+                            j = Jalali.fromGregorian(g);
+                            return OrderListCard(
+                              shopName: orderedItems[index]["shop"]["shopName"],
+                              orderNumber:
+                                  orderedItems[index]["orderNumber"].toString(),
+                              time: toStringFormatter(j),
+                              onTap: () {
+                                Storage.orderId = orderedItems[index]["_id"];
+                                Navigator.pushNamed(
+                                    context, OrderDetailScreen.id);
+                              },
+                              image: picFunc(),
+                            );
+                          }),
+                    ),
+                    if (_isLoadMoreRunning == true)
+                      const Padding(
+                        padding: EdgeInsets.only(top: 10, bottom: 10),
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            color: kOrangeColor,
                           ),
-                          Expanded(
-                            child: Center(
-                              child: OrangeButton(
-                                text: 'تحویل',
-                                onPressed: () {
-                                  Navigator.pushNamed(
-                                      context, OrdersDeliveryConfirmation.id);
-                                },
-                              ),
+                        ),
+                      ),
+                    if (_hasNextPage == false)
+                      Container(
+                        padding: const EdgeInsets.only(top: 10, bottom: 10),
+                        child: const Center(
+                          child: Text(
+                            'پایان لیست',
+                            style: TextStyle(
+                              fontFamily: "Dana",
                             ),
                           ),
-                        ],
+                        ),
                       ),
+                    OrangeButton(
+                      text: 'تحویل',
+                      onPressed: () {
+                        Navigator.pushNamed(
+                            context, OrdersDeliveryConfirmation.id);
+                      },
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           );

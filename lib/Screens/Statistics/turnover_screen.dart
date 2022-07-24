@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:masoul_kharid/Classes/Cards/turnover_card.dart';
+import 'package:masoul_kharid/Classes/Dialogs/error_dialog.dart';
 import 'package:masoul_kharid/Constants/colors.dart';
 import 'package:masoul_kharid/Screens/login_page.dart';
+import 'package:masoul_kharid/Screens/profile_screen.dart';
 
 class TurnOverScreen extends StatefulWidget {
   const TurnOverScreen({Key? key}) : super(key: key);
@@ -25,12 +27,22 @@ class _TurnOverScreenState extends State<TurnOverScreen> {
   String? imagePath;
   final storage = const FlutterSecureStorage();
 
+    profilePicFunc() {
+    if (imagePath == null) {
+      return const AssetImage(
+        'images/staticImages/productStaticImage.jpg',
+      );
+    } else {
+      return NetworkImage('https://api.carbon-family.com/${imagePath!}');
+    }
+  }
+
   Future getMarketInfo() async {
     String? value = await storage.read(key: "token");
     Map<String, String> headers = {'token': value!};
     try {
       var response = await http.get(
-        Uri.parse('https://testapi.carbon-family.com/api/market/profile'),
+        Uri.parse('https://api.carbon-family.com/api/market/profile'),
         headers: headers,
       );
       if (response.statusCode == 200) {
@@ -53,6 +65,22 @@ class _TurnOverScreenState extends State<TurnOverScreen> {
             (Route<dynamic> route) => false,
           );
         }
+        if (response.statusCode == 403) {
+          showDialog(
+              context: context,
+              builder: (context) {
+                return ErrorDialog(
+                  errorText: 'شما دسترسی به این بخش را ندارید',
+                  onPressed: () {
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      ProfileScreen.id,
+                      (Route<dynamic> route) => false,
+                    );
+                  },
+                );
+              });
+        }
       }
     } catch (e) {
       print(e);
@@ -69,7 +97,7 @@ class _TurnOverScreenState extends State<TurnOverScreen> {
     try {
       var response = await http.get(
           Uri.parse(
-              "https://testapi.carbon-family.com/api/market/financial/turnover"),
+              "https://api.carbon-family.com/api/market/financial/turnover"),
           headers: headers);
       if (response.statusCode == 200) {
         var data = response.body;
@@ -159,12 +187,7 @@ class _TurnOverScreenState extends State<TurnOverScreen> {
                               radius: 35,
                               child: CircleAvatar(
                                 radius: 32,
-                                backgroundImage: NetworkImage(
-                                  imagePath != null
-                                      ? 'https://testapi.carbon-family.com/' +
-                                          imagePath!
-                                      : 'https://testapi.carbon-family.com/uploads/markets/marketImages/7185b4aa4494c37820e2d4abfefc6166_6246f113965272bf7ca06282_1648818031253.jpg',
-                                ),
+                                backgroundImage: profilePicFunc(),
                               ),
                             ),
                             Padding(

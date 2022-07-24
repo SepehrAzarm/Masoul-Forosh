@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:masoul_kharid/Classes/Text&TextStyle/orange_header_text.dart';
 import 'package:masoul_kharid/Constants/colors.dart';
-import 'package:masoul_kharid/Screens/splash_screen.dart';
+import 'package:masoul_kharid/Screens/login_page.dart';
 
 class TermsAndConditionsScreen extends StatefulWidget {
   const TermsAndConditionsScreen({Key? key}) : super(key: key);
@@ -31,7 +31,7 @@ class _TermsAndConditionsScreenState extends State<TermsAndConditionsScreen> {
     try {
       var response = await http.get(
         Uri.parse(
-            'https://testapi.carbon-family.com/api/market/configs/globalConfigs'),
+            'https://api.carbon-family.com/api/market/configs/globalConfigs'),
       );
       if (response.statusCode == 200) {
         var data = response.body;
@@ -114,7 +114,7 @@ class _TermsAndConditionsScreenState extends State<TermsAndConditionsScreen> {
                         onPressed: () {
                           Navigator.pushNamedAndRemoveUntil(
                             context,
-                            SplashScreen.id,
+                            LoginPage.id,
                             (Route<dynamic> route) => false,
                           );
                         },

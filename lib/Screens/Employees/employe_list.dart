@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:masoul_kharid/Classes/Cards/employee_list_card.dart';
+import 'package:masoul_kharid/Classes/Dialogs/error_dialog.dart';
 import 'package:masoul_kharid/Constants/colors.dart';
 import 'package:masoul_kharid/Screens/Employees/employee_profile.dart';
 import 'package:masoul_kharid/Screens/login_page.dart';
@@ -64,8 +65,23 @@ class _EmployeeListState extends State<EmployeeList> {
             (Route<dynamic> route) => false,
           );
         }
+        if (response.statusCode == 403) {
+          showDialog(
+              context: context,
+              builder: (context) {
+                return ErrorDialog(
+                  errorText: 'شما دسترسی به این بخش را ندارید',
+                  onPressed: () {
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      ProfileScreen.id,
+                      (Route<dynamic> route) => false,
+                    );
+                  },
+                );
+              });
+        }
       }
-
     } catch (e) {
       print(e);
     }
@@ -106,17 +122,23 @@ class _EmployeeListState extends State<EmployeeList> {
         child: ListView.builder(
           itemCount: employeeNames.isNotEmpty ? employeeNames.length : 0,
           itemBuilder: (context, int index) {
+              profilePicFunc() {
+    if (employeeImages[index] == null) {
+      return const AssetImage(
+        'images/staticImages/productStaticImage.jpg',
+      );
+    } else {
+      return NetworkImage('https://api.carbon-family.com/${employeeImages[index]!}');
+    }
+  }
             return EmployeeListCard(
               onTap: () {
                 Storage.employeeId = employeeIdList[index];
                 Navigator.pushNamed(context, EmployeeProfile.id);
               },
               name: employeeNames[index] + ' ' + employeeLastName[index],
-              status: employeeStatus[index] == true ? 'فعال' : 'غیر فغال',
-              image: employeeImages[index] == null
-                  ? 'https://testapi.carbon-family.com/uploads/users/usersProfileImages/cacf6b802a0e391967d195af9d43b1cc_6246f113965272bf7ca06282_1648817834578.png'
-                  : 'https://testapi.carbon-family.com/' +
-                      employeeImages[index],
+              status: employeeStatus[index] == true ? 'فعال' : 'غیر فعال',
+              image: profilePicFunc(),
             );
           },
         ),

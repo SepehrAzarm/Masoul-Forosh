@@ -12,6 +12,7 @@ class Storage {
   static late String categoryName;
   static late String logId;
   static late String mobile;
+  static late String courierVerficationCode;
 
   static void resetEmployeeId() {
     employeeId = '';

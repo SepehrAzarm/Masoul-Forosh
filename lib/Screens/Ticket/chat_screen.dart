@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -8,7 +10,6 @@ import 'package:masoul_kharid/Classes/chat_text_and_avatar.dart';
 import 'package:masoul_kharid/Constants/colors.dart';
 import 'package:masoul_kharid/Screens/Ticket/tickets_list.dart';
 import 'package:masoul_kharid/Screens/login_page.dart';
-import 'package:masoul_kharid/Screens/profile_screen.dart';
 import 'package:masoul_kharid/Services/storage_class.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 
@@ -48,7 +49,7 @@ class _TicketChatScreenState extends State<TicketChatScreen> {
     try {
       var response = await http.get(
           Uri.parse(
-              "https://testapi.carbon-family.com/api/market/tickets/${Storage.ticketId}"),
+              "https://api.carbon-family.com/api/market/tickets/${Storage.ticketId}"),
           headers: headers);
       if (response.statusCode == 200) {
         var data = response.body;
@@ -72,7 +73,6 @@ class _TicketChatScreenState extends State<TicketChatScreen> {
         print(response.statusCode);
         print(response.body);
         if (response.statusCode == 401) {
-          // ignore: use_build_context_synchronously
           Navigator.pushNamedAndRemoveUntil(
             context,
             LoginPage.id,
@@ -102,7 +102,7 @@ class _TicketChatScreenState extends State<TicketChatScreen> {
     try {
       var response = await http.post(
         Uri.parse(
-            'https://testapi.carbon-family.com/api/market/tickets/responseToTicket'),
+            'https://api.carbon-family.com/api/market/tickets/responseToTicket'),
         headers: headers,
         body: body,
       );
@@ -137,7 +137,7 @@ class _TicketChatScreenState extends State<TicketChatScreen> {
     try {
       var response = await http.put(
           Uri.parse(
-              "https://testapi.carbon-family.com/api/market/tickets/status"),
+              "https://api.carbon-family.com/api/market/tickets/status"),
           headers: headers,
           body: body);
       if (response.statusCode == 200) {
@@ -388,35 +388,33 @@ class _TicketChatScreenState extends State<TicketChatScreen> {
                       ),
                     ),
                     Expanded(
-                      child: Container(
-                        child: ListView.builder(
-                            itemCount: massagesList.length,
-                            itemBuilder: (context, int index) {
-                              ImageProvider picFunc() {
-                                if (massagesList[index]["userProfileImage"] ==
-                                    null) {
-                                  return const AssetImage(
-                                    'images/EmployeeProfile.png',
-                                  );
-                                } else {
-                                  return NetworkImage(
-                                      'https://testapi.carbon-family.com/${massagesList[index]["userProfileImage"]}');
-                                }
+                      child: ListView.builder(
+                          itemCount: massagesList.length,
+                          itemBuilder: (context, int index) {
+                            ImageProvider picFunc() {
+                              if (massagesList[index]["userProfileImage"] ==
+                                  null) {
+                                return const AssetImage(
+                                  'images/EmployeeProfile.png',
+                                );
+                              } else {
+                                return NetworkImage(
+                                    'https://api.carbon-family.com/${massagesList[index]["userProfileImage"]}');
                               }
+                            }
 
-                              return ChatTextAndAvatar(
-                                isMe: payload["user"]["_id"] ==
-                                        massagesList[index]["userId"]
-                                    ? true
-                                    : false,
-                                text: massagesList[index]["text"],
-                                profileImage: picFunc(),
-                              );
-                            }),
-                      ),
+                            return ChatTextAndAvatar(
+                              isMe: payload["user"]["_id"] ==
+                                      massagesList[index]["userId"]
+                                  ? true
+                                  : false,
+                              text: massagesList[index]["text"],
+                              profileImage: picFunc(),
+                            );
+                          }),
                     ),
                     //Text Box
-                    Container(
+                    SizedBox(
                       height: 60,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,

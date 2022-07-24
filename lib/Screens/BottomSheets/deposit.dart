@@ -46,54 +46,17 @@ class DepositBSH extends StatelessWidget {
                   ],
                 ),
               ),
-              Container(
-                height: 140,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.only(right: 12),
-                      height: kLabelTextContainerHeight,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: const [
-                          TextFieldLabel(text: 'مبلغ برداشت را وارد کنید: '),
-                          Text(
-                            '(به تومان)',
-                            style: TextStyle(
-                              fontFamily: "Dana",
-                              color: Color(0xFF6D6D6D),
-                              fontSize: 8,
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: TextField(
-                        textInputAction: TextInputAction.next,
-                        keyboardType: TextInputType.number,
-                        // controller: _controllerPhoneNumber,
-                        cursorColor: kButtonOrangeColor,
-                        // textAlignVertical: TextAlignVertical.center,
-                        textAlign: TextAlign.center,
-                        onChanged: (String value) {},
-                        style: const TextStyle(
-                          fontFamily: 'IranYekan',
-                        ),
-                        decoration: textFieldDecorations(),
-                      ),
-                    ),
-                  ],
+              const Center(
+                child: Text(
+                  'به زودی',
+                  style: TextStyle(
+                    fontFamily: "Dana",
+                    color: kOrangeColor,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 40,
+                  ),
                 ),
-              ),
-              OrangeButton(
-                text: 'واریز',
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
+              )
             ],
           ),
         ),

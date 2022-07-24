@@ -42,7 +42,7 @@ class _SupportTicketScreenState extends State<SupportTicketScreen> {
     try {
       var response = await http.post(
         Uri.parse(
-            'https://testapi.carbon-family.com/api/market/tickets/newTicket'),
+            'https://api.carbon-family.com/api/market/tickets/newTicket'),
         headers: headers,
         body: body,
       );

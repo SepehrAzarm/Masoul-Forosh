@@ -92,10 +92,9 @@ class _ProductEditState extends State<ProductEdit> {
       amountSecText = 'تعداد';
     } else if (dropDownValue == 'کیلوگرم') {
       amountSecText = 'کیلوگرم';
-    } else if(dropDownValue == 'گرم'){
+    } else if (dropDownValue == 'گرم') {
       amountSecText = 'گرم';
-    }
-     else if (dropDownValue == 'لیتر') {
+    } else if (dropDownValue == 'لیتر') {
       amountSecText = 'لیتر';
     }
     return amountSecText;
@@ -107,7 +106,7 @@ class _ProductEditState extends State<ProductEdit> {
     try {
       var response = await http.get(
         Uri.parse(
-            "https://testapi.carbon-family.com/api/market/products/${Storage.productId}"),
+            "https://api.carbon-family.com/api/market/products/${Storage.productId}"),
         headers: headers,
       );
       if (response.statusCode == 200) {
@@ -163,6 +162,22 @@ class _ProductEditState extends State<ProductEdit> {
             (Route<dynamic> route) => false,
           );
         }
+        if (response.statusCode == 403) {
+          showDialog(
+              context: context,
+              builder: (context) {
+                return ErrorDialog(
+                  errorText: 'شما دسترسی به این بخش را ندارید',
+                  onPressed: () {
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      ProfileScreen.id,
+                      (Route<dynamic> route) => false,
+                    );
+                  },
+                );
+              });
+        }
       }
     } catch (e) {
       print(e);
@@ -196,7 +211,7 @@ class _ProductEditState extends State<ProductEdit> {
     var body = jsonEncode(data);
     try {
       var response = await http.put(
-          Uri.parse("https://testapi.carbon-family.com/api/market/products"),
+          Uri.parse("https://api.carbon-family.com/api/market/products"),
           headers: headers,
           body: body);
       if (response.statusCode == 200) {
@@ -236,7 +251,7 @@ class _ProductEditState extends State<ProductEdit> {
     try {
       var dioRequest = Dio();
       dioRequest.options.baseUrl =
-          'https://testapi.carbon-family.com/api/market/products/uploadImage';
+          'https://api.carbon-family.com/api/market/products/uploadImage';
       dioRequest.options.headers = {
         'token': value!,
         "Content-Type": "multipart/from-data",
@@ -250,7 +265,7 @@ class _ProductEditState extends State<ProductEdit> {
         )
       });
       var response = await dioRequest.post(
-          'https://testapi.carbon-family.com/api/market/products/uploadImage',
+          'https://api.carbon-family.com/api/market/products/uploadImage',
           data: formData);
       if (response.statusCode == 201) {
         print(response.statusCode);
@@ -284,8 +299,8 @@ class _ProductEditState extends State<ProductEdit> {
     } else {
       return Image(
         image: NetworkImage(availableImage.isEmpty
-            ? 'https://testapi.carbon-family.com/${imagePath!}'
-            : 'https://testapi.carbon-family.com/${availableImage[0]}'),
+            ? 'https://api.carbon-family.com/${imagePath!}'
+            : 'https://api.carbon-family.com/${availableImage[0]}'),
         fit: BoxFit.cover,
       );
     }
@@ -846,7 +861,7 @@ class _ProductEditState extends State<ProductEdit> {
                                     // ignore: use_build_context_synchronously
                                     : Navigator.pushNamedAndRemoveUntil(
                                         context,
-                                        ProductsMainPage.id,
+                                        ProfileScreen.id,
                                         (Route<dynamic> route) => false,
                                       );
                               } else {

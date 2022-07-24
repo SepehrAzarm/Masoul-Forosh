@@ -11,7 +11,7 @@ class EmployeeListCard extends StatelessWidget {
   }) : super(key: key);
   final String name;
   final String status;
-  final String image;
+  final Object image;
   final Function()? onTap;
 
   @override
@@ -31,7 +31,7 @@ class EmployeeListCard extends StatelessWidget {
                   backgroundColor: kOrangeColor,
                   child: CircleAvatar(
                     radius: 35,
-                    backgroundImage: NetworkImage(image),
+                    backgroundImage: image as ImageProvider,
                   ),
                 ),
                 //Content Text

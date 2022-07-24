@@ -48,7 +48,7 @@ class _OrdersListState extends State<OrdersList> {
         'images/staticImages/ShopDefaultPic.png',
       );
     } else {
-      return NetworkImage('https://testapi.carbon-family.com/$profileImage');
+      return NetworkImage('https://api.carbon-family.com/$profileImage');
     }
   }
 
@@ -71,7 +71,7 @@ class _OrdersListState extends State<OrdersList> {
     try {
       var response = await http.get(
           Uri.parse(
-              "https://testapi.carbon-family.com/api/market/orders/list/basedOnShops"),
+              "https://api.carbon-family.com/api/market/orders/list/basedOnShops"),
           headers: headers);
       if (response.statusCode == 200) {
         var data = response.body;
@@ -81,6 +81,22 @@ class _OrdersListState extends State<OrdersList> {
             orderedItems.add(items[i]);
           }
         });
+        if (orderedItems.isEmpty) {
+          return showDialog(
+              context: context,
+              builder: (context) {
+                return ErrorDialog(
+                  errorText: 'لیست سفارشات شما خالی میباشد',
+                  onPressed: () {
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      ProfileScreen.id,
+                      (Route<dynamic> route) => false,
+                    );
+                  },
+                );
+              });
+        }
         print(response.statusCode);
         print(response.body);
       } else {
@@ -92,7 +108,24 @@ class _OrdersListState extends State<OrdersList> {
             context,
             LoginPage.id,
             (Route<dynamic> route) => false,
-          );}
+          );
+        }
+        if (response.statusCode == 403) {
+          showDialog(
+              context: context,
+              builder: (context) {
+                return ErrorDialog(
+                  errorText: 'شما دسترسی به این بخش را ندارید',
+                  onPressed: () {
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      ProfileScreen.id,
+                      (Route<dynamic> route) => false,
+                    );
+                  },
+                );
+              });
+        }
       }
     } catch (e) {
       print(e);
@@ -121,7 +154,7 @@ class _OrdersListState extends State<OrdersList> {
       try {
         final response = await http.get(
           Uri.parse(
-              "https://testapi.carbon-family.com/api/market/orders/list/basedOnShops?page=$page"),
+              "https://api.carbon-family.com/api/market/orders/list/basedOnShops?page=$page"),
           headers: headers,
         );
         final List fetchedPosts = [];
@@ -161,7 +194,7 @@ class _OrdersListState extends State<OrdersList> {
     try {
       var response = await http.get(
           Uri.parse(
-              "https://testapi.carbon-family.com/api/market/orders/delivery/$verificationCode"),
+              "https://api.carbon-family.com/api/market/orders/delivery/$verificationCode"),
           headers: headers);
       if (response.statusCode == 200) {
         var data = response.body;
@@ -196,7 +229,7 @@ class _OrdersListState extends State<OrdersList> {
     try {
       var response = await http.post(
         Uri.parse(
-            'https://testapi.carbon-family.com/api/market/orders/delivery/$verificationCode'),
+            'https://api.carbon-family.com/api/market/orders/delivery/$verificationCode'),
         headers: headers,
       );
       if (response.statusCode == 201) {
@@ -217,27 +250,11 @@ class _OrdersListState extends State<OrdersList> {
 
   orderListConfirm() async {
     await getOrderList();
-    if (orderedItems.isEmpty) {
-      return showDialog(
-          context: context,
-          builder: (context) {
-            return ErrorDialog(
-              errorText: 'لیست سفارشات شما خالی میباشد',
-              onPressed: () {
-                Navigator.pushNamedAndRemoveUntil(
-                  context,
-                  ProfileScreen.id,
-                  (Route<dynamic> route) => false,
-                );
-              },
-            );
-          });
-    }
   }
 
   @override
   void initState() {
-    orderListConfirm();
+    getOrderList();
     _controller = ScrollController()..addListener(loadMoreLoginList);
     super.initState();
   }
@@ -304,7 +321,7 @@ class _OrdersListState extends State<OrdersList> {
                               } else {
                                 return Image(
                                   image: NetworkImage(
-                                      'https://testapi.carbon-family.com/${orderedItems[index]["shop"]["shopLogo"]}'),
+                                      'https://api.carbon-family.com/${orderedItems[index]["shop"]["shopLogo"]}'),
                                   fit: BoxFit.cover,
                                 );
                               }
@@ -353,8 +370,102 @@ class _OrdersListState extends State<OrdersList> {
                     OrangeButton(
                       text: 'تحویل',
                       onPressed: () {
-                        Navigator.pushNamed(
-                            context, OrdersDeliveryConfirmation.id);
+                        showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                shape: const RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.all(
+                                        Radius.circular(20.0))),
+                                content: SizedBox(
+                                  height: 100,
+                                  width: 300,
+                                  child: Center(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            Container(
+                                              padding: const EdgeInsets.only(
+                                                  right: 12),
+                                              height: kLabelTextContainerHeight,
+                                              child: const TextFieldLabel(
+                                                  text:
+                                                      'کد پیک را وارد نمائید '),
+                                            ),
+                                          ],
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 10),
+                                          child: TextField(
+                                            textInputAction:
+                                                TextInputAction.next,
+                                            keyboardType: TextInputType.number,
+                                            // controller: _controllerPhoneNumber,
+                                            cursorColor: kButtonOrangeColor,
+                                            // textAlignVertical: TextAlignVertical.center,
+                                            textAlign: TextAlign.center,
+                                            onChanged: (String value) {
+                                              verificationCode = value;
+                                              Storage.courierVerficationCode =
+                                                  value;
+                                            },
+                                            style: const TextStyle(
+                                              fontFamily: 'IranYekan',
+                                            ),
+                                            decoration: textFieldDecorations(),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                actions: [
+                                  OrangeButton(
+                                    text: 'تحویل',
+                                    onPressed: () async {
+                                      if (verificationCode != null ) {
+                                        await getOrderAndCourierInfo();
+                                      errorText != null
+                                          ? showDialog(
+                                              context: context,
+                                              builder: (context) {
+                                                return ErrorDialog(
+                                                  errorText: '$errorText',
+                                                  onPressed: () {
+                                                    setState(() {
+                                                      errorText = null;
+                                                    });
+                                                    Navigator.pop(context);
+                                                  },
+                                                );
+                                              })
+                                          : Navigator.pushNamed(context,
+                                              OrdersDeliveryConfirmation.id);
+                                      }
+                                       else {
+                                        showDialog(
+                                              context: context,
+                                              builder: (context) {
+                                                return ErrorDialog(
+                                                  errorText: 'لطفا کد پیک را وارد نمائید',
+                                                  onPressed: () {
+                                                    setState(() {});
+                                                    Navigator.pop(context);
+                                                  },
+                                                );
+                                              });
+                                       }
+                                    },
+                                  ),
+                                ],
+                              );
+                            });
                       },
                     ),
                   ],

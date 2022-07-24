@@ -3,8 +3,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
+import 'package:masoul_kharid/Classes/Dialogs/error_dialog.dart';
 import 'package:masoul_kharid/Screens/Statistics/factor_screen.dart';
 import 'package:masoul_kharid/Screens/login_page.dart';
+import 'package:masoul_kharid/Screens/profile_screen.dart';
 import 'package:masoul_kharid/Services/storage_class.dart';
 
 import '../../Classes/Cards/factor_list_card.dart';
@@ -49,7 +51,7 @@ class _FactorListScreenState extends State<FactorListScreen> {
     });
     try {
       var response = await http.get(
-          Uri.parse("https://testapi.carbon-family.com/api/market/invoices"),
+          Uri.parse("https://api.carbon-family.com/api/market/invoices"),
           headers: headers);
       if (response.statusCode == 200) {
         var data = response.body;
@@ -71,6 +73,22 @@ class _FactorListScreenState extends State<FactorListScreen> {
             LoginPage.id,
             (Route<dynamic> route) => false,
           );
+        }
+        if (response.statusCode == 403) {
+          showDialog(
+              context: context,
+              builder: (context) {
+                return ErrorDialog(
+                  errorText: 'شما دسترسی به این بخش را ندارید',
+                  onPressed: () {
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      ProfileScreen.id,
+                      (Route<dynamic> route) => false,
+                    );
+                  },
+                );
+              });
         }
       }
     } catch (e) {
@@ -100,7 +118,7 @@ class _FactorListScreenState extends State<FactorListScreen> {
       try {
         final response = await http.get(
           Uri.parse(
-              "https://testapi.carbon-family.com/api/market/invoices?page=$page"),
+              "https://api.carbon-family.com/api/market/invoices?page=$page"),
           headers: headers,
         );
         final List fetchedPosts = [];

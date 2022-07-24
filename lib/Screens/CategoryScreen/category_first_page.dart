@@ -31,7 +31,7 @@ class _CategoryFirstPageState extends State<CategoryFirstPage> {
     try {
       var response = await http.get(
         Uri.parse(
-            "https://testapi.carbon-family.com/api/public/global/productsCategories"),
+            "https://api.carbon-family.com/api/public/global/productsCategories"),
         headers: headers,
       );
       if (response.statusCode == 200) {
@@ -65,7 +65,7 @@ class _CategoryFirstPageState extends State<CategoryFirstPage> {
     try {
       var response = await http.get(
         Uri.parse(
-                "https://testapi.carbon-family.com/api/public/global/productsCategories")
+                "https://api.carbon-family.com/api/public/global/productsCategories")
             .replace(queryParameters: queryParams),
         headers: headers,
       );
@@ -94,85 +94,91 @@ class _CategoryFirstPageState extends State<CategoryFirstPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        centerTitle: true,
-        backgroundColor: Colors.white,
-        leading: const BackButton(
-          color: Colors.black,
-        ),
-        title: const Text(
-          'انتخاب دسته بندی محصول',
-          style: TextStyle(
-            fontFamily: 'Dana',
-            fontSize: 14,
+    return categoryList.isEmpty
+        ? const Center(
+            child: CircularProgressIndicator(
             color: kOrangeColor,
-          ),
-        ),
-      ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-          child: ListView.builder(
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: categoryList.isNotEmpty ? categoryList.length : 0,
-            itemBuilder: (BuildContext context, int index) {
-              return GestureDetector(
-                onTap: () async {
-                  setState(() {
-                    categoryId = categoryIdList[index];
-                  });
-                  await getChildren();
-                  if (childrenList.isNotEmpty) {
-                    if (mounted) {
-                      Navigator.pushNamed(context, CategorySecondList.id);
-                    }
-                    Storage.categoryId = categoryId!;
-                  } else if (childrenList.isEmpty) {
-                    Storage.categoryId = categoryId!;
-                    Storage.categoryName = categoryList[index];
-                    if (mounted && Storage.isEditProduct == false) {
-                      Navigator.pop(
-                        context,
-                        ModalRoute.withName(AddProductPage.id),
-                      );
-                    } else if (mounted && Storage.isEditProduct == true) {
-                      Navigator.of(context).pop(
-                        ModalRoute.withName(ProductEdit.id),
-                      );
-                    }
-                  }
-                },
-                child: SizedBox(
-                  height: 55,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 15),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Text(
-                          categoryList[index],
-                          style: const TextStyle(
-                            fontFamily: 'IranYekan',
-                            color: Colors.black45,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 19,
+          ))
+        : Scaffold(
+            appBar: AppBar(
+              elevation: 0,
+              centerTitle: true,
+              backgroundColor: Colors.white,
+              leading: const BackButton(
+                color: Colors.black,
+              ),
+              title: const Text(
+                'انتخاب دسته بندی محصول',
+                style: TextStyle(
+                  fontFamily: 'Dana',
+                  fontSize: 14,
+                  color: kOrangeColor,
+                ),
+              ),
+            ),
+            body: SafeArea(
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                child: ListView.builder(
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: categoryList.isNotEmpty ? categoryList.length : 0,
+                  itemBuilder: (BuildContext context, int index) {
+                    return GestureDetector(
+                      onTap: () async {
+                        setState(() {
+                          categoryId = categoryIdList[index];
+                        });
+                        await getChildren();
+                        if (childrenList.isNotEmpty) {
+                          if (mounted) {
+                            Navigator.pushNamed(context, CategorySecondList.id);
+                          }
+                          Storage.categoryId = categoryId!;
+                        } else if (childrenList.isEmpty) {
+                          Storage.categoryId = categoryId!;
+                          Storage.categoryName = categoryList[index];
+                          if (mounted && Storage.isEditProduct == false) {
+                            Navigator.pop(
+                              context,
+                              ModalRoute.withName(AddProductPage.id),
+                            );
+                          } else if (mounted && Storage.isEditProduct == true) {
+                            Navigator.of(context).pop(
+                              ModalRoute.withName(ProductEdit.id),
+                            );
+                          }
+                        }
+                      },
+                      child: SizedBox(
+                        height: 55,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 15),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Text(
+                                categoryList[index],
+                                style: const TextStyle(
+                                  fontFamily: 'IranYekan',
+                                  color: Colors.black45,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 19,
+                                ),
+                              ),
+                              const Divider(
+                                color: kNewsCardContentTextColor,
+                                thickness: 0.5,
+                              )
+                            ],
                           ),
                         ),
-                        const Divider(
-                          color: kNewsCardContentTextColor,
-                          thickness: 0.5,
-                        )
-                      ],
-                    ),
-                  ),
+                      ),
+                    );
+                  },
                 ),
-              );
-            },
-          ),
-        ),
-      ),
-    );
+              ),
+            ),
+          );
   }
 }

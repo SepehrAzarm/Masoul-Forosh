@@ -25,6 +25,8 @@ class OTPInputPage extends StatefulWidget {
 class _OTPInputPageState extends State<OTPInputPage> {
   final TextEditingController _otpController = TextEditingController();
   final TextEditingController _newPassword = TextEditingController();
+  final TextEditingController _newPasswordConfirmation =
+      TextEditingController();
   final storage = const FlutterSecureStorage();
   Timer? countdownTimer;
   Duration myDuration = const Duration(minutes: 5);
@@ -32,17 +34,15 @@ class _OTPInputPageState extends State<OTPInputPage> {
   bool obsText = true;
   String? errorText;
   String? newPass;
+  String? newPassConfirmation;
   bool visible = false;
   bool resendVisible = false;
 
   Future getOtp() async {
-    String? value = await storage.read(key: "token");
-    Map<String, String> headers = {'token': value!};
     try {
       var response = await http.get(
         Uri.parse(
-            'https://testapi.carbon-family.com/api/market/authentication/verify'),
-        headers: headers,
+            'https://api.carbon-family.com/api/market/authentication/forgetpassword/${Storage.mobile}'),
       );
       if (response.statusCode == 200) {
         print(response.statusCode);
@@ -61,7 +61,7 @@ class _OTPInputPageState extends State<OTPInputPage> {
   Future postOTPVerify() async {
     var response = await http.post(
         Uri.parse(
-            'https://testapi.carbon-family.com/api/market/authentication/forgetpassword'),
+            'https://api.carbon-family.com/api/market/authentication/forgetpassword'),
         body: {
           "mobile": Storage.mobile,
           "verificationCode": code,
@@ -209,7 +209,7 @@ class _OTPInputPageState extends State<OTPInputPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Visibility(
-                        visible: false,
+                        visible: resendVisible,
                         child: GestureDetector(
                           onTap: () async {
                             resetTimer();
@@ -243,10 +243,48 @@ class _OTPInputPageState extends State<OTPInputPage> {
                   width: MediaQuery.of(context).size.width,
                   height: 60,
                   child: TextField(
-                    obscureText: true,
+                    obscureText: obsText,
                     controller: _newPassword,
                     onChanged: (value) {
                       newPass = value;
+                    },
+                    cursorColor: kButtonOrangeColor,
+                    decoration: InputDecoration(
+                      suffixIcon: IconButton(
+                        iconSize: 24.0,
+                        icon: Icon(obsText == true
+                            ? Icons.visibility
+                            : Icons.visibility_off),
+                        onPressed: () {
+                          setState(() {
+                            obsText == true ? obsText = false : obsText = true;
+                          });
+                        },
+                      ),
+                      focusedBorder: const UnderlineInputBorder(
+                        borderSide: BorderSide(
+                          color: kOrangeColor,
+                          width: 2.0,
+                        ),
+                      ),
+                      hintText: 'رمز عبور جدید ',
+                      hintStyle: const TextStyle(
+                        fontFamily: 'Dana',
+                        fontSize: 13,
+                        color: kTextFieldHintTextColor,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width,
+                  height: 60,
+                  child: TextField(
+                    obscureText: true,
+                    controller: _newPasswordConfirmation,
+                    onChanged: (value) {
+                      newPassConfirmation = value;
                     },
                     cursorColor: kButtonOrangeColor,
                     decoration: const InputDecoration(
@@ -256,7 +294,7 @@ class _OTPInputPageState extends State<OTPInputPage> {
                           width: 2.0,
                         ),
                       ),
-                      hintText: 'رمز عبور جدید ',
+                      hintText: 'رمز عبور جدید را مجدد وارد نمائید ',
                       hintStyle: TextStyle(
                         fontFamily: 'Dana',
                         fontSize: 13,
@@ -265,31 +303,57 @@ class _OTPInputPageState extends State<OTPInputPage> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 300),
+                const SizedBox(height: 30),
+                const Text(
+                  'رمز عبور باید شامل حداقل 8 کاراکتر، حروف بزرگ و کوچک انگلیسی و اعداد باشد.',
+                  style: TextStyle(
+                    fontFamily: 'IranYekan',
+                    fontSize: 10,
+                    color: Colors.red,
+                  ),
+                ),
+                const SizedBox(height: 150),
                 OrangeButton(
                     text: 'تغییر رمز عبور',
                     onPressed: () async {
-                      await postOTPVerify();
-                      errorText != null
-                          ? showDialog(
-                              context: context,
-                              builder: (context) {
-                                return ErrorDialog(
-                                  errorText: '$errorText',
-                                  onPressed: () {
-                                    setState(() {
-                                      errorText = null;
-                                      visible = false;
-                                    });
-                                    Navigator.pop(context);
-                                  },
-                                );
-                              })
-                          : Navigator.pushNamedAndRemoveUntil(
-                              context,
-                              LoginPage.id,
-                              (Route<dynamic> route) => false,
-                            );
+                      if (newPass == newPassConfirmation) {
+                        await postOTPVerify();
+                        errorText != null
+                            ? showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return ErrorDialog(
+                                    errorText: '$errorText',
+                                    onPressed: () {
+                                      setState(() {
+                                        errorText = null;
+                                        visible = false;
+                                      });
+                                      Navigator.pop(context);
+                                    },
+                                  );
+                                })
+                            : Navigator.pushNamedAndRemoveUntil(
+                                context,
+                                LoginPage.id,
+                                (Route<dynamic> route) => false,
+                              );
+                      } else {
+                        showDialog(
+                            context: context,
+                            builder: (context) {
+                              return ErrorDialog(
+                                errorText: 'رمز عبور مطابقت ندارد',
+                                onPressed: () {
+                                  setState(() {
+                                    errorText = null;
+                                    visible = false;
+                                  });
+                                  Navigator.pop(context);
+                                },
+                              );
+                            });
+                      }
                     }),
               ],
             ),

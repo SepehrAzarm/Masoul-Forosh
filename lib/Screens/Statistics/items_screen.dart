@@ -35,7 +35,7 @@ class _SellingItemsScreenState extends State<SellingItemsScreen> {
     try {
       var response = await http.get(
           Uri.parse(
-              "https://testapi.carbon-family.com/api/market/history/sellItems/BasedOnProducts"),
+              "https://api.carbon-family.com/api/market/history/sellItems/BasedOnProducts"),
           headers: headers);
       if (response.statusCode == 200) {
         var data = response.body;
@@ -51,6 +51,22 @@ class _SellingItemsScreenState extends State<SellingItemsScreen> {
 
         print(response.statusCode);
         print(response.body);
+        if (itemsListTitle.isEmpty) {
+          return showDialog(
+              context: context,
+              builder: (context) {
+                return ErrorDialog(
+                  errorText: 'لیست اقلام فروش شما خالی میباشد',
+                  onPressed: () {
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      ProfileScreen.id,
+                      (Route<dynamic> route) => false,
+                    );
+                  },
+                );
+              });
+        }
       } else {
         print(response.statusCode);
         print(response.body);
@@ -61,6 +77,22 @@ class _SellingItemsScreenState extends State<SellingItemsScreen> {
             LoginPage.id,
             (Route<dynamic> route) => false,
           );
+        }
+        if (response.statusCode == 403) {
+          showDialog(
+              context: context,
+              builder: (context) {
+                return ErrorDialog(
+                  errorText: 'شما دسترسی به این بخش را ندارید',
+                  onPressed: () {
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      ProfileScreen.id,
+                      (Route<dynamic> route) => false,
+                    );
+                  },
+                );
+              });
         }
       }
     } catch (e) {
@@ -89,29 +121,8 @@ class _SellingItemsScreenState extends State<SellingItemsScreen> {
     return height;
   }
 
-  sellItemsListConfirm() async {
-    await getSellItemsList();
-    if (itemsListTitle.isEmpty) {
-      return showDialog(
-          context: context,
-          builder: (context) {
-            return ErrorDialog(
-              errorText: 'لیست اقلام فروش شما خالی میباشد',
-              onPressed: () {
-                Navigator.pushNamedAndRemoveUntil(
-                  context,
-                  ProfileScreen.id,
-                  (Route<dynamic> route) => false,
-                );
-              },
-            );
-          });
-    }
-  }
-
   @override
   void initState() {
-    sellItemsListConfirm();
     getSellItemsList();
     super.initState();
   }
@@ -183,7 +194,7 @@ class _SellingItemsScreenState extends State<SellingItemsScreen> {
                               center: Text(
                                 itemsListTitle[0],
                                 style: const TextStyle(
-                                  fontSize: 20,
+                                  fontSize: 18,
                                   fontWeight: FontWeight.bold,
                                   fontFamily: 'IranYekan',
                                   color: kOrangeColor,
@@ -198,7 +209,7 @@ class _SellingItemsScreenState extends State<SellingItemsScreen> {
                               center: Text(
                                 itemsListTitle[1],
                                 style: const TextStyle(
-                                  fontSize: 20,
+                                  fontSize: 18,
                                   fontWeight: FontWeight.bold,
                                   fontFamily: 'IranYekan',
                                   color: kOrangeColor,

@@ -1,7 +1,9 @@
 import 'dart:convert';
 
+import 'package:check_vpn_connection/check_vpn_connection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:masoul_kharid/Classes/orange_button.dart';
 import 'package:masoul_kharid/Screens/get_started_page.dart';
 import 'package:masoul_kharid/Screens/profile_screen.dart';
@@ -27,14 +29,89 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
+    checkVPNConnection();
+    checkInternet();
     checkFirstRun();
+  }
+
+    checkInternet() async {
+    bool result = await InternetConnectionChecker().hasConnection;
+    if (result == false) {
+      showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: const Center(
+                child: SizedBox(
+                  width: 80,
+                  height: 80,
+                  child: Image(
+                    image: AssetImage('images/ErroIcon.png'),
+                  ),
+                ),
+              ),
+              content: const Text(
+                'لطفا اتصال اینترنت خود را چک کنید',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: 'IranYekan',
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              actions: [
+                OrangeButton(
+                    text: 'بستن',
+                    onPressed: () {
+                      Navigator.pop(context);
+                    })
+              ],
+            );
+          });
+    }
+  }
+
+  checkVPNConnection() async {
+    if (await CheckVpnConnection.isVpnActive()) {
+      showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: const Center(
+                child: SizedBox(
+                  width: 80,
+                  height: 80,
+                  child: Image(
+                    image: AssetImage('images/ErroIcon.png'),
+                  ),
+                ),
+              ),
+              content: const Text(
+                'لطفا فیلتر شکن خود را قطع کنید',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: 'IranYekan',
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              actions: [
+                OrangeButton(
+                    text: 'بستن',
+                    onPressed: () {
+                      Navigator.pop(context);
+                    })
+              ],
+            );
+          });
+    }
   }
 
   Future getGlobalInfo() async {
     try {
       var response = await http.get(
         Uri.parse(
-            'https://testapi.carbon-family.com/api/market/configs/globalConfigs'),
+            'https://api.carbon-family.com/api/market/configs/globalConfigs'),
       );
       if (response.statusCode == 200) {
         var data = response.body;
@@ -84,6 +161,7 @@ class _SplashScreenState extends State<SplashScreen> {
     print(currentVersion);
     if (currentVersion != version) {
       showDialog(
+        barrierDismissible: false,
           context: context,
           builder: (context) {
             return AlertDialog(

@@ -36,7 +36,7 @@ class _OTPVerifyScreenState extends State<OTPVerifyScreen> {
     };
     var response = await http.post(
         Uri.parse(
-            'https://testapi.carbon-family.com/api/market/authentication/verify'),
+            'https://api.carbon-family.com/api/market/authentication/verify'),
         headers: headers,
         body: {'verificationCode': code});
     if (response.statusCode == 201) {
@@ -63,7 +63,7 @@ class _OTPVerifyScreenState extends State<OTPVerifyScreen> {
     try {
       var response = await http.get(
         Uri.parse(
-            'https://testapi.carbon-family.com/api/market/authentication/verify'),
+            'https://api.carbon-family.com/api/market/authentication/verify'),
         headers: headers,
       );
       if (response.statusCode == 200) {

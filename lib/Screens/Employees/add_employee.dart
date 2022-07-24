@@ -30,6 +30,11 @@ class _AddNewEmployeeState extends State<AddNewEmployee> {
   final TextEditingController _email = TextEditingController();
   final storage = const FlutterSecureStorage();
   final ImagePicker _picker = ImagePicker();
+  List<dynamic> marketAdminUserAccess = [];
+  Map accessMap = {};
+  List accessListKeys = [];
+  List accessListValues = [];
+  List toggled = [];
   late File imageFile;
   var newImage;
   String? imagePath;
@@ -42,6 +47,62 @@ class _AddNewEmployeeState extends State<AddNewEmployee> {
   bool obsText = true;
   bool visible = false;
   String? errorText;
+
+  @override
+  void initState() {
+    getEmployeeAccessList();
+    super.initState();
+  }
+
+    profilePicFunc() {
+    if (newImage != null) {
+      return Image.file(
+        File(newImage.path),
+        fit: BoxFit.cover,
+      ).image;
+    } else if (imagePath == null) {
+      return const AssetImage(
+        'images/staticImages/productStaticImage.jpg',
+      );
+    } else {
+      return NetworkImage('https://api.carbon-family.com/${imagePath!}');
+    }
+  }
+
+  Future getEmployeeAccessList() async {
+    String? value = await storage.read(key: "token");
+    Map<String, String> headers = {
+      'token': value!,
+      "Accept": "application/json",
+      "Content-Type": "application/json"
+    };
+    try {
+      var response = await http.get(
+        Uri.parse(
+            "https://api.carbon-family.com/api/market/users/access/list"),
+        headers: headers,
+      );
+      if (response.statusCode == 200) {
+        var data = response.body;
+        setState(() {
+          accessMap = jsonDecode(data)["data"];
+          accessMap.forEach((key, value) {
+            accessListKeys.add(key);
+            accessListValues.add(value);
+          });
+          print(accessListKeys);
+          print(accessListValues);
+        });
+        print(response.statusCode);
+        // print(response.body);
+      } else {
+        print(response.statusCode);
+        print(response.body);
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
 
   Future postAddNewEmployee() async {
     String? value = await storage.read(key: "token");
@@ -57,13 +118,13 @@ class _AddNewEmployeeState extends State<AddNewEmployee> {
       "password": password,
       "profileImage": imagePath,
       "role": "support",
-      "access": ["products"],
+      "access": marketAdminUserAccess,
       "email": email
     };
     var body = jsonEncode(data);
     try {
       var response = await http.post(
-          Uri.parse('https://testapi.carbon-family.com/api/market/users'),
+          Uri.parse('https://api.carbon-family.com/api/market/users'),
           headers: headers,
           body: body);
       if (response.statusCode == 201) {
@@ -109,7 +170,7 @@ class _AddNewEmployeeState extends State<AddNewEmployee> {
     try {
       var dioRequest = Dio();
       dioRequest.options.baseUrl =
-          'https://testapi.carbon-family.com/api/market/users/uploadImage';
+          'https://api.carbon-family.com/api/market/users/uploadImage';
       dioRequest.options.headers = {
         'token': value!,
         "Content-Type": "multipart/from-data",
@@ -123,7 +184,7 @@ class _AddNewEmployeeState extends State<AddNewEmployee> {
         )
       });
       var response = await dioRequest.post(
-          'https://testapi.carbon-family.com/api/market/users/uploadImage',
+          'https://api.carbon-family.com/api/market/users/uploadImage',
           data: formData);
       if (response.statusCode == 201) {
         print(response.statusCode);
@@ -183,10 +244,7 @@ class _AddNewEmployeeState extends State<AddNewEmployee> {
                         child: CircleAvatar(
                           backgroundColor: const Color(0xFFFFDFC2),
                           radius: 55,
-                          backgroundImage: NetworkImage(imagePath == null
-                              ? 'https://testapi.carbon-family.com/uploads/users/usersProfileImages/cacf6b802a0e391967d195af9d43b1cc_6246f113965272bf7ca06282_1648817834578.png'
-                              : 'https://testapi.carbon-family.com/' +
-                                  imagePath!),
+                          backgroundImage: profilePicFunc(),
                         ),
                       ),
                       const SizedBox(
@@ -351,8 +409,21 @@ class _AddNewEmployeeState extends State<AddNewEmployee> {
                     ),
                   ],
                 ),
+                const SizedBox(height: 15),
+                const SizedBox(
+                  width: 350,
+                  height: 20,
+                  child: Text(
+                    'در صورتی که کارمند شما ایمیل ندارد ایمیل خودتان را وارد کنید',
+                    style: TextStyle(
+                      fontFamily: 'IranYekan',
+                      fontSize: 10,
+                      color: Colors.red,
+                    ),
+                  ),
+                ),
                 //mobile
-                const SizedBox(height: 30),
+                const SizedBox(height: 15),
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -549,7 +620,71 @@ class _AddNewEmployeeState extends State<AddNewEmployee> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 80),
+                const SizedBox(height: 30),
+                SizedBox(
+                  height: 250,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(
+                        height: 40,
+                        child: Text(
+                          'دسترسی ها:',
+                          style: TextStyle(
+                            fontFamily: 'Dana',
+                            fontSize: 17,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: ListView.builder(
+                            itemCount: accessListValues.length,
+                            itemBuilder: (context, int index) {
+                              if (marketAdminUserAccess
+                                  .contains(accessListKeys[index])) {
+                                toggled.add(index);
+                              }
+                              return SizedBox(
+                                height: 35,
+                                width: 175,
+                                child: Row(
+                                  children: [
+                                    Checkbox(
+                                      activeColor: kButtonOrangeColor,
+                                      value: toggled.contains(index)
+                                          ? true
+                                          : false,
+                                      onChanged: (bool? value) {
+                                        setState(() {
+                                          if (toggled.contains(index)) {
+                                            toggled.clear();
+                                            marketAdminUserAccess
+                                                .remove(accessListKeys[index]);
+                                          } else {
+                                            toggled.add(index);
+                                            marketAdminUserAccess
+                                                .add(accessListKeys[index]);
+                                          }
+                                        });
+                                      },
+                                    ),
+                                    Text(
+                                      '${accessListValues[index]}',
+                                      style: const TextStyle(
+                                        fontFamily: 'Dana',
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
                 Center(
                   child: Visibility(
                     maintainSize: true,

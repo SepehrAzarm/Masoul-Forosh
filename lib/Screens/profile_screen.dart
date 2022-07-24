@@ -7,8 +7,10 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:masoul_kharid/Classes/Cards/product_card.dart';
 import 'package:masoul_kharid/Classes/Dialogs/aboutus_dialog.dart';
+import 'package:masoul_kharid/Classes/Dialogs/error_dialog.dart';
 import 'package:masoul_kharid/Classes/settings_body_content.dart';
 import 'package:masoul_kharid/Constants/colors.dart';
+import 'package:masoul_kharid/Constants/strings.dart';
 import 'package:masoul_kharid/Screens/BottomSheets/employee_settings.dart';
 import 'package:masoul_kharid/Screens/BottomSheets/statistic_bottom_sheet.dart';
 import 'package:masoul_kharid/Screens/Employees/add_employee.dart';
@@ -53,7 +55,7 @@ class _ProfileScreenState extends State<ProfileScreen>
       );
     } else {
       return NetworkImage(
-          'https://testapi.carbon-family.com/${productsList[index]["media"][0]}');
+          'https://api.carbon-family.com/${productsList[index]["media"][0]}');
     }
   }
 
@@ -66,7 +68,7 @@ class _ProfileScreenState extends State<ProfileScreen>
     });
     try {
       var response = await http.get(
-          Uri.parse("https://testapi.carbon-family.com/api/market/products"),
+          Uri.parse("https://api.carbon-family.com/api/market/products"),
           headers: headers);
       if (response.statusCode == 200) {
         var data = response.body;
@@ -116,7 +118,7 @@ class _ProfileScreenState extends State<ProfileScreen>
       try {
         final response = await http.get(
           Uri.parse(
-              "https://testapi.carbon-family.com/api/market/products?page=$page"),
+              "https://api.carbon-family.com/api/market/products?page=$page"),
           headers: headers,
         );
         final List fetchedPosts = [];
@@ -151,7 +153,7 @@ class _ProfileScreenState extends State<ProfileScreen>
     Map<String, String> headers = {'token': value!};
     try {
       var response = await http.get(
-        Uri.parse('https://testapi.carbon-family.com/api/market/profile'),
+        Uri.parse('https://api.carbon-family.com/api/market/profile'),
         headers: headers,
       );
       if (response.statusCode == 200) {
@@ -187,7 +189,7 @@ class _ProfileScreenState extends State<ProfileScreen>
         'images/staticImages/productStaticImage.jpg',
       );
     } else {
-      return NetworkImage('https://testapi.carbon-family.com/${imagePath!}');
+      return NetworkImage('https://api.carbon-family.com/${imagePath!}');
     }
   }
 
@@ -467,7 +469,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                   Column(
                     children: [
                       SizedBox(
-                        height: 120 * productsList.length.toDouble(),
+                        height: 120 * productsList.length.toDouble() + 100,
                         width: MediaQuery.of(context).size.width,
                         child: TabBarView(
                           controller: _tabController,
@@ -648,7 +650,8 @@ class _ProfileScreenState extends State<ProfileScreen>
               onTap: () {
                 showDialog<String>(
                   context: context,
-                  builder: (BuildContext context) => const AboutUsDialog(),
+                  builder: (BuildContext context) =>
+                      const AboutUsDialog(text: kDefaultText),
                 );
               },
             ),

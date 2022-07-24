@@ -38,7 +38,7 @@ class _AccountSettingsState extends State<AccountSettings> {
     Map<String, String> headers = {'token': value!};
     try {
       var response = await http.get(
-        Uri.parse('https://testapi.carbon-family.com/api/market/profile'),
+        Uri.parse('https://api.carbon-family.com/api/market/profile'),
         headers: headers,
       );
       if (response.statusCode == 200) {
@@ -59,7 +59,24 @@ class _AccountSettingsState extends State<AccountSettings> {
             context,
             LoginPage.id,
             (Route<dynamic> route) => false,
-          );}
+          );
+        }
+        if (response.statusCode == 403) {
+          showDialog(
+              context: context,
+              builder: (context) {
+                return ErrorDialog(
+                  errorText: 'شما دسترسی به این بخش را ندارید',
+                  onPressed: () {
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      ProfileScreen.id,
+                      (Route<dynamic> route) => false,
+                    );
+                  },
+                );
+              });
+        }
         print(response.statusCode);
         print(response.body);
       }
@@ -82,7 +99,7 @@ class _AccountSettingsState extends State<AccountSettings> {
     try {
       var dioRequest = Dio();
       dioRequest.options.baseUrl =
-          'https://testapi.carbon-family.com/api/market/profile/uploadImage';
+          'https://api.carbon-family.com/api/market/profile/uploadImage';
       dioRequest.options.headers = {
         'token': value!,
         "Content-Type": "multipart/from-data",
@@ -96,7 +113,7 @@ class _AccountSettingsState extends State<AccountSettings> {
         )
       });
       var response = await dioRequest.post(
-          'https://testapi.carbon-family.com/api/market/profile/uploadImage',
+          'https://api.carbon-family.com/api/market/profile/uploadImage',
           data: formData);
       if (response.statusCode == 201) {
         print(response.statusCode);
@@ -134,7 +151,7 @@ class _AccountSettingsState extends State<AccountSettings> {
     print(body);
     try {
       var response = await http.put(
-        Uri.parse('https://testapi.carbon-family.com/api/market/profile'),
+        Uri.parse('https://api.carbon-family.com/api/market/profile'),
         headers: headers,
         body: body,
       );
@@ -167,7 +184,7 @@ class _AccountSettingsState extends State<AccountSettings> {
     try {
       var response = await http.put(
         Uri.parse(
-            'https://testapi.carbon-family.com/api/market/profile/location'),
+            'https://api.carbon-family.com/api/market/profile/location'),
         headers: headers,
         body: body,
       );
@@ -200,7 +217,7 @@ class _AccountSettingsState extends State<AccountSettings> {
     try {
       var response = await http.put(
         Uri.parse(
-            'https://testapi.carbon-family.com/api/market/profile/activeDaysAndHours'),
+            'https://api.carbon-family.com/api/market/profile/activeDaysAndHours'),
         headers: headers,
         body: body,
       );
@@ -219,12 +236,17 @@ class _AccountSettingsState extends State<AccountSettings> {
   }
 
   profilePicFunc() {
-    if (imagePath == null) {
+    if (newImage != null) {
+      return Image.file(
+        File(newImage.path),
+        fit: BoxFit.cover,
+      ).image;
+    } else if (imagePath == null) {
       return const AssetImage(
         'images/staticImages/productStaticImage.jpg',
       );
     } else {
-      return NetworkImage('https://testapi.carbon-family.com/${imagePath!}');
+      return NetworkImage('https://api.carbon-family.com/${imagePath!}');
     }
   }
 
@@ -324,7 +346,6 @@ class _AccountSettingsState extends State<AccountSettings> {
                                 text: 'ویرایش عکس فروشگاه',
                                 onPressed: () async {
                                   await chooseImage();
-                                  await postImage();
                                 },
                               ),
                               const SizedBox(height: 20),
@@ -401,6 +422,11 @@ class _AccountSettingsState extends State<AccountSettings> {
                           if (activeDays.isNotEmpty) {
                             await putUpdateMarketActiveDays();
                           }
+
+                          if (newImage != null) {
+                            await postImage();
+                          }
+
                           errorText == null
                               // ignore: use_build_context_synchronously
                               ? Navigator.pushNamedAndRemoveUntil(

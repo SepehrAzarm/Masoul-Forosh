@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:masoul_kharid/Classes/Cards/ticket_list_card.dart';
+import 'package:masoul_kharid/Classes/Dialogs/error_dialog.dart';
 import 'package:masoul_kharid/Constants/colors.dart';
 import 'package:masoul_kharid/Screens/Ticket/chat_screen.dart';
 import 'package:masoul_kharid/Screens/Ticket/support_ticket.dart';
@@ -53,7 +54,7 @@ class _TicketsListState extends State<TicketsList> {
     };
     try {
       var response = await http.get(
-          Uri.parse("https://testapi.carbon-family.com/api/market/tickets"),
+          Uri.parse("https://api.carbon-family.com/api/market/tickets"),
           headers: headers);
       if (response.statusCode == 200) {
         var data = response.body;
@@ -79,6 +80,22 @@ class _TicketsListState extends State<TicketsList> {
             LoginPage.id,
             (Route<dynamic> route) => false,
           );
+        }
+        if (response.statusCode == 403) {
+          showDialog(
+              context: context,
+              builder: (context) {
+                return ErrorDialog(
+                  errorText: 'شما دسترسی به این بخش را ندارید',
+                  onPressed: () {
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      ProfileScreen.id,
+                      (Route<dynamic> route) => false,
+                    );
+                  },
+                );
+              });
         }
       }
     } catch (e) {
@@ -106,7 +123,7 @@ class _TicketsListState extends State<TicketsList> {
       try {
         final response = await http.get(
           Uri.parse(
-              "https://testapi.carbon-family.com/api/market/tickets?page=$page"),
+              "https://api.carbon-family.com/api/market/tickets?page=$page"),
           headers: headers,
         );
         final List fetchedOpenTickets = [];

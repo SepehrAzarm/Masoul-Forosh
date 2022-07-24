@@ -4,11 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:masoul_kharid/Classes/Cards/wallet_card.dart';
+import 'package:masoul_kharid/Classes/Dialogs/error_dialog.dart';
 import 'package:masoul_kharid/Classes/orange_button.dart';
 import 'package:masoul_kharid/Constants/colors.dart';
 import 'package:masoul_kharid/Screens/BottomSheets/deposit.dart';
 import 'package:masoul_kharid/Screens/BottomSheets/withdraw_bsh.dart';
 import 'package:masoul_kharid/Screens/login_page.dart';
+import 'package:masoul_kharid/Screens/profile_screen.dart';
 import 'package:masoul_kharid/Services/storage_class.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 import 'package:intl/intl.dart' as intl;
@@ -188,7 +190,7 @@ class _WalletScreenState extends State<WalletScreen> {
     try {
       var response = await http.get(
           Uri.parse(
-              "https://testapi.carbon-family.com/api/market/history/deposits"),
+              "https://api.carbon-family.com/api/market/history/deposits"),
           headers: headers);
       if (response.statusCode == 200) {
         var data = response.body;
@@ -209,6 +211,22 @@ class _WalletScreenState extends State<WalletScreen> {
             LoginPage.id,
             (Route<dynamic> route) => false,
           );
+        }
+        if (response.statusCode == 403) {
+          showDialog(
+              context: context,
+              builder: (context) {
+                return ErrorDialog(
+                  errorText: 'شما دسترسی به این بخش را ندارید',
+                  onPressed: () {
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      ProfileScreen.id,
+                      (Route<dynamic> route) => false,
+                    );
+                  },
+                );
+              });
         }
         print(response.statusCode);
         print(response.body);
@@ -240,7 +258,7 @@ class _WalletScreenState extends State<WalletScreen> {
       try {
         final response = await http.get(
           Uri.parse(
-              "https://testapi.carbon-family.com/api/market/history/deposits?page=$depositPage"),
+              "https://api.carbon-family.com/api/market/history/deposits?page=$depositPage"),
           headers: headers,
         );
         final List<Map> fetchedPosts = [];
@@ -279,7 +297,7 @@ class _WalletScreenState extends State<WalletScreen> {
     try {
       var response = await http.get(
           Uri.parse(
-              "https://testapi.carbon-family.com/api/market/history/withdrawals"),
+              "https://api.carbon-family.com/api/market/history/withdrawals"),
           headers: headers);
       if (response.statusCode == 200) {
         var data = response.body;
@@ -293,6 +311,22 @@ class _WalletScreenState extends State<WalletScreen> {
         print(response.statusCode);
         print(response.body);
       } else {
+        if (response.statusCode == 403) {
+          showDialog(
+              context: context,
+              builder: (context) {
+                return ErrorDialog(
+                  errorText: 'شما دسترسی به این بخش را ندارید',
+                  onPressed: () {
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      ProfileScreen.id,
+                      (Route<dynamic> route) => false,
+                    );
+                  },
+                );
+              });
+        }
         print(response.statusCode);
         print(response.body);
       }
@@ -323,7 +357,7 @@ class _WalletScreenState extends State<WalletScreen> {
       try {
         final response = await http.get(
           Uri.parse(
-              "https://testapi.carbon-family.com/api/market/history/withdrawals?page=$withdrawalPage"),
+              "https://api.carbon-family.com/api/market/history/withdrawals?page=$withdrawalPage"),
           headers: headers,
         );
         final List<Map> fetchedPosts = [];
@@ -360,7 +394,7 @@ class _WalletScreenState extends State<WalletScreen> {
     try {
       var response = await http.get(
           Uri.parse(
-              "https://testapi.carbon-family.com/api/market/financial/balance"),
+              "https://api.carbon-family.com/api/market/financial/balance"),
           headers: headers);
       if (response.statusCode == 200) {
         var data = response.body;
@@ -371,6 +405,22 @@ class _WalletScreenState extends State<WalletScreen> {
         print(response.statusCode);
         print(response.body);
       } else {
+        if (response.statusCode == 403) {
+          showDialog(
+              context: context,
+              builder: (context) {
+                return ErrorDialog(
+                  errorText: 'شما دسترسی به این بخش را ندارید',
+                  onPressed: () {
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      ProfileScreen.id,
+                      (Route<dynamic> route) => false,
+                    );
+                  },
+                );
+              });
+        }
         print(response.statusCode);
         print(response.body);
       }
@@ -385,7 +435,7 @@ class _WalletScreenState extends State<WalletScreen> {
     try {
       var response = await http.get(
         Uri.parse(
-            "https://testapi.carbon-family.com/api/market/history/deposits/${Storage.depositId}"),
+            "https://api.carbon-family.com/api/market/history/deposits/${Storage.depositId}"),
         headers: headers,
       );
       if (response.statusCode == 200) {
@@ -405,6 +455,18 @@ class _WalletScreenState extends State<WalletScreen> {
         Gregorian g2 = Gregorian.fromDateTime(dateAndTime2);
         depositTAM = Jalali.fromGregorian(g2);
       } else {
+        if (response.statusCode == 403) {
+          showDialog(
+              context: context,
+              builder: (context) {
+                return ErrorDialog(
+                  errorText: 'شما دسترسی به این بخش را ندارید',
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                );
+              });
+        }
         print(response.body);
         print(response.statusCode);
       }
@@ -419,7 +481,7 @@ class _WalletScreenState extends State<WalletScreen> {
     try {
       var response = await http.get(
         Uri.parse(
-            "https://testapi.carbon-family.com/api/market/history/withdrawals/${Storage.withdrawalId}"),
+            "https://api.carbon-family.com/api/market/history/withdrawals/${Storage.withdrawalId}"),
         headers: headers,
       );
       if (response.statusCode == 200) {
@@ -440,6 +502,18 @@ class _WalletScreenState extends State<WalletScreen> {
         Gregorian g2 = Gregorian.fromDateTime(dateAndTime2);
         depositTAM = Jalali.fromGregorian(g2);
       } else {
+        if (response.statusCode == 403) {
+          showDialog(
+              context: context,
+              builder: (context) {
+                return ErrorDialog(
+                  errorText: 'شما دسترسی به این بخش را ندارید',
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                );
+              });
+        }
         print(response.body);
         print(response.statusCode);
       }
@@ -454,7 +528,7 @@ class _WalletScreenState extends State<WalletScreen> {
     try {
       var response = await http.get(
           Uri.parse(
-              "https://testapi.carbon-family.com/api/market/financial/bankAccounts"),
+              "https://api.carbon-family.com/api/market/financial/bankAccounts"),
           headers: headers);
       if (response.statusCode == 200) {
         var data = response.body;
@@ -561,85 +635,40 @@ class _WalletScreenState extends State<WalletScreen> {
                                       height: 130,
                                       width: 180,
                                       child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
                                         children: [
-                                          SizedBox(
-                                            height: 65,
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.stretch,
-                                              children: [
-                                                const Center(
-                                                  child: Text(
-                                                    'ارزش کل دارایی ها',
-                                                    style: TextStyle(
-                                                        fontFamily: "Dana",
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: Colors.white,
-                                                        fontSize: 10),
-                                                  ),
+                                          Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.stretch,
+                                            children: [
+                                              const Center(
+                                                child: Text(
+                                                  'ارزش کل دارایی ها',
+                                                  style: TextStyle(
+                                                      fontFamily: "Dana",
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Colors.white,
+                                                      fontSize: 12),
                                                 ),
-                                                Center(
-                                                  child: Text(
-                                                    intl.NumberFormat
-                                                            .decimalPattern()
-                                                        .format(totalBalance),
-                                                    style: const TextStyle(
-                                                        fontFamily: "IranYekan",
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: Colors.white,
-                                                        fontSize: 22),
-                                                  ),
+                                              ),
+                                              Center(
+                                                child: Text(
+                                                  intl.NumberFormat
+                                                          .decimalPattern()
+                                                      .format(totalBalance),
+                                                  style: const TextStyle(
+                                                      fontFamily: "IranYekan",
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Colors.white,
+                                                      fontSize: 32),
                                                 ),
-                                              ],
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            height: 65,
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                GestureDetector(
-                                                  onTap: () {
-                                                    showModalBottomSheet(
-                                                        context: context,
-                                                        builder: (context) =>
-                                                            const DepositBSH());
-                                                  },
-                                                  child: const SizedBox(
-                                                    height: 50,
-                                                    width: 40,
-                                                    child: Image(
-                                                      image: AssetImage(
-                                                        'images/Icons/DepositIcon.png',
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                const SizedBox(width: 10),
-                                                GestureDetector(
-                                                  onTap: () {
-                                                    showModalBottomSheet(
-                                                        context: context,
-                                                        builder: (context) =>
-                                                            const WithdrawBSH());
-                                                  },
-                                                  child: const SizedBox(
-                                                    height: 50,
-                                                    width: 40,
-                                                    child: Image(
-                                                      image: AssetImage(
-                                                        'images/Icons/WithdrawalIcon.png',
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
+                                              ),
+                                            ],
                                           ),
                                         ],
                                       ),
@@ -647,6 +676,71 @@ class _WalletScreenState extends State<WalletScreen> {
                                   )
                                 ],
                               ),
+                            ),
+                          ),
+                          SizedBox(
+                            height: 60,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                TextButton(
+                                  onPressed: () {
+                                    showModalBottomSheet(
+                                        context: context,
+                                        builder: (context) =>
+                                            const DepositBSH());
+                                  },
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFFFB341),
+                                      borderRadius: BorderRadius.circular(10.0),
+                                    ),
+                                    // width: 370.0,
+                                    height: 57.0,
+                                    width: 160,
+                                    child: const Center(
+                                      child: Text(
+                                        "واریز",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontFamily: 'Dana',
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    showModalBottomSheet(
+                                            context: context,
+                                            builder: (context) =>
+                                                const WithdrawBSH())
+                                        .then((_) => setState(() {
+                                              _refresh();
+                                            }));
+                                  },
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFFFB341),
+                                      borderRadius: BorderRadius.circular(10.0),
+                                    ),
+                                    // width: 370.0,
+                                    height: 57.0,
+                                    width: 160,
+                                    child: const Center(
+                                      child: Text(
+                                        "برداشت",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontFamily: 'Dana',
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                           const SizedBox(height: 10),

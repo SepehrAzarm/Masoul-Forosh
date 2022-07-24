@@ -4,6 +4,7 @@ import 'package:masoul_kharid/Classes/orange_button.dart';
 import 'package:masoul_kharid/Constants/colors.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:masoul_kharid/Screens/Employees/employe_list.dart';
 import 'package:masoul_kharid/Screens/login_page.dart';
 import 'package:masoul_kharid/Services/storage_class.dart';
 
@@ -59,7 +60,7 @@ class _EmployeeProfileState extends State<EmployeeProfile> {
     try {
       var response = await http.get(
         Uri.parse(
-            "https://testapi.carbon-family.com/api/market/users/${Storage.employeeId}"),
+            "https://api.carbon-family.com/api/market/users/${Storage.employeeId}"),
         headers: headers,
       );
       if (response.statusCode == 200) {
@@ -102,7 +103,7 @@ class _EmployeeProfileState extends State<EmployeeProfile> {
     try {
       var response = await http.get(
         Uri.parse(
-            "https://testapi.carbon-family.com/api/market/users/access/list"),
+            "https://api.carbon-family.com/api/market/users/access/list"),
         headers: headers,
       );
       if (response.statusCode == 200) {
@@ -141,7 +142,7 @@ class _EmployeeProfileState extends State<EmployeeProfile> {
     var body = jsonEncode(data);
     try {
       var response = await http.put(
-          Uri.parse("https://testapi.carbon-family.com/api/market/users"),
+          Uri.parse("https://api.carbon-family.com/api/market/users"),
           headers: headers,
           body: body);
       if (response.statusCode == 200) {
@@ -169,12 +170,12 @@ class _EmployeeProfileState extends State<EmployeeProfile> {
     };
     Map data = {
       "userId": Storage.employeeId,
-      "status": false,
+      "status": !status!,
     };
     var body = jsonEncode(data);
     try {
       var response = await http.put(
-          Uri.parse("https://testapi.carbon-family.com/api/market/users"),
+          Uri.parse("https://api.carbon-family.com/api/market/users"),
           headers: headers,
           body: body);
       if (response.statusCode == 200) {
@@ -190,6 +191,16 @@ class _EmployeeProfileState extends State<EmployeeProfile> {
       }
     } catch (e) {
       print(e);
+    }
+  }
+
+  profilePicFunc() {
+    if (image == null) {
+      return const AssetImage(
+        'images/staticImages/productStaticImage.jpg',
+      );
+    } else {
+      return NetworkImage('https://api.carbon-family.com/${image!}');
     }
   }
 
@@ -257,11 +268,7 @@ class _EmployeeProfileState extends State<EmployeeProfile> {
                                           height: 130,
                                           child: CircleAvatar(
                                             radius: 50,
-                                            backgroundImage: NetworkImage(image ==
-                                                    null
-                                                ? 'https://testapi.carbon-family.com/uploads/users/usersProfileImages/cacf6b802a0e391967d195af9d43b1cc_6246f113965272bf7ca06282_1648817834578.png'
-                                                : 'https://testapi.carbon-family.com/' +
-                                                    image!),
+                                            backgroundImage: profilePicFunc(),
                                           ),
                                         ),
                                         const SizedBox(width: 10),
@@ -297,7 +304,7 @@ class _EmployeeProfileState extends State<EmployeeProfile> {
                                                 child: Text(
                                                   status == true
                                                       ? 'فعال'
-                                                      : 'غیر فغال',
+                                                      : 'غیر فعال',
                                                   style: const TextStyle(
                                                     color: Color(0xFF414141),
                                                     fontFamily: 'Dana',
@@ -349,7 +356,7 @@ class _EmployeeProfileState extends State<EmployeeProfile> {
                           ),
                           const SizedBox(height: 40),
                           SizedBox(
-                            height: 250,
+                            height: accessListValues.length * 40,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -366,6 +373,8 @@ class _EmployeeProfileState extends State<EmployeeProfile> {
                                 ),
                                 Expanded(
                                   child: ListView.builder(
+                                      physics:
+                                          const NeverScrollableScrollPhysics(),
                                       itemCount: accessListValues.length,
                                       itemBuilder: (context, int index) {
                                         if (marketAdminUserAccess
@@ -391,6 +400,19 @@ class _EmployeeProfileState extends State<EmployeeProfile> {
                                                           .remove(
                                                               accessListKeys[
                                                                   index]);
+                                                    } else if (accessListKeys[
+                                                            index] ==
+                                                        "users") {
+                                                      for (var i = 0;
+                                                          i <
+                                                              accessListValues
+                                                                  .length;
+                                                          i++) {
+                                                        toggled.add(true);
+                                                      }
+                                                      marketAdminUserAccess
+                                                          .addAll(
+                                                              accessListKeys);
                                                     } else {
                                                       toggled.add(index);
                                                       marketAdminUserAccess.add(
@@ -507,7 +529,13 @@ class _EmployeeProfileState extends State<EmployeeProfile> {
                                                       errorText = null;
                                                       visible = false;
                                                     });
-                                                    Navigator.pop(context);
+                                                    Navigator
+                                                        .pushNamedAndRemoveUntil(
+                                                      context,
+                                                      EmployeeList.id,
+                                                      (Route<dynamic> route) =>
+                                                          false,
+                                                    );
                                                   })
                                             ],
                                           );
@@ -589,7 +617,13 @@ class _EmployeeProfileState extends State<EmployeeProfile> {
                                                       errorText = null;
                                                       visible = false;
                                                     });
-                                                    Navigator.pop(context);
+                                                    Navigator
+                                                        .pushNamedAndRemoveUntil(
+                                                      context,
+                                                      EmployeeList.id,
+                                                      (Route<dynamic> route) =>
+                                                          false,
+                                                    );
                                                   })
                                             ],
                                           );
@@ -602,10 +636,10 @@ class _EmployeeProfileState extends State<EmployeeProfile> {
                                 ),
                                 width: 370.0,
                                 height: 57.0,
-                                child: const Center(
+                                child: Center(
                                   child: Text(
-                                    'تعلیق',
-                                    style: TextStyle(
+                                    status == true ? 'تعلیق' : 'رفع تعلیق',
+                                    style: const TextStyle(
                                       color: Colors.white,
                                       fontFamily: 'Dana',
                                       fontWeight: FontWeight.bold,

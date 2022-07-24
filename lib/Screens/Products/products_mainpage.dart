@@ -53,7 +53,7 @@ class _ProductsMainPageState extends State<ProductsMainPage> {
     try {
       var response = await http.get(
         Uri.parse(
-            "https://testapi.carbon-family.com/api/market/products/${Storage.productId}"),
+            "https://api.carbon-family.com/api/market/products/${Storage.productId}"),
         headers: headers,
       );
       if (response.statusCode == 200) {
@@ -88,7 +88,7 @@ class _ProductsMainPageState extends State<ProductsMainPage> {
       );
     } else {
       return Image(
-        image: NetworkImage('https://testapi.carbon-family.com/${image[0]}'),
+        image: NetworkImage('https://api.carbon-family.com/${image[0]}'),
         fit: BoxFit.cover,
       );
     }

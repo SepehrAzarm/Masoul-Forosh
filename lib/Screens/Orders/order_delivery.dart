@@ -44,82 +44,8 @@ class _OrdersDeliveryConfirmationState
         'images/staticImages/ShopDefaultPic.png',
       );
     } else {
-      return NetworkImage('https://testapi.carbon-family.com/$profileImage');
+      return NetworkImage('https://api.carbon-family.com/$profileImage');
     }
-  }
-
-  showCourierDialog() {
-    return showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(20.0))),
-            content: SizedBox(
-              height: 100,
-              width: 300,
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.only(right: 12),
-                          height: kLabelTextContainerHeight,
-                          child: const TextFieldLabel(
-                              text: 'کد پیک را وارد نمائید '),
-                        ),
-                      ],
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: TextField(
-                        textInputAction: TextInputAction.next,
-                        keyboardType: TextInputType.number,
-                        // controller: _controllerPhoneNumber,
-                        cursorColor: kButtonOrangeColor,
-                        // textAlignVertical: TextAlignVertical.center,
-                        textAlign: TextAlign.center,
-                        onChanged: (String value) {
-                          verificationCode = value;
-                        },
-                        style: const TextStyle(
-                          fontFamily: 'IranYekan',
-                        ),
-                        decoration: textFieldDecorations(),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            actions: [
-              OrangeButton(
-                text: 'تحویل',
-                onPressed: () async {
-                  await getOrderAndCourierInfo();
-                  errorText != null
-                      ? showDialog(
-                          context: context,
-                          builder: (context) {
-                            return ErrorDialog(
-                              errorText: '$errorText',
-                              onPressed: () {
-                                setState(() {
-                                  errorText = null;
-                                });
-                                Navigator.pop(context);
-                              },
-                            );
-                          })
-                      : Navigator.pop(context);
-                },
-              ),
-            ],
-          );
-        });
   }
 
   String toStringFormatter(Jalali j) {
@@ -138,7 +64,7 @@ class _OrdersDeliveryConfirmationState
     try {
       var response = await http.get(
           Uri.parse(
-              "https://testapi.carbon-family.com/api/market/orders/delivery/$verificationCode"),
+              "https://api.carbon-family.com/api/market/orders/delivery/${Storage.courierVerficationCode}"),
           headers: headers);
       if (response.statusCode == 200) {
         var data = response.body;
@@ -185,7 +111,7 @@ class _OrdersDeliveryConfirmationState
     try {
       var response = await http.post(
         Uri.parse(
-            'https://testapi.carbon-family.com/api/market/orders/delivery/$verificationCode'),
+            'https://api.carbon-family.com/api/market/orders/delivery/${Storage.courierVerficationCode}'),
         headers: headers,
       );
       if (response.statusCode == 201) {
@@ -198,7 +124,7 @@ class _OrdersDeliveryConfirmationState
         });
         print(response.statusCode);
         print(response.body);
-        if (response.statusCode == 401) {
+        if (response.statusCode == 403) {
           // ignore: use_build_context_synchronously
           Navigator.pushNamedAndRemoveUntil(
             context,
@@ -214,186 +140,197 @@ class _OrdersDeliveryConfirmationState
 
   @override
   void initState() {
-    Future.delayed(Duration.zero, () {
-      showCourierDialog();
-    });
+    getOrderAndCourierInfo();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: 60,
-        centerTitle: true,
-        elevation: 0.5,
-        backgroundColor: Colors.white,
-        leading: const BackButton(
-          color: Colors.black,
-        ),
-        title: const Text(
-          'لیست سفارشات',
-          style: TextStyle(
-            fontFamily: "IranYekan",
-            fontWeight: FontWeight.bold,
+    return firstName == null
+        ? const Center(
+            child: CircularProgressIndicator(
             color: kOrangeColor,
-            fontSize: 17,
-          ),
-        ),
-      ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-          child: Container(
-            // color: Colors.amberAccent,
-            child: ListView(
-              children: [
-                Container(
-                  // color: Colors.pinkAccent,
-                  height: 300,
-                  child: Column(
+          ))
+        : Scaffold(
+            appBar: AppBar(
+              toolbarHeight: 60,
+              centerTitle: true,
+              elevation: 0.5,
+              backgroundColor: Colors.white,
+              leading: const BackButton(
+                color: Colors.black,
+              ),
+              title: const Text(
+                'لیست سفارشات',
+                style: TextStyle(
+                  fontFamily: "IranYekan",
+                  fontWeight: FontWeight.bold,
+                  color: kOrangeColor,
+                  fontSize: 17,
+                ),
+              ),
+            ),
+            body: SafeArea(
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                child: Container(
+                  // color: Colors.amberAccent,
+                  child: ListView(
                     children: [
                       Container(
+                        // color: Colors.pinkAccent,
                         height: 300,
-                        width: 300,
                         child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            CircleAvatar(
-                              backgroundColor: Colors.white,
-                              radius: 60,
-                              backgroundImage: courierPicInfo(),
-                            ),
-                            Column(
-                              children: [
-                                const Text(
-                                  'نام پیک',
-                                  style: TextStyle(
-                                    fontFamily: "Dana",
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF707070),
-                                    fontSize: 12,
+                            Container(
+                              height: 300,
+                              width: 300,
+                              child: Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  CircleAvatar(
+                                    backgroundColor: Colors.white,
+                                    radius: 60,
+                                    backgroundImage: courierPicInfo(),
                                   ),
-                                ),
-                                Text(
-                                  'آقای $firstName  $lastName',
-                                  style: const TextStyle(
-                                    fontFamily: "Dana",
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
-                                    fontSize: 18,
+                                  Column(
+                                    children: [
+                                      const Text(
+                                        'نام پیک',
+                                        style: TextStyle(
+                                          fontFamily: "Dana",
+                                          fontWeight: FontWeight.bold,
+                                          color: Color(0xFF707070),
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                      Text(
+                                        firstName == null
+                                            ? ''
+                                            : 'آقای $firstName  $lastName',
+                                        style: const TextStyle(
+                                          fontFamily: "Dana",
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                          fontSize: 18,
+                                        ),
+                                      )
+                                    ],
                                   ),
-                                )
-                              ],
-                            ),
-                            Column(
-                              children: [
-                                const Text(
-                                  'شماره تماس',
-                                  style: TextStyle(
-                                    fontFamily: "Dana",
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF707070),
-                                    fontSize: 12,
+                                  Column(
+                                    children: [
+                                      const Text(
+                                        'شماره تماس',
+                                        style: TextStyle(
+                                          fontFamily: "Dana",
+                                          fontWeight: FontWeight.bold,
+                                          color: Color(0xFF707070),
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                      Text(
+                                        mobile == null ? '' : '$mobile',
+                                        style: const TextStyle(
+                                          fontFamily: "IranYekan",
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                          fontSize: 18,
+                                        ),
+                                      )
+                                    ],
                                   ),
-                                ),
-                                Text(
-                                  '$mobile',
-                                  style: const TextStyle(
-                                    fontFamily: "IranYekan",
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
-                                    fontSize: 18,
-                                  ),
-                                )
-                              ],
+                                ],
+                              ),
                             ),
                           ],
+                        ),
+                      ),
+                      const Divider(
+                        height: 2,
+                        thickness: 1,
+                      ),
+                      const SizedBox(height: 10),
+                      Container(
+                        height: orderedItems.length * 85,
+                        child: ListView.builder(
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: orderedItems.length,
+                            itemBuilder: (context, int index) {
+                              Widget picFunc() {
+                                if (orderedItems[index]["shop"]["shopLogo"] ==
+                                    null) {
+                                  return const Image(
+                                    fit: BoxFit.cover,
+                                    image: AssetImage(
+                                      'images/staticImages/ShopDefaultPic.png',
+                                    ),
+                                  );
+                                } else {
+                                  return Image(
+                                    image: NetworkImage(
+                                        'https://api.carbon-family.com/${orderedItems[index]["shop"]["shopLogo"]}'),
+                                    fit: BoxFit.cover,
+                                  );
+                                }
+                              }
+
+                              var dateAndTime = DateTime.parse(
+                                      orderedItems[index]["createdAt"]!)
+                                  .toLocal();
+                              Gregorian g = Gregorian.fromDateTime(dateAndTime);
+                              j = Jalali.fromGregorian(g);
+                              return OrderListCard(
+                                shopName: orderedItems[index]["shop"]
+                                    ["shopName"],
+                                orderNumber: orderedItems[index]
+                                        ["invoiceNumber"]
+                                    .toString(),
+                                time: toStringFormatter(j),
+                                onTap: () {
+                                  Storage.orderId = orderedItems[index]["_id"];
+                                  Navigator.pushNamed(
+                                      context, OrderDetailScreen.id);
+                                },
+                                image: picFunc(),
+                              );
+                            }),
+                      ),
+                      Container(
+                        height: 100,
+                        // color: Colors.blueAccent,
+                        child: OrangeButton(
+                          text: 'تحویل',
+                          onPressed: () async {
+                            await postDeliveryConfirmation();
+                            errorText != null
+                                ? showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return ErrorDialog(
+                                        errorText: '$errorText',
+                                        onPressed: () {
+                                          setState(() {
+                                            errorText = null;
+                                          });
+                                          Navigator.pop(context);
+                                        },
+                                      );
+                                    })
+                                : Navigator.pushNamedAndRemoveUntil(
+                                    context,
+                                    OrdersList.id,
+                                    (Route<dynamic> route) => false,
+                                  );
+                          },
                         ),
                       ),
                     ],
                   ),
                 ),
-                const Divider(
-                  height: 2,
-                  thickness: 1,
-                ),
-                const SizedBox(height: 10),
-                Container(
-                  height: orderedItems.length * 85,
-                  child: ListView.builder(
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: orderedItems.length,
-                      itemBuilder: (context, int index) {
-                        Widget picFunc() {
-                          if (orderedItems[index]["shop"]["shopLogo"] == null) {
-                            return const Image(
-                              fit: BoxFit.cover,
-                              image: AssetImage(
-                                'images/staticImages/ShopDefaultPic.png',
-                              ),
-                            );
-                          } else {
-                            return Image(
-                              image: NetworkImage(
-                                  'https://testapi.carbon-family.com/${orderedItems[index]["shop"]["shopLogo"]}'),
-                              fit: BoxFit.cover,
-                            );
-                          }
-                        }
-
-                        var dateAndTime =
-                            DateTime.parse(orderedItems[index]["createdAt"]!)
-                                .toLocal();
-                        Gregorian g = Gregorian.fromDateTime(dateAndTime);
-                        j = Jalali.fromGregorian(g);
-                        return OrderListCard(
-                          shopName: orderedItems[index]["shop"]["shopName"],
-                          orderNumber:
-                              orderedItems[index]["invoiceNumber"].toString(),
-                          time: toStringFormatter(j),
-                          onTap: () {
-                            Storage.orderId = orderedItems[index]["_id"];
-                            Navigator.pushNamed(context, OrderDetailScreen.id);
-                          },
-                          image: picFunc(),
-                        );
-                      }),
-                ),
-                Container(
-                  height: 100,
-                  // color: Colors.blueAccent,
-                  child: OrangeButton(
-                    text: 'تحویل',
-                    onPressed: () async {
-                      await postDeliveryConfirmation();
-                      errorText != null
-                          ? showDialog(
-                              context: context,
-                              builder: (context) {
-                                return ErrorDialog(
-                                  errorText: '$errorText',
-                                  onPressed: () {
-                                    setState(() {
-                                      errorText = null;
-                                    });
-                                    Navigator.pop(context);
-                                  },
-                                );
-                              })
-                          : Navigator.pushNamedAndRemoveUntil(
-                              context,
-                              OrdersList.id,
-                              (Route<dynamic> route) => false,
-                            );
-                    },
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
-        ),
-      ),
-    );
+          );
   }
 }

@@ -35,7 +35,7 @@ class _WithdrawBSHState extends State<WithdrawBSH> {
     try {
       var response = await http.get(
           Uri.parse(
-              "https://testapi.carbon-family.com/api/market/financial/bankAccounts"),
+              "https://api.carbon-family.com/api/market/financial/bankAccounts"),
           headers: headers);
       if (response.statusCode == 200) {
         var data = response.body;
@@ -71,7 +71,7 @@ class _WithdrawBSHState extends State<WithdrawBSH> {
     try {
       var response = await http.post(
         Uri.parse(
-            'https://testapi.carbon-family.com/api/market/financial/withdrawal'),
+            'https://api.carbon-family.com/api/market/financial/withdrawal'),
         headers: headers,
         body: body,
       );
@@ -96,7 +96,7 @@ class _WithdrawBSHState extends State<WithdrawBSH> {
     try {
       var response = await http.get(
           Uri.parse(
-              "https://testapi.carbon-family.com/api/market/financial/balance"),
+              "https://api.carbon-family.com/api/market/financial/balance"),
           headers: headers);
       if (response.statusCode == 200) {
         var data = response.body;
@@ -277,6 +277,7 @@ class _WithdrawBSHState extends State<WithdrawBSH> {
                                                 if (toggled.contains(index)) {
                                                   toggled.clear();
                                                 } else {
+                                                  toggled.clear();
                                                   toggled.add(index);
                                                 }
                                                 bankAccountInfo =

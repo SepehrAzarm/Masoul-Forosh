@@ -44,7 +44,7 @@ class _LoginPageState extends State<LoginPage> {
     try {
       var response = await http.get(
         Uri.parse(
-            'https://testapi.carbon-family.com/api/market/authentication/verify'),
+            'https://api.carbon-family.com/api/market/authentication/verify'),
         headers: headers,
       );
       if (response.statusCode == 200) {
@@ -65,7 +65,7 @@ class _LoginPageState extends State<LoginPage> {
     try {
       var response = await http.post(
         Uri.parse(
-            'https://testapi.carbon-family.com/api/market/authentication/login'),
+            'https://api.carbon-family.com/api/market/authentication/login'),
         body: {
           'mobile': phoneNumber,
           'password': password,

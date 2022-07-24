@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:masoul_kharid/Classes/Cards/activity_log_card.dart';
 import 'package:masoul_kharid/Classes/Cards/employee_login_card.dart';
+import 'package:masoul_kharid/Classes/Dialogs/error_dialog.dart';
 import 'package:masoul_kharid/Classes/orange_button.dart';
 import 'package:masoul_kharid/Screens/login_page.dart';
+import 'package:masoul_kharid/Screens/profile_screen.dart';
 import 'package:masoul_kharid/Services/storage_class.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 import 'package:http/http.dart' as http;
@@ -53,7 +55,7 @@ class _EmployeeListsState extends State<EmployeeLists> {
     try {
       var response = await http.get(
           Uri.parse(
-              "https://testapi.carbon-family.com/api/market/history/login?page=$page"),
+              "https://api.carbon-family.com/api/market/history/login?page=$page"),
           headers: headers);
       if (response.statusCode == 200) {
         var data = response.body;
@@ -75,6 +77,22 @@ class _EmployeeListsState extends State<EmployeeLists> {
             LoginPage.id,
             (Route<dynamic> route) => false,
           );
+        }
+        if (response.statusCode == 403) {
+          showDialog(
+              context: context,
+              builder: (context) {
+                return ErrorDialog(
+                  errorText: 'شما دسترسی به این بخش را ندارید',
+                  onPressed: () {
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      ProfileScreen.id,
+                      (Route<dynamic> route) => false,
+                    );
+                  },
+                );
+              });
         }
       }
     } catch (e) {
@@ -104,7 +122,7 @@ class _EmployeeListsState extends State<EmployeeLists> {
       try {
         final response = await http.get(
           Uri.parse(
-              "https://testapi.carbon-family.com/api/market/history/login?page=$page"),
+              "https://api.carbon-family.com/api/market/history/login?page=$page"),
           headers: headers,
         );
         final List fetchedPosts = [];
@@ -147,7 +165,7 @@ class _EmployeeListsState extends State<EmployeeLists> {
     try {
       var response = await http.get(
           Uri.parse(
-              "https://testapi.carbon-family.com/api/market/history/userActionsLogs?page=$logPage"),
+              "https://api.carbon-family.com/api/market/history/userActionsLogs?page=$logPage"),
           headers: headers);
       if (response.statusCode == 200) {
         var data = response.body;
@@ -160,6 +178,22 @@ class _EmployeeListsState extends State<EmployeeLists> {
         print(response.statusCode);
         print(response.body);
       } else {
+        if (response.statusCode == 403) {
+          showDialog(
+              context: context,
+              builder: (context) {
+                return ErrorDialog(
+                  errorText: 'شما دسترسی به این بخش را ندارید',
+                  onPressed: () {
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      ProfileScreen.id,
+                      (Route<dynamic> route) => false,
+                    );
+                  },
+                );
+              });
+        }
         print(response.statusCode);
         print(response.body);
       }
@@ -189,7 +223,7 @@ class _EmployeeListsState extends State<EmployeeLists> {
       try {
         final response = await http.get(
           Uri.parse(
-              "https://testapi.carbon-family.com/api/market/history/userActionsLogs?page=$logPage"),
+              "https://api.carbon-family.com/api/market/history/userActionsLogs?page=$logPage"),
           headers: headers,
         );
         final List fetchedPosts = [];
@@ -231,7 +265,7 @@ class _EmployeeListsState extends State<EmployeeLists> {
     try {
       var response = await http.get(
           Uri.parse(
-              "https://testapi.carbon-family.com/api/market/history/userActionsLogs/${Storage.logId}"),
+              "https://api.carbon-family.com/api/market/history/userActionsLogs/${Storage.logId}"),
           headers: headers);
       if (response.statusCode == 200) {
         var data = response.body;

@@ -140,7 +140,7 @@ class _AddProductPageState extends State<AddProductPage> {
     var body = jsonEncode(data);
     try {
       var response = await http.post(
-        Uri.parse('https://testapi.carbon-family.com/api/market/products'),
+        Uri.parse('https://api.carbon-family.com/api/market/products'),
         headers: headers,
         body: body,
       );
@@ -161,6 +161,22 @@ class _AddProductPageState extends State<AddProductPage> {
             LoginPage.id,
             (Route<dynamic> route) => false,
           );
+        }
+        if (response.statusCode == 403) {
+          showDialog(
+              context: context,
+              builder: (context) {
+                return ErrorDialog(
+                  errorText: 'شما دسترسی به این بخش را ندارید',
+                  onPressed: () {
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      ProfileScreen.id,
+                      (Route<dynamic> route) => false,
+                    );
+                  },
+                );
+              });
         }
       }
     } catch (e) {
@@ -187,7 +203,7 @@ class _AddProductPageState extends State<AddProductPage> {
     try {
       var dioRequest = Dio();
       dioRequest.options.baseUrl =
-          'https://testapi.carbon-family.com/api/market/products/uploadImage';
+          'https://api.carbon-family.com/api/market/products/uploadImage';
       dioRequest.options.headers = {
         'token': value!,
         "Content-Type": "multipart/from-data",
@@ -201,7 +217,7 @@ class _AddProductPageState extends State<AddProductPage> {
         )
       });
       var response = await dioRequest.post(
-          'https://testapi.carbon-family.com/api/market/products/uploadImage',
+          'https://api.carbon-family.com/api/market/products/uploadImage',
           data: formData);
       if (response.statusCode == 201) {
         print(response.statusCode);
@@ -235,7 +251,7 @@ class _AddProductPageState extends State<AddProductPage> {
     } else {
       return Image(
         image: NetworkImage(
-          'https://testapi.carbon-family.com/${imagePath!}',
+          'https://api.carbon-family.com/${imagePath!}',
         ),
         fit: BoxFit.cover,
       );
@@ -253,7 +269,7 @@ class _AddProductPageState extends State<AddProductPage> {
     try {
       var response = await http.get(
         Uri.parse(
-                "https://testapi.carbon-family.com/api/public/global/productsCategories")
+                "https://api.carbon-family.com/api/public/global/productsCategories")
             .replace(queryParameters: queryParams),
         headers: headers,
       );

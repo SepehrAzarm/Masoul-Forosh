@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:masoul_kharid/Constants/colors.dart';
-import 'package:masoul_kharid/Constants/strings.dart';
 
 class AboutUsDialog extends StatelessWidget {
   const AboutUsDialog({
     Key? key,
+    required this.text,
   }) : super(key: key);
+  final String text;
 
   @override
   Widget build(BuildContext context) {
@@ -32,13 +33,13 @@ class AboutUsDialog extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 15),
           child: SizedBox(
-            height: 250,
+            height: 400,
             width: double.maxFinite,
             child: ListView(
-              children: const [
+              children: [
                 Text(
-                  kDefaultText,
-                  style: TextStyle(
+                  text,
+                  style: const TextStyle(
                     fontSize: 13,
                     fontFamily: 'IranYekan',
                     color: kGreyTextColor,

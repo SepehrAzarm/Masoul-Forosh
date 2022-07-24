@@ -75,7 +75,7 @@ class _FactorScreenState extends State<FactorScreen> {
     try {
       var response = await http.get(
           Uri.parse(
-              "https://testapi.carbon-family.com/api/market/invoices/${Storage.invoiceId}"),
+              "https://api.carbon-family.com/api/market/invoices/${Storage.invoiceId}"),
           headers: headers);
       if (response.statusCode == 200) {
         var data = response.body;
@@ -471,7 +471,7 @@ class _FactorScreenState extends State<FactorScreen> {
                                                             .spaceEvenly,
                                                     children: [
                                                       const Text(
-                                                        'وضعیت پرداخت',
+                                                        'وضعیت',
                                                         style: TextStyle(
                                                           fontWeight:
                                                               FontWeight.bold,
@@ -521,7 +521,7 @@ class _FactorScreenState extends State<FactorScreen> {
                                                             .spaceEvenly,
                                                     children: [
                                                       const Text(
-                                                        'زمان ایجاد تراکنش',
+                                                        "زمان ثبت سفارش",
                                                         style: TextStyle(
                                                           fontWeight:
                                                               FontWeight.bold,
@@ -561,14 +561,14 @@ class _FactorScreenState extends State<FactorScreen> {
                                                             .spaceEvenly,
                                                     children: [
                                                       const Text(
-                                                        'زمان تراکنش',
+                                                        "زمان پرداخت سفارش",
                                                         style: TextStyle(
                                                           fontWeight:
                                                               FontWeight.bold,
                                                           fontFamily:
                                                               'IranSans',
                                                           color: kOrangeColor,
-                                                          fontSize: 10,
+                                                          fontSize: 8,
                                                         ),
                                                       ),
                                                       Text(
